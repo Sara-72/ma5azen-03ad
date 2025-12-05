@@ -1,0 +1,149 @@
+body {
+    margin: 0;
+    font-family: "Cairo", sans-serif;
+    background: #f7f7f7;
+}
+
+
+/* PAGE LAYOUT */
+.page {
+   display: flex;
+    flex-direction: row;
+    padding: 20px;
+    gap: 40px;
+}
+
+.sidebar {
+    width: 260px;
+    background: white;
+    padding: 20px;
+    border-right: 3px solid #0a4266; /* بدل left */
+    box-shadow: 2px 0 8px rgba(0,0,0,0.1); /* ظل من اليمين للشمال */
+}
+
+
+
+.sidebar .username {
+    font-size: 18px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.sidebar .menu {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar .menu li {
+    padding: 12px 0;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.sidebar .menu li.active {
+    color: #0a4266;
+    font-weight: bold;
+    border-bottom: 2px solid #0a4266;
+}
+
+.save-btn {
+    width: 100%;
+    margin-top: 20px;
+    background: #0a4266;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+
+.table-section {
+    width: 65%;
+    position: relative;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+th, td {
+    border: 1px solid #000;
+    padding: 12px;
+    text-align: center;
+}
+
+input {
+    width: 90%;
+    height: 32px;
+    border: 2px solid #ccc;
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+
+
+.sidebar {
+    width: 260px;
+    background: white;
+    padding: 20px;
+    border-right: 3px solid #0a4266;
+}
+
+
+.table-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+
+.plus-btn,
+.minus-btn {
+    width: 45px;
+    height: 45px;
+    border: none;
+    border-radius: 50%;
+    background: #0a4266;
+    color: white;
+    font-size: 26px;
+    cursor: pointer;
+    margin-top: 300px;
+    transition: 0.2s;
+}
+
+.plus-btn:hover,
+.minus-btn:hover {
+    transform: scale(1.1);
+    background: #0c5a85;
+}
+
+
+table {
+    border-collapse: collapse;
+    width: 750px;
+    background: white;
+}
+
+table th, table td {
+    border: 1px solid #444;
+    padding: 10px;
+    text-align: center;
+}
+
+table input {
+    width: 120px;
+    height: 30px;
+    border: 1px solid #aaa;
+    border-radius: 6px;
+    padding: 5px;
+}
+
+
+
+
+
+
+

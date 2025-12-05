@@ -61,11 +61,11 @@
         </div>
     </div>
 
-    <button type="submit" [disabled]="isSubmitting()" class="submit-btn mt-4">
+    <button type="submit" [disabled]="isSubmitting() || simpleForm.invalid" class="submit-btn mt-4">
         @if (isSubmitting()) {
             جاري الإرسال...
         } @else {
-            إرسال
+        حفظ البيانات
         }
     </button>
 </form>
