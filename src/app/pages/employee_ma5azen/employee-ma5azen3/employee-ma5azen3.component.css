@@ -17,7 +17,7 @@ body {
     width: 260px;
     background: white;
     padding: 20px;
-    border-right: 3px solid #0a4266;
+    border-left: 1px solid #ddd;
     box-shadow: 2px 0 8px rgba(0,0,0,0.1);
 }
 
@@ -89,7 +89,7 @@ input {
     width: 260px;
     background: white;
     padding: 20px;
-    border-right: 3px solid #0a4266;
+    border-right: 3px solid #0a3a63;
 }
 
 
@@ -106,7 +106,7 @@ input {
     height: 45px;
     border: none;
     border-radius: 50%;
-    background: #0a4266;
+    background: #0a3a63;
     color: white;
     font-size: 26px;
     cursor: pointer;
