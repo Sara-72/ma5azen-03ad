@@ -17,8 +17,8 @@ body {
     width: 260px;
     background: white;
     padding: 20px;
-    border-right: 3px solid #0a4266; /* بدل left */
-    box-shadow: 2px 0 8px rgba(0,0,0,0.1); /* ظل من اليمين للشمال */
+    border-right: 3px solid #0a4266;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.1);
 }
 
 
@@ -41,9 +41,9 @@ body {
 }
 
 .sidebar .menu li.active {
-    color: #0a4266;
+     color: #0a3a63;
     font-weight: bold;
-    border-bottom: 2px solid #0a4266;
+    border-left: 4px solid #0a3a63;
 }
 
 .save-btn {
