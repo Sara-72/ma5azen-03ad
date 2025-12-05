@@ -1,0 +1,67 @@
+.body{
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #f7f7f7;
+
+}
+
+.main-contant {
+  display: flex;
+  justify-content: space-between;
+  padding: 40px 50px;
+}
+
+.table-section {
+  width: 60%;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+   background: white;
+
+}
+
+table th,table td {
+  border: 1px solid #000;
+  padding: 15px;
+  text-align: center;
+  font-size: 16px;
+}
+
+table input {
+  width: 90%;
+  height: 30px;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+}
+
+.sidebar {
+  width: 25%;
+  background: #ffffff;
+  padding: 20px;
+}
+
+.username {
+  font-size: 17px;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+.sidebar-menu ul {
+  list-style: none;
+  padding: 0;
+
+}
+
+.sidebar-menu ul li {
+  padding: 15px 0;
+  font-size: 17px;
+  border-bottom: 1px  solid #ccc;
+  cursor: pointer;
+}
+
+.sidebar-menu ul li.active {
+  color: #0a3a63;
+  border-left: 3px solid #0a3a63;
+}
