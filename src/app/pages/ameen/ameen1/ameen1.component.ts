@@ -58,10 +58,10 @@ export class Ameen1Component implements OnInit{
   // Helper function to create the form group for a single table row (4 columns)
   private createTableRowFormGroup(): FormGroup {
     return this.fb.group({
-      item: [''],
-      category: [''],
-      code: [''],
-      count: ['', Validators.required] // Making count required just as an example
+      item: ['',Validators.required],
+      category: ['',Validators.required],
+      code: ['',Validators.required],
+      count: ['', Validators.required] 
     });
   }
 

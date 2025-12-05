@@ -28,6 +28,68 @@
 </div>
 
 
+
+
+<form [formGroup]="inventoryLogForm" (ngSubmit)="onSubmit()" dir="rtl">
+
+    <div class="log-container">
+
+        <header class="log-header text-center">
+            <h2 class="text-center">يومية المخزن</h2>
+
+        </header>
+            <div class="storehouse-field">
+                <label>مخزن:</label>
+                <input type="text" formControlName="storehouseName" class="input-line">
+            </div>
+
+
+        <div class="table-section">
+            <table>
+                <thead>
+                    <tr>
+                        <th>التاريخ</th>
+                        <th>رقم الإذن</th>
+                        <th>وارد من / منصرف إلى</th>
+                        <th>قيمة الأصناف المضافة</th>
+                        <th>قيمة الأصناف المنصرفة</th>
+                        <th>ملاحظات</th>
+                    </tr>
+                </thead>
+
+                <tbody formArrayName="tableData">
+                    @for (rowGroup of tableData.controls; track $index) {
+                        <tr [formGroupName]="$index">
+                            <td><input type="text" formControlName="date" class="table-input"></td>
+                            <td><input type="text" formControlName="authorizationNumber" class="table-input"></td>
+                            <td><input type="text" formControlName="sourceOrDestination" class="table-input wide-col"></td>
+                            <td><input type="text" formControlName="addedValue" class="table-input"></td>
+                            <td><input type="text" formControlName="issuedValue" class="table-input"></td>
+                            <td><input type="text" formControlName="notes" class="table-input wide-col"></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="row-controls">
+                <button type="button" class="remove-row-button" (click)="removeRow()">-</button>
+                <button type="button" class="add-row-button" (click)="addRow()">+</button>
+            </div>
+        </div>
+
+        <div class="button-section">
+            <button type="submit" [disabled]="isSubmitting() || inventoryLogForm.invalid" class="submit-btn mt-5">
+                @if (isSubmitting()) {
+                    جاري الإرسال...
+                } @else {
+                    حفظ البيانات
+                }
+            </button>
+        </div>
+    </div>
+</form>
+
+
 <app-footer>
 </app-footer>
 

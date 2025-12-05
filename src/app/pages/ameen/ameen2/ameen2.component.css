@@ -45,3 +45,177 @@
 .side-element-r:hover a{
   color:var(--secondary-color);
 }
+
+
+
+/* Main Container and Header */
+.log-container {
+    width: 90%;
+    max-width: 1000px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+}
+.log-header {
+
+    align-items: center;
+    margin-bottom: 20px;
+}
+.log-header h2 {
+    font-size: 2em;
+    font-weight: bold;
+    margin: 0;
+}
+.storehouse-field {
+    display: flex;
+    align-items: center;
+}
+.storehouse-field label {
+    font-weight: bold;
+    margin-left: 10px;
+    white-space: nowrap;
+}
+.storehouse-field .input-line {
+    border: 1px solid #000;
+    height: 30px;
+    padding: 0 5px;
+    width: 150px;
+    border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    -ms-border-radius: 3px;
+    -o-border-radius: 3px;
+}
+
+/* Table Section and Positioning */
+.table-section {
+    position: relative;
+    margin-top: 20px;
+    padding-bottom: 30px;
+}
+.table-section table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #000;
+    table-layout: fixed;
+}
+.table-section th {
+    padding: 8px 5px;
+    border: 1px solid #000;
+    text-align: center;
+    background-color: #f0f0f0;
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+/* Adjusting Column Widths based on content */
+.table-section th:nth-child(1), /* التاريخ */
+.table-section th:nth-child(2), /* رقم الإذن */
+.table-section th:nth-child(4), /* قيمة الأصناف المضافة */
+.table-section th:nth-child(5) { /* قيمة الأصناف المنصرفة */
+    width: 12%;
+}
+.table-section th:nth-child(3), /* وارد من / منصرف إلى */
+.table-section th:nth-child(6) { /* ملاحظات */
+    width: 26%; /* Wider columns */
+}
+
+
+/* Input and Cell Styles */
+.table-section td {
+    padding: 2px;
+    border: 1px solid #000;
+    text-align: center;
+    height: 45px;
+}
+.table-input {
+    width: 100%;
+    height: calc(100% - 4px);
+    border: 1px solid #999;
+    background-color: white;
+    padding: 2px 5px;
+    box-sizing: border-box;
+    text-align: center;
+    border-radius: 3px;
+}
+.table-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+/* Dynamic Row Button Styles (Exact Overlap) */
+.add-row-button,
+.remove-row-button {
+    position: absolute;
+    bottom: -17.5px;
+    background-color: var(--primary-color);
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 33px;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+    z-index: 10;
+    padding: 0;
+}
+
+.add-row-button {
+    right: -17.5px;
+    font-size: 2em;
+}
+
+.remove-row-button {
+    left: -17.5px;
+    font-size: 2em;
+}
+
+/* --- Base Button Styles --- */
+
+.submit-btn {
+    /* General appearance and size */
+    padding: 10px 30px;
+    font-size: 1.1em;
+    font-weight: bold; /* Use the fw-medium from HTML */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s, opacity 0.2s; /* Smooth transitions */
+
+    /* Center text if not already centered by Bootstrap or other framework */
+    text-align: center;
+
+    /* Ensure text color is white as specified in HTML */
+    color: white;
+}
+
+/* --- Conditional Styles (Based on Form State) --- */
+
+/* Style for when the button is enabled and ready to submit (valid form) */
+/* Corresponds to the [class.bg-blue-600] binding */
+.submit-btn:not(:disabled) {
+    background-color: var(--primary-color);
+}
+
+/* Style for when the button is disabled (invalid form or submitting) */
+.submit-btn:disabled {
+
+    background-color:var(--black-color);
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+/* Style for hover effect (optional, only for enabled state) */
+.submit-btn:not(:disabled):hover {
+    background-color: var(--secondary-color);
+}
+
+/* Style for the "Processing..." state (optional) */
+.submit-btn:disabled.is-processing {
+    background-color: var(--secondary-color);
+
+}
