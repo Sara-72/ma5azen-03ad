@@ -47,7 +47,10 @@ a{
     cursor:default;
 }
 
-/***********************************************************************/
+
+
+/********************************************************/
+
 
 
 /* Basic Reset and RTL Setup */
@@ -213,49 +216,6 @@ a{
 }
 
 
-
-/* --- Base Button Styles --- */
-
-.submit-btn {
-    /* General appearance and size */
-    padding: 10px 30px;
-    font-size: 1.1em;
-    font-weight: bold; /* Use the fw-medium from HTML */
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.2s, opacity 0.2s; /* Smooth transitions */
-
-    /* Center text if not already centered by Bootstrap or other framework */
-    text-align: center;
-
-    /* Ensure text color is white as specified in HTML */
-    color: white;
-}
-
-/* --- Conditional Styles (Based on Form State) --- */
-
-/* Style for when the button is enabled and ready to submit (valid form) */
-/* Corresponds to the [class.bg-blue-600] binding */
-.submit-btn:not(:disabled) {
-    background-color: var(--primary-color);
-}
-
-/* Style for when the button is disabled (invalid form or submitting) */
-.submit-btn:disabled {
-    /* Corresponds to the [class.bg-blue-400] binding */
-    background-color:var(--black-color);
-    cursor: not-allowed;
-    opacity: 0.8;
-}
-
-/* Style for hover effect (optional, only for enabled state) */
-.submit-btn:not(:disabled):hover {
-    background-color: var(--secondary-color);
-}
-
-/* Style for the "Processing..." state (optional) */
-.submit-btn:disabled.is-processing {
-    background-color: var(--secondary-color); /* A neutral color while waiting */
-    /* Add animation or spin effect if desired */
+table ,th, td {
+  border: 1px solid black;
 }

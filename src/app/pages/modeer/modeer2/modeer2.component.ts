@@ -9,7 +9,7 @@ import { FooterComponent } from '../../../components/footer/footer.component';
 
 
 interface ConsumableRow {
-  itemNumber: string;
+
   itemName: string;
   unit: string;
   quantityRequired: string;
@@ -34,45 +34,54 @@ interface ConsumableRow {
 
 export class Modeer2Component implements OnInit {
 
+// --- PROPERTIES FOR DROPDOWN OPTIONS (New) ---
+  // Date Arrays
+  days: string[] = Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0')); // "01" to "31"
+  months: string[] = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0')); // "01" to "12"
+  years: string[] = Array.from({ length: 100 }, (_, i) => String(i).padStart(2, '0')); // "00" to "99" (Last 2 digits of year)
 
- // --- PROPERTIES ---
+  // Item Name and Condition Arrays (Example data - replace with your actual options)
+  itemNames: string[] = ['أثاث', 'قرطاسية', 'إلكترونيات', 'أدوات نظافة'];
+  itemConditions: string[] = ['جديدة', 'مستعمل', 'قابل للإصلاح', 'كهنة أو خردة'];
+
+
+  // --- FORM PROPERTIES ---
   tableRows: ConsumableRow[] = [this.createEmptyRow()];
-  consumableForm!: FormGroup; // Use '!' for non-null assertion, initialized in constructor
-  isSubmitting = signal(false); // 💡 signal imported now
+  consumableForm!: FormGroup;
+  isSubmitting = signal(false);
 
   // --- DEPENDENCY INJECTION ---
   private router = inject(Router);
   private fb = inject(FormBuilder);
-  // private apiService = inject(ApiService);
 
   // --- CONSTRUCTOR & INITIALIZATION ---
-
-  //  Constructor is REQUIRED to initialize FormGroup using FormBuilder
   constructor() {
     this.consumableForm = this.fb.group({
-      // Top Info Section Fields (Add actual fields based on your form image)
+      // Top Info Section Fields - ALL REQUIRED
       destinationName: ['', Validators.required],
       storehouse: ['', Validators.required],
+
+      // Date Groups - Now relying on selection (dropdowns)
       requestDateGroup: this.fb.group({
-          yy: ['', [Validators.required, Validators.pattern('[0-9]{2}')]],
-          mm: ['', [Validators.required, Validators.pattern('[0-9]{2}')]],
-          dd: ['', [Validators.required, Validators.pattern('[0-9]{2}')]]
+          yy: ['', Validators.required],
+          mm: ['', Validators.required],
+          dd: ['', Validators.required]
       }),
       regularDateGroup: this.fb.group({
-          yy: ['', [Validators.required, Validators.pattern('[0-9]{2}')]],
-          mm: ['', [Validators.required, Validators.pattern('[0-9]{2}')]],
-          dd: ['', [Validators.required, Validators.pattern('[0-9]{2}')]]
+          yy: ['', Validators.required],
+          mm: ['', Validators.required],
+          dd: ['', Validators.required]
       }),
-      authorizationNumber: ['', Validators.required],
-      requestorName: ['', Validators.required],
-      documentNumber: [''],
+
+
+      requestorName: ['', Validators.required], // Matches 'اسم الطالب'
+      documentNumber: ['', Validators.required], // Matches 'سند الصرف'
 
       // Table Data using FormArray
       tableData: this.fb.array([])
     });
   }
 
-  //  ngOnInit is REQUIRED when implementing OnInit (even if empty)
   ngOnInit(): void {
     // Initialize the FormArray with the initial row data
     this.tableRows.forEach(() => {
@@ -88,69 +97,65 @@ export class Modeer2Component implements OnInit {
   // Helper function to create the form group for a single table row
   private createTableRowFormGroup(): FormGroup {
     return this.fb.group({
-      itemNumber: [''],
-      itemName: [''],
-      unit: [''],
-      quantityRequired: [''],
-      quantityAuthorized: [''],
-      quantityIssued: [''],
-      itemCondition: [''],
-      unitPrice: [''],
-      value: ['']
+      // MANDATORY FIELDS FOR VALIDATION
+
+      itemName: ['', Validators.required], // اسم الصنف (Dropdown)
+      unit: ['', Validators.required], // الوحدة
+      quantityRequired: ['', Validators.required], // الكمية المطلوبة
+
+      // OPTIONAL FIELDS
+      quantityAuthorized: [''], // الكمية المصرح بها
+      quantityIssued: [''], // الكمية المنصرفة
+      itemCondition: [''], // حالة الصنف (Dropdown - made optional but selection still works)
+      unitPrice: [''], // سعر الوحدة
+      value: [''] // القيمة
     });
   }
 
-  // Helper function to create an empty row object (for display/interface consistency)
+  // Helper function to create an empty row object
   private createEmptyRow(): ConsumableRow {
-    // ... (same as your original)
     return {
-        itemNumber: '', itemName: '', unit: '', quantityRequired: '',
+        itemName: '', unit: '', quantityRequired: '',
         quantityAuthorized: '', quantityIssued: '', itemCondition: '',
         unitPrice: '', value: ''
     };
   }
 
-  // --- ROW MANAGEMENT LOGIC (Synchronized with FormArray) ---
-
-  // ➕ Method to add a new row
+  // --- ROW MANAGEMENT LOGIC ---
   addRow(): void {
     this.tableRows.push(this.createEmptyRow());
-    this.tableData.push(this.createTableRowFormGroup()); // Add corresponding FormGroup
+    this.tableData.push(this.createTableRowFormGroup());
   }
 
-  // ➖ Method to remove the last row
   removeRow(): void {
     if (this.tableRows.length > 1) {
       this.tableRows.pop();
-      this.tableData.removeAt(this.tableData.length - 1); // Remove corresponding FormGroup
+      this.tableData.removeAt(this.tableData.length - 1);
     } else if (this.tableRows.length === 1) {
-      this.tableRows[0] = this.createEmptyRow();
-      this.tableData.at(0).reset(); // Clear data in the single remaining FormGroup
+      // Clear data in the single remaining FormGroup but don't remove the row
+      this.tableData.at(0).reset();
     }
   }
 
   // --- SAVE BUTTON LOGIC ---
-
   onSubmit(): void {
     if (this.consumableForm.invalid) {
+      // Marks all controls as touched to display validation errors
       this.consumableForm.markAllAsTouched();
       console.warn('Form is invalid. Cannot submit.');
       return;
     }
 
-    this.isSubmitting.set(true); // Disable the button
+    this.isSubmitting.set(true);
     const formData = this.consumableForm.value;
     console.log('Sending Form Data:', formData);
 
-    // --- ACTUAL API CALL OR PLACEHOLDER ---
-    // Example: Replace this setTimeout with your apiService call
     setTimeout(() => {
       console.log('Request submitted successfully!');
       this.isSubmitting.set(false);
-      // Navigate to a confirmation page or /ameen3
-      
     }, 2000);
+  }
     // -------------------------------------
   }
 
-}
+

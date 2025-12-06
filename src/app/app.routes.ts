@@ -12,6 +12,8 @@ import { Ameen2Component } from './pages/ameen/ameen2/ameen2.component';
 import { Ameen3Component } from './pages/ameen/ameen3/ameen3.component';
 import { Modeer1Component } from './pages/modeer/modeer1/modeer1.component';
 import { Modeer2Component } from './pages/modeer/modeer2/modeer2.component';
+import { Modeer3Component } from './pages/modeer/modeer3/modeer3.component';
+import { Modeer4Component } from './pages/modeer/modeer4/modeer4.component';
 import { Employee1Component } from './pages/employee/employee1/employee1.component';
 import { Employee2Component } from './pages/employee/employee2/employee2.component';
 import { EmployeeMa5azen1Component } from './pages/employee_ma5azen/employee-ma5azen1/employee-ma5azen1.component';
@@ -34,12 +36,14 @@ export const routes: Routes = [
   { path: 'ameen3', component: Ameen3Component, title: 'ameen3'},
   { path: 'modeer1', component: Modeer1Component, title: 'modeer1'},
   { path: 'modeer2', component: Modeer2Component, title: 'modeer2'},
+  { path: 'modeer3', component: Modeer3Component, title: 'modeer3'},
+  { path: 'modeer4', component: Modeer4Component, title: 'modeer4'},
   { path: 'employee1', component: Employee1Component, title: 'employee1'},
   { path: 'employee2', component: Employee2Component, title: 'employee2'},
-  { path: 'employee_ma3azen1', component: EmployeeMa5azen1Component, title: 'employee_ma3azen1'},
-  { path: 'employee_ma3azen2', component: EmployeeMa5azen2Component, title: 'employee_ma3azen2'},
-  { path: 'employee_ma3azen3', component: EmployeeMa5azen3Component, title: 'employee_ma3azen3'},
-  { path: 'employee_ma3azen4', component:EmployeeMa5azen4Component , title:'employee_ma3azen4'},
+  { path: 'employee_ma5azen1', component: EmployeeMa5azen1Component, title: 'employee_ma5azen1'},
+  { path: 'employee_ma5azen2', component: EmployeeMa5azen2Component, title: 'employee_ma5azen2'},
+  { path: 'employee_ma5azen3', component: EmployeeMa5azen3Component, title: 'employee_ma5azen3'},
+  { path: 'employee_ma5azen4', component:EmployeeMa5azen4Component , title:'employee_ma5azen4'},
   { path: 'elda3m' , component :Elda3mComponent , title:'elda3m'}
 
 
