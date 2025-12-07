@@ -13,8 +13,8 @@ export class HomeComponent {
 
 
   goToLogin() {
-    
-    this.router.navigate(['/login']);
+
+    this.router.navigate(['/login5']);
     console.log('Navigating to login page...');
   }
 

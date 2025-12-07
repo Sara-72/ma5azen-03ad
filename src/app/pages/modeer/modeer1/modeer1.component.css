@@ -62,12 +62,12 @@ table {
   /* Set the table to take full width of its container */
   width: 100%;
   border-collapse: collapse; /* Essential for clean borders */
-  border: 1px solid #000; /* Main outer border */
+  border: 1px solid #dee2e6 ; /* Main outer border */
 }
 
 th, td {
   /* Style for all header and data cells */
-  border: 2px solid #000;
+  border: 2px solid #dee2e6 ;
   padding: 30px;
   text-align: center; /* Center text alignment */
   height: 85px;

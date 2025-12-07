@@ -28,7 +28,7 @@ import { Elda3mComponent } from './pages/elda3m/elda3m.component';
 
 export const routes: Routes = [
 
-  { path: '', component: HomeComponent, title: 'Home' },
+  { path: 'home', component: HomeComponent, title: 'home'},
   { path: 'login', component: LoginPageComponent, title: 'Login' },
   { path: 'login2', component:Login2PageComponent, title: 'Login2' },
   { path: 'login3', component: Login3PageComponent, title: 'Login3' },
