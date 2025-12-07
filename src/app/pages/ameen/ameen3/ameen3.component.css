@@ -46,3 +46,186 @@ a{
     border-left: 4px solid #0a3a63;
     cursor:default;
 }
+
+
+
+
+/**********************************************/
+
+
+
+
+
+
+/* Basic Reset and RTL Setup */
+.form-container {
+    width: 800px;
+    margin: 30px auto;
+    padding: 20px;
+    border: 1px solid #000;
+    font-family: Arial, sans-serif;
+    direction: rtl; /* Crucial for Arabic layout */
+}
+
+/* Header Styling */
+.form-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form-header .title {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.form-header .subtitle {
+    font-size: 1.2em;
+    font-weight: normal;
+    margin-top: 0;
+}
+
+/* Info Section Styling (Fields at the top) */
+.info-section .row {
+    display: flex;
+    justify-content: flex-end; /* Align fields to the right */
+    margin-bottom: 10px;
+}
+
+.info-section .field {
+    display: flex;
+    align-items: center;
+    margin-right: 15px; /* Spacing between fields */
+    white-space: nowrap;
+}
+
+.info-section .field label {
+    font-weight: bold;
+    margin-left: 5px; /* Space between label and input */
+}
+
+.info-section .input-line {
+    border: 1px solid #000;
+    border-radius: 3px;
+    height: 25px;
+    width: 150px;
+}
+
+.info-section .input-box {
+    border: 1px solid #000;
+    border-radius: 3px;
+    height: 25px;
+    width: 48px;
+    margin-left: 5px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    -ms-border-radius: 3px;
+    -o-border-radius: 3px;
+}
+
+.info-section .field.wide .input-line {
+    width: 500px; /* Make the wide fields span across the form */
+}
+
+/* Main Table Styling */
+.table-section {
+    position: relative;
+    margin-top: 20px;
+    border: 1px solid #000;
+    border-radius: 3px;
+}
+
+.table-section table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-section th, .table-section td {
+    border: 1px solid #000;
+    border-radius: 3px;
+    padding: 5px;
+    text-align: center;
+    height: 40px; /* Set a standard cell height */
+}
+
+.table-section th {
+    background-color: #f0f0f0;
+    font-size: 0.9em;
+    padding: 10px 5px;
+}
+
+.table-section .table-input {
+    width: 90%;
+    border: none;
+    text-align: center;
+    height: 30px;
+}
+
+.remove-row-button {
+    position: absolute;
+    bottom: -15px;
+    left: -15px; /* Adjust position for RTL context */
+    background-color:var(--primary-color);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 28px;
+    font-size: 1.5em;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.add-row-button {
+    position: absolute;
+    bottom: -15px;
+    right: -15px; /* Adjust position for RTL context */
+    background-color:var(--primary-color);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 28px;
+    font-size: 1.5em;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Signature Section Styling */
+.signature-section {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 50px;
+    padding-bottom: 20px;
+}
+
+.signature-section div {
+
+    text-align: center;
+    /* border-bottom: 1px dotted #000; Dotted line for signature */
+    padding-bottom: 15px;
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+/* Footnotes Styling */
+.footnotes {
+    margin-top: 20px;
+    font-size: 0.8em;
+    line-height: 1.5;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+}
+
+
+table ,th, td {
+  border:1px solid black;
+}
+
+td{
+  padding: 5px;
+  text-align: center;
+  height: 35px;
+}

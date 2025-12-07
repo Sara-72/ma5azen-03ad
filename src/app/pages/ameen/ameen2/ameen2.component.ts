@@ -44,11 +44,11 @@ export class Ameen2Component implements OnInit {
   private createTableRowFormGroup(): FormGroup {
     return this.fb.group({
       date: ['',Validators.required],             // التاريخ
-      authorizationNumber: ['',Validators.required], // رقم الإذن
+
       sourceOrDestination: ['',Validators.required], // وارد من / منصرف إلى
       addedValue: ['',Validators.required],       // قيمة الأصناف المضافة
       issuedValue: ['',Validators.required],      // قيمة الأصناف المنصرفة
-      notes: ['',Validators.required],            // ملاحظات
+            
 
     });
   }

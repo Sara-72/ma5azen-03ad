@@ -110,7 +110,12 @@
         <div class="row">
             <div class="field">
                 <label>(*) سند الصرف :</label>
-                <input type="text" formControlName="documentNumber" class="input-line">
+                  <select formControlName="documentNumber" class="table-input">
+                                <option value="" disabled selected hidden>الحالة</option>
+                                @for (condition of documentNumbers; track condition) {
+                                    <option [value]="condition">{{ condition }}</option>
+                                }
+                  </select>
             </div>
         </div>
     </div>
@@ -193,7 +198,7 @@
 <div class="button-section">
         <button type="submit" [disabled]="isSubmitting() || consumableForm.invalid" class="submit-btn text-white fw-medium p-3 fs-5">
             @if (isSubmitting()) {
-                جاري المعالجة...
+                جاري الحفظ...
             } @else {
 
 حفظ الاذن

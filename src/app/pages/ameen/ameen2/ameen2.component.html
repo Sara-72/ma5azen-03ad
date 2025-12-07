@@ -3,12 +3,15 @@
 </app-header>
 
 
+
+<div class="d-flex">
 <aside class="sidebar">
             <h5>مرحباً أستاذ/ة محمد أحمد</h5>
             <ul class="mt-5">
                 <li><a href="/ameen1">المخزن</a></li>
                 <li class="active"><a >دفتر اليومية</a></li>
                 <li><a href="/ameen3">أذونات الصرف</a></li>
+                <li><a href="/ameen4">دفاتر اليومية</a></li>
 
             </ul>
         </aside>
@@ -34,11 +37,11 @@
                 <thead>
                     <tr>
                         <th>التاريخ</th>
-                        <th>رقم الإذن</th>
+
                         <th>وارد من / منصرف إلى</th>
                         <th>قيمة الأصناف المضافة</th>
                         <th>قيمة الأصناف المنصرفة</th>
-                        <th>ملاحظات</th>
+
                     </tr>
                 </thead>
 
@@ -46,11 +49,11 @@
                     @for (rowGroup of tableData.controls; track $index) {
                         <tr [formGroupName]="$index">
                             <td><input type="text" formControlName="date" class="table-input"></td>
-                            <td><input type="text" formControlName="authorizationNumber" class="table-input"></td>
+
                             <td><input type="text" formControlName="sourceOrDestination" class="table-input wide-col"></td>
                             <td><input type="text" formControlName="addedValue" class="table-input"></td>
                             <td><input type="text" formControlName="issuedValue" class="table-input"></td>
-                            <td><input type="text" formControlName="notes" class="table-input wide-col"></td>
+
                         </tr>
                     }
                 </tbody>
@@ -65,7 +68,7 @@
         <div class="button-section">
             <button type="submit" [disabled]="isSubmitting() || inventoryLogForm.invalid" class="submit-btn mt-5">
                 @if (isSubmitting()) {
-                    جاري الإرسال...
+                    جاري الحفظ...
                 } @else {
                     حفظ البيانات
                 }
@@ -73,6 +76,10 @@
         </div>
     </div>
 </form>
+
+
+</div>
+
 
 
 <app-footer>

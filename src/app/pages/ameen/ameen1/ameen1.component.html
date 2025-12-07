@@ -13,6 +13,7 @@
                 <li class="active"><a>المخزن</a></li>
                 <li><a href="/ameen2">دفتر اليومية</a></li>
                 <li><a href="/ameen3">أذونات الصرف</a></li>
+                <li><a href="/ameen4">دفاتر اليومية</a></li>
 
             </ul>
         </aside>
@@ -24,19 +25,57 @@
         <table>
             <thead>
                 <tr>
-                    <th>الصنف</th>
+
+                    <th>التاريخ</th>
                     <th>الفئة</th>
-                    <th>الكود</th>
+                    <th>الصنف</th>
                     <th>العدد</th>
+
                 </tr>
             </thead>
 
             <tbody formArrayName="tableData">
                 @for (rowGroup of tableData.controls; track $index) {
                     <tr [formGroupName]="$index">
-                        <td><input type="text" formControlName="item" class="table-input"></td>
-                        <td><input type="text" formControlName="category" class="table-input"></td>
-                        <td><input type="text" formControlName="code" class="table-input"></td>
+
+
+                      <td formGroupName="dateGroup" class="date-cell">
+                        <div class="d-flex justify-content-center align-items-center h-100">
+                            <select formControlName="dd" class="table-input date-select">
+                                <option value="" disabled selected hidden>DD</option>
+                                @for (day of days; track day) { <option [value]="day">{{ day }}</option> }
+                            </select>
+                            /
+                            <select formControlName="mm" class="table-input date-select">
+                                <option value="" disabled selected hidden>MM</option>
+                                @for (month of months; track month) { <option [value]="month">{{ month }}</option> }
+                            </select>
+                            /
+                            <select formControlName="yy" class="table-input date-select">
+                                <option value="" disabled selected hidden>YY</option>
+                                @for (year of years; track year) { <option [value]="year">{{ year }}</option> }
+                            </select>
+                        </div>
+                    </td>
+
+                  <td>
+                        <select formControlName="category" class="table-input">
+                            <option value="" disabled selected hidden>اختر فئة</option>
+                            @for (category of categories; track category) {
+                                <option [value]="category">{{ category }}</option>
+                            }
+                        </select>
+                    </td>
+
+                    <td>
+                        <select formControlName="item" class="table-input">
+                            <option [ngValue]="null" disabled selected hidden>اختر صنف</option>
+                            @for (item of availableItemsByRow[$index]; track item) {
+                                <option [value]="item">{{ item }}</option>
+                            }
+                        </select>
+                    </td>
+
                         <td><input type="text" formControlName="count" class="table-input"></td>
                     </tr>
                 }
@@ -51,7 +90,7 @@
 
     <button type="submit" [disabled]="isSubmitting() || simpleForm.invalid" class="submit-btn mt-4">
         @if (isSubmitting()) {
-            جاري الإرسال...
+            جاري الحفظ...
         } @else {
         حفظ البيانات
         }

@@ -259,3 +259,11 @@ a{
     background-color: var(--secondary-color); /* A neutral color while waiting */
     /* Add animation or spin effect if desired */
 }
+
+
+select{
+  background-color: white;
+  border:1px solid black;
+  padding:0.5%;
+}
+

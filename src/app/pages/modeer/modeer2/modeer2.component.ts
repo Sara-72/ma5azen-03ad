@@ -38,11 +38,12 @@ export class Modeer2Component implements OnInit {
   // Date Arrays
   days: string[] = Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0')); // "01" to "31"
   months: string[] = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0')); // "01" to "12"
-  years: string[] = Array.from({ length: 100 }, (_, i) => String(i).padStart(2, '0')); // "00" to "99" (Last 2 digits of year)
+  years: string[] = Array.from({ length: 100 }, (_, i) => String(2000 + i));// "00" to "99" (Last 2 digits of year)
 
   // Item Name and Condition Arrays (Example data - replace with your actual options)
   itemNames: string[] = ['أثاث', 'قرطاسية', 'إلكترونيات', 'أدوات نظافة'];
   itemConditions: string[] = ['جديدة', 'مستعمل', 'قابل للإصلاح', 'كهنة أو خردة'];
+  documentNumbers:string[]=[' كشف العجز',' سند خصم' ,' أصناف تالفة أو تالفة ',' محضر بيع جلب تشغيل-',' إهداءات ليست للنشاط الرئيسي للجهة']
 
 
   // --- FORM PROPERTIES ---

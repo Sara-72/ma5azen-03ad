@@ -14,12 +14,12 @@
       <ul class="nav nav-tabs mt-4">
 
               <li class="nav-item">
-                <a class="nav-link" aria-current="page" href="/login5"><i class="fa-solid fa-user"></i> مسئول </a>
+                <a class="nav-link active" aria-current="page" href="/login5"><i class="fa-solid fa-user"></i> مسئول </a>
               </li>
 
 
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="/login"><i class="fa-solid fa-user"></i> موظف </a>
+                <a class="nav-link " aria-current="page" href="/login"><i class="fa-solid fa-user"></i> موظف </a>
               </li>
 
               <li class="nav-item">
@@ -95,47 +95,6 @@
 
         </div>
 
-
-        <div class="form-check d-flex flex-row mt-2" id="collegeGroup">
-
-          <label class="block text-sm font-bold text-gray-700 mb-2">
-            اختر الكلية   :&nbsp;&nbsp;&nbsp;<span [class.text-red-500]="isInvalid('college')" class="font-normal text-xs"></span>
-            </label>
-
-              <input id="college-education" class="form-check-input ms-1" type="radio" name="college" formControlName="college" value="education"
-              (change)="loginForm.get('college')?.markAsTouched()">
-              <label class="form-check-label mx-2" for="college-education">
-                    كلية التربية
-              </label>
-
-              <input id="college-csai" class="form-check-input ms-1" type="radio" name="college" formControlName="college" value="csai"
-              (change)="loginForm.get('college')?.markAsTouched()">
-              <label class="form-check-label mx-2" for="college-csai">
-                    كلية الحاسبات و الذكاء الاصطناعي
-              </label>
-
-              <input id="college-alsun"  class="form-check-input ms-1" type="radio" name="college" formControlName="college"  value="alsun"
-              (change)="loginForm.get('college')?.markAsTouched()">
-              <label class="form-check-label mx-2" for="college-alsun">
-                    كلية الألسن
-              </label>
-
-              <input id="college-tourism" class="form-check-input ms-1" type="radio" name="college" formControlName="college" value="tourism"
-              (change)="loginForm.get('college')?.markAsTouched()">
-              <label class="form-check-label mx-2" for="college-tourism">
-                    كلية السياحة و الفنادق
-              </label>
-
-
-
-            @if (isInvalid('college')) {
-              <div class="mt-1 text-xs text-red-600 font-medium text-right" dir="rtl">
-                <span>يجب اختيار كلية واحدة على الأقل. (A college selection is required.)</span>
-              </div>
-            }
-
-
-        </div>
 
 
           <div class="button mt-4">

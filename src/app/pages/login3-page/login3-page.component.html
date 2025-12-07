@@ -14,6 +14,11 @@
       <ul class="nav nav-tabs mt-4">
 
               <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="/login5"><i class="fa-solid fa-user"></i> مسئول </a>
+              </li>
+
+
+              <li class="nav-item">
                 <a class="nav-link" aria-current="page" href="/login" ><i class="fa-solid fa-user"></i> موظف </a>
               </li>
 
@@ -112,6 +117,14 @@
               <label class="form-check-label mx-2" for="college-tourism">
                     كلية السياحة و الفنادق
               </label>
+
+
+                            <input id="markazi" class="form-check-input ms-1" type="radio"  name="college" formControlName="college" value="markazi"
+              (change)="loginForm.get('college')?.markAsTouched()">
+              <label class="form-check-label mx-2" for="markazi">
+مركزية
+</label>
+
 
               @if (isInvalid('college')) {
               <div class="mt-1 text-xs text-red-600 font-medium text-right" dir="rtl">

@@ -1,0 +1,57 @@
+
+.u-logo{
+  width:100px;
+  height:100px;
+}
+
+
+.login-box{
+  width:650px;
+  height: 500px;
+
+}
+
+.nav-tabs {
+  --bs-nav-tabs-border-color: var(--secondary-color);
+}
+
+.nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+  border-color: var(--secondary-color);
+
+}
+.nav-link {
+  color:black;
+  transition: 0.3s;
+  -webkit-transition: 0.3s;
+  -moz-transition: 0.3s;
+  -ms-transition: 0.3s;
+  -o-transition: 0.3s;
+}
+.nav-tabs .nav-link:focus, .nav-tabs .nav-link:hover {
+  color:var(--secondary-color);
+}
+
+
+.form-check-input:checked{
+  background-color: var(--primary-color);
+}
+
+label{
+  white-space: nowrap;
+}
+
+.btn{
+  background-color: var(--primary-color);
+
+  transition: 0.5s;
+  -webkit-transition: 0.5s;
+  -moz-transition: 0.5s;
+  -ms-transition: 0.5s;
+  -o-transition: 0.5s;
+
+  width: 100%;
+}
+
+.btn:hover{
+  background-color: var(--secondary-color);
+}

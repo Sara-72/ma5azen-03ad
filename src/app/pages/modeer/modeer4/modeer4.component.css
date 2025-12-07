@@ -200,7 +200,7 @@ a{
 .signature-section div {
 
     text-align: center;
-    border-bottom: 1px dotted #000; /* Dotted line for signature */
+    /* border-bottom: 1px dotted #000; Dotted line for signature */
     padding-bottom: 15px;
     font-weight: bold;
     font-size: 0.9em;
@@ -217,5 +217,11 @@ a{
 
 
 table ,th, td {
-  border: 1px solid black;
+  border:1px solid black;
+}
+
+td{
+  padding: 5px;
+  text-align: center;
+  height: 35px;
 }

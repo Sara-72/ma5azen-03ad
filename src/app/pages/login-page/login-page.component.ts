@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { Employee1Component } from '../employee/employee1/employee1.component';
-import { Ameen1Component } from '../ameen/ameen1/ameen1.component';
+
 
 function passwordValidator(control: AbstractControl): ValidationErrors | null {
   const value = control.value || '';
