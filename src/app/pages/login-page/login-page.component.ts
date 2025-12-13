@@ -14,7 +14,6 @@ import { FooterComponent } from '../../components/footer/footer.component';
 import { Employee1Component } from '../employee/employee1/employee1.component';
 import { AuthService } from '../../services/auth.service';
 
-
 function passwordValidator(control: AbstractControl): ValidationErrors | null {
   const value = control.value || '';
 
@@ -38,6 +37,26 @@ function passwordValidator(control: AbstractControl): ValidationErrors | null {
 
   return null;
 }
+function collegeValidator(control: AbstractControl): ValidationErrors | null {
+  const value = control.value;
+
+  if (!value) {
+    return { required: true };
+  }
+
+  const allowedColleges = ['education', 'csai', 'alsun', 'tourism'];
+
+  if (!allowedColleges.includes(value)) {
+    return {
+      invalidCollege: {
+        message: 'الكلية غير صحيحة'
+      }
+    };
+  }
+
+  return null;
+}
+
 
 interface LoginForm {
   email: FormControl<string>;
@@ -76,8 +95,9 @@ export class LoginPageComponent {
     ]),
 
     college: this.fb.control<string | null>(null, [
-        Validators.required
-    ]),
+      Validators.required,
+      collegeValidator
+  ]),
 
 
   }) as FormGroup<LoginForm>;
@@ -101,24 +121,43 @@ export class LoginPageComponent {
   }
 
 
-
 onSubmit() {
-  if (this.loginForm.invalid) return;
+  if (this.loginForm.invalid) {
+    this.loginForm.markAllAsTouched();
+    return;
+  }
 
   this.isSubmitting.set(true);
 
   const data = {
-    email: this.loginForm.value.email,
-    password: this.loginForm.value.password
+    email: this.loginForm.value.email!,
+    password: this.loginForm.value.password!
   };
 
   this.auth.userLogin(data).subscribe({
-
     next: (res: any) => {
       console.log('Login response:', res);
+
+      const selectedCollege = this.auth.normalizeFaculty(
+        this.loginForm.value.college
+      );
+
+      const actualFaculty = this.auth.normalizeFaculty(
+        res.faculty
+      );
+
+      if (selectedCollege !== actualFaculty) {
+        this.isSubmitting.set(false);
+        this.message.set({
+          text: 'الكلية المختارة لا تطابق الكلية المسجلة لهذا الحساب',
+          type: 'error'
+        });
+        return;
+      }
+
       localStorage.setItem('token', res.token);
       localStorage.setItem('role', 'USER');
-      localStorage.setItem('college', this.loginForm.value.college!);
+      localStorage.setItem('college', selectedCollege as string);
 
       this.router.navigate(['/employee1']);
     },
@@ -131,6 +170,7 @@ onSubmit() {
     }
   });
 }
+
 
 
 }

@@ -129,10 +129,18 @@
 
 
             @if (isInvalid('college')) {
-              <div class="mt-1 text-xs text-red-600 font-medium text-right" dir="rtl">
-                <span>يجب اختيار كلية واحدة على الأقل. (A college selection is required.)</span>
-              </div>
+            <div class="mt-1 text-xs text-red-600 font-medium">
+              @if (loginForm.get('college')?.getError('required')) {
+              <span class="text-danger">من فضلك اختر الكلية</span>
+              }
+              @else if (loginForm.get('college')?.getError('invalidCollege')) {
+              <span class="text-danger">
+                {{ loginForm.get('college')?.getError('invalidCollege')?.message }}
+              </span>
+              }
+            </div>
             }
+
 
 
         </div>
