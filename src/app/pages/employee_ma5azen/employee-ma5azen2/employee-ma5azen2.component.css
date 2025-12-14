@@ -1,5 +1,3 @@
-
-
 a{
   text-decoration: none;
   color:var(--black-color);
@@ -49,4 +47,25 @@ a{
     cursor:default;
 
 }
+.ledger-box {
+    border: 1px solid #444;
+    padding: 20px;
+}
 
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #444;
+    height: 60px;
+    text-align: center;
+    vertical-align: top;
+    padding: 8px;
+}
+
+th {
+  background-color: #f0f0f0;
+    font-weight: bold;
+}

@@ -1,10 +1,20 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-
+const FACULTY_MAP: Record<string, string> = {
+  'كلية التربية': 'education',
+  'كلية الحاسبات والذكاء الاصطناعي': 'csai',
+  'كلية الألسن': 'alsun',
+  'كلية السياحة و الفنادق': 'tourism'
+};
 @Injectable({
   providedIn: 'root'
 })
+
 export class AuthService {
+  normalizeFaculty(faculty: string | null | undefined): string | null {
+  if (!faculty) return null;
+  return FACULTY_MAP[faculty] ?? faculty;
+}
 
   private api = 'http://newwinventoryapi.runasp.net/api';
 
@@ -47,4 +57,5 @@ export class AuthService {
   addInventoryManager(data: any) {
     return this.http.post(`${this.api}/InventoryManagers`, data);
   }
+  
 }

@@ -47,7 +47,7 @@ a{
     cursor:default;
 }
 
-/************************************************/
+/****************/
 
 /*  MAIN CONTENT  */
 .content {
@@ -94,4 +94,15 @@ a{
     justify-content: space-between;
 }
 
+input[type="number"] {
+    width: 10%;
+    height: 20px;
+    font-size: 15px;
+}
 
+input[type="text"] {
+  width: 20%;
+  height: 20px;
+  font-size: 15px;
+
+}
