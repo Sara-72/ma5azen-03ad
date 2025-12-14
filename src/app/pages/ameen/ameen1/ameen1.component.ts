@@ -3,8 +3,11 @@ import { Router } from '@angular/router';
 import { HeaderComponent } from '../../../components/header/header.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 
+
 import { FormsModule, FormBuilder, ReactiveFormsModule, FormGroup, Validators, FormArray } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+import { StoreKeeperStockService } from '../../../services/store-keeper-stock.service';
 // Assuming you have an ApiService to handle HTTP requests
 // import { ApiService } from '../services/api.service';
 
@@ -66,6 +69,8 @@ export class Ameen1Component implements OnInit ,OnDestroy{
   // Dependency Injection
   private fb = inject(FormBuilder);
   private router = inject(Router);
+  private stockService = inject(StoreKeeperStockService);
+
 
   constructor() {
     this.simpleForm = this.fb.group({
@@ -173,21 +178,54 @@ ngOnInit(): void {
   // --- SAVE BUTTON LOGIC ---
 
 onSubmit(): void {
-      if (this.simpleForm.invalid) {
-        this.simpleForm.markAllAsTouched();
-        console.warn('Form is invalid. Cannot submit.');
-        return;
+  if (this.simpleForm.invalid) {
+    this.simpleForm.markAllAsTouched();
+    return;
+  }
+
+  this.isSubmitting.set(true);
+
+  const rows = this.simpleForm.value.tableData;
+
+  // نحول كل صف لشكل الـ API
+  const payload = rows.map((row: any) => {
+    const { yy, mm, dd } = row.dateGroup;
+    return {
+      stock: {
+        itemName: row.item,
+        category: row.category,
+        quantity: Number(row.count),
+        date: `${yy}-${mm}-${dd}T00:00:00`
       }
+    };
+  });
 
-      this.isSubmitting.set(true);
-      const formData = this.simpleForm.value;
-      console.log('Sending Form Data:', formData);
+  console.log('Payload:', payload);
 
-      setTimeout(() => {
-        console.log('Request submitted successfully!');
+  // إرسال كل صف
+ let completed = 0;
+
+payload.forEach((stock: any) => {
+  this.stockService.addStock(stock).subscribe({
+    next: (res) => {
+      console.log('تم الحفظ', res);
+      completed++;
+
+      if (completed === payload.length) {
         this.isSubmitting.set(false);
-        // router navigation logic here
-      }, 2000);
+        alert('تم حفظ البيانات بنجاح');
+        this.simpleForm.reset();
+      }
+    },
+    error: (err: HttpErrorResponse) => {
+      console.error('خطأ من السيرفر', err);
+      this.isSubmitting.set(false);
+      alert('حصل خطأ أثناء الحفظ');
     }
+  });
+});
+
+}
+
 
 }
