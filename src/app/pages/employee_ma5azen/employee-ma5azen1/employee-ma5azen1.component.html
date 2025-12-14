@@ -17,162 +17,89 @@
             </ul>
         </aside>
 
-        <div class="table-wrapper mt-5 mx-5">
-          <table>
-      <thead>
-        <tr>
-          <th>رقم الإضافة</th>
-          <th>اسم الصنف</th>
-          <th>الوحدة</th>
-          <th>الكمية</th>
-          <th>سعر الوحدة</th>
-          <th>القيمة</th>
-          <th>حالة الصنف</th>
-        </tr>
-      </thead>
+      <form [formGroup]="inventoryLogForm" (ngSubmit)="onSubmit()" dir="rtl" class="me-5">
 
-      <tbody>
-        <tr>
-          <td><input type="number"></td>
-          <td><input type="text"></td>
-          <td><input type="number"></td>
-          <td><input type="number"></td>
-          <td><input type="number"></td>
-          <td><input type="number"></td>
-          <td>
-            <select class="ledger-select">
-    <option value="">اختر</option>
-    <option value="consumable">مستهلك</option>
-    <option value="durable">مستديم</option>
-</select>
+        <div class="table-section">
+            <table class="table table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>رقم الإضافة</th>
+                        <th>اسم الصنف</th>
+                        <th>الوحدة</th>
+                        <th>الكمية</th>
+                        <th>سعر الوحدة</th>
+                        <th>القيمة</th>
+                        <th>حالة الصنف</th>
+                    </tr>
+                </thead>
 
-          </td>
-        </tr>
+                <tbody formArrayName="tableData">
+                    @for (rowGroup of tableData.controls; track $index) {
+                        <tr [formGroupName]="$index">
 
-        <tr>
-          <td><input type="number"></td>
-          <td><input type="text"></td>
-          <td><input type="number"></td>
-          <td><input type="number"></td>
-          <td><input type="number"></td>
-          <td><input type="number"></td>
-          <td>
-            <select class="ledger-select">
-    <option value="">اختر</option>
-    <option value="consumable">مستهلك</option>
-    <option value="durable">مستديم</option>
-</select>
+                            <td>
+                                <input type="number" formControlName="additionNumber" class="form-control text-center" min="0">
+                            </td>
 
-          </td>
-        </tr>
+                          <td>
+                                  <select formControlName="itemName" class="form-select text-center">
+                                        <option value="" disabled selected>--- اختر ---</option>
 
-        <tr>
-          <td><input type="number"></td>
-          <td><input type="text"></td>
-          <td><input type="number"></td>
-          <td><input type="number"></td>
-          <td><input type="number"></td>
-          <td><input type="number"></td>
-          <td>
-            <select class="ledger-select">
-    <option value="">اختر</option>
-    <option value="consumable">مستهلك</option>
-    <option value="durable">مستديم</option>
-</select>
+                                  @for (item of ma5azenItemOptions; track item) {
+                                        <option [value]="item">{{ item }}</option>
+                                      }
+                                  </select>
+                          </td>
 
-          </td>
-        </tr>
+                            <td>
+                                <input type="text" formControlName="unit" class="form-control text-center">
+                            </td>
 
-        <tr>
-          <td><input type="number"></td>
-          <td><input type="text"></td>
-          <td><input type="number"></td>
-          <td><input type="number"></td>
-          <td><input type="number"></td>
-          <td><input type="number"></td>
-          <td>
-            <select class="ledger-select">
-    <option value="">اختر</option>
-    <option value="consumable">مستهلك</option>
-    <option value="durable">مستديم</option>
-</select>
+                            <td>
+                                <input type="number" formControlName="quantity" class="form-control text-center" min="1">
+                            </td>
 
-          </td>
-        </tr>
+                            <td>
+                                <input type="number" formControlName="unitPrice" class="form-control text-center" min="0">
+                            </td>
 
-        <tr>
-          <td><input type="number"></td>
-          <td><input type="text"></td>
-          <td><input type="number"></td>
-          <td><input type="number"></td>
-          <td><input type="number"></td>
-          <td><input type="number"></td>
-          <td>
-            <select class="ledger-select">
-    <option value="">اختر</option>
-    <option value="consumable">مستهلك</option>
-    <option value="durable">مستديم</option>
-</select>
+                            <td>
+                                <input type="number" formControlName="value" class="form-control text-center" min="0">
+                            </td>
 
-          </td>
-        </tr>
+                            <td>
+                                <select formControlName="itemCondition" class="form-select text-center">
+                                    <option value="" disabled selected>اختر</option>
+                                    <option value="مستهلك">مستهلك</option>
+                                    <option value="مستديم">مستديم</option>
+                                </select>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
 
-        <tr>
-          <td><input type="number"></td>
-          <td><input type="text"></td>
-          <td><input type="number"></td>
-          <td><input type="number"></td>
-          <td><input type="number"></td>
-          <td><input type="number"></td>
-          <td>
-            <select class="ledger-select">
-    <option value="">اختر</option>
-    <option value="consumable">مستهلك</option>
-    <option value="durable">مستديم</option>
-</select>
-
-          </td>
-        </tr>
-
-        <tr>
-          <td><input type="number"></td>
-          <td><input type="text"></td>
-          <td><input type="number"></td>
-          <td><input type="number"></td>
-          <td><input type="number"></td>
-          <td><input type="number"></td>
-          <td>
-            <select class="ledger-select">
-    <option value="">اختر</option>
-    <option value="consumable">مستهلك</option>
-    <option value="durable">مستديم</option>
-</select>
-
-          </td>
-        </tr>
-         <tr>
-          <td><input type="number"min="0"></td>
-          <td><input type="text"></td>
-          <td><input type="number" min="0"></td>
-          <td><input type="number" min="0"></td>
-          <td><input type="number" min="0"></td>
-          <td><input type="number" min="0"></td>
-          <td>
-            <select class="ledger-select">
-    <option value="">اختر</option>
-    <option value="consumable">مستهلك</option>
-    <option value="durable">مستديم</option>
-</select>
-
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-
+            <div class="row-controls">
+                <button type="button" class="remove-row-button" (click)="removeRow()">-</button>
+                <button type="button" class="add-row-button" (click)="addRow()">+</button>
+            </div>
+        </div> <div class="button-section">
+            <button
+                type="submit"
+                [disabled]="isSubmitting() || inventoryLogForm.invalid"
+                class="submit-btn mt-5">
+                @if (isSubmitting()) {
+                    جاري الحفظ...
+                } @else {
+                    حفظ البيانات
+                }
+            </button>
         </div>
 
-      </div>
+    </form>
+
+
+    </div>
 
 <app-footer>
 

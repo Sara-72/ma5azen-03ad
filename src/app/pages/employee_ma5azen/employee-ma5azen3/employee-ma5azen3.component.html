@@ -1,104 +1,81 @@
-<app-header>
-
-</app-header>
+<app-header> </app-header>
 
 <div class="content d-flex flex-row">
+  <aside class="sidebar">
+    <h5>مرحباً أستاذ/ة محمد أحمد</h5>
+    <ul class="mt-5">
+      <li><a href="/employee_ma5azen1">دفتر المالية</a></li>
+      <li><a href="/employee_ma5azen2">كاتب الشطب</a></li>
+      <li class="active"><a>المخزن</a></li>
+      <li><a href="/employee_ma5azen4">مخزن الأمين</a></li>
+    </ul>
+  </aside>
 
-      <aside class="sidebar">
-            <h5>مرحباً أستاذ/ة محمد أحمد</h5>
-            <ul class="mt-5">
-
-                <li><a href="/employee_ma5azen1">دفتر المالية</a></li>
-                <li><a href="/employee_ma5azen2">كاتب الشطب</a></li>
-                <li class="active"><a >المخزن</a></li>
-                <li><a href="/employee_ma5azen4">مخزن الأمين</a></li>
-
-            </ul>
-        </aside>
-
-
-
-
-<form [formGroup]="simpleForm" (ngSubmit)="onSubmit()" dir="rtl" class="mt-5 form-part">
+  <form
+    [formGroup]="simpleForm"
+    (ngSubmit)="onSubmit()"
+    dir="rtl"
+    class="mt-5 form-part"
+  >
     <div class="table-section">
-        <table>
-            <thead>
-                <tr>
+      <table>
+        <thead>
+          <tr>
+            <th>الفئة</th>
+            <th>الصنف</th>
+            <th>العدد</th>
+          </tr>
+        </thead>
 
-                    <th>التاريخ</th>
-                    <th>الفئة</th>
-                    <th>الصنف</th>
-                    <th>العدد</th>
-
-                </tr>
-            </thead>
-
-            <tbody formArrayName="tableData">
-                @for (rowGroup of tableData.controls; track $index) {
-                    <tr [formGroupName]="$index">
-
-
-                      <td formGroupName="dateGroup" class="date-cell">
-                        <div class="d-flex justify-content-center align-items-center h-100">
-                            <select formControlName="dd" class="table-input date-select">
-                                <option value="" disabled selected hidden>DD</option>
-                                @for (day of days; track day) { <option [value]="day">{{ day }}</option> }
-                            </select>
-                            /
-                            <select formControlName="mm" class="table-input date-select">
-                                <option value="" disabled selected hidden>MM</option>
-                                @for (month of months; track month) { <option [value]="month">{{ month }}</option> }
-                            </select>
-                            /
-                            <select formControlName="yy" class="table-input date-select">
-                                <option value="" disabled selected hidden>YY</option>
-                                @for (year of years; track year) { <option [value]="year">{{ year }}</option> }
-                            </select>
-                        </div>
-                    </td>
-
-                  <td>
-                        <select formControlName="category" class="table-input">
-                            <option value="" disabled selected hidden>اختر فئة</option>
-                            @for (category of categories; track category) {
-                                <option [value]="category">{{ category }}</option>
-                            }
-                        </select>
-                    </td>
-
-                    <td>
-                        <select formControlName="item" class="table-input">
-                            <option [ngValue]="null" disabled selected hidden>اختر صنف</option>
-                            @for (item of availableItemsByRow[$index]; track item) {
-                                <option [value]="item">{{ item }}</option>
-                            }
-                        </select>
-                    </td>
-
-                        <td><input type="text" formControlName="count" class="table-input"></td>
-                    </tr>
+        <tbody formArrayName="tableData">
+          @for (rowGroup of tableData.controls; track $index) {
+          <tr [formGroupName]="$index">
+            <td>
+              <select formControlName="category" class="table-input">
+                <option value="" disabled selected hidden>اختر فئة</option>
+                @for (category of categories; track category) {
+                <option [value]="category">{{ category }}</option>
                 }
-            </tbody>
-        </table>
+              </select>
+            </td>
 
-        <div class="row-controls">
-            <button type="button" class="remove-row-button" (click)="removeRow()">-</button>
-            <button type="button" class="add-row-button" (click)="addRow()">+</button>
-        </div>
+            <td>
+              <select formControlName="item" class="table-input">
+                <option [ngValue]="null" disabled selected hidden>
+                  اختر صنف
+                </option>
+                @for (item of availableItemsByRow[$index]; track item) {
+                <option [value]="item">{{ item }}</option>
+                }
+              </select>
+            </td>
+
+            <td>
+              <input type="text" formControlName="count" class="table-input" />
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+
+      <div class="row-controls">
+        <button type="button" class="remove-row-button" (click)="removeRow()">
+          -
+        </button>
+        <button type="button" class="add-row-button" (click)="addRow()">
+          +
+        </button>
+      </div>
     </div>
 
-    <button type="submit" [disabled]="isSubmitting() || simpleForm.invalid" class="submit-btn mt-4">
-        @if (isSubmitting()) {
-            جاري الحفظ...
-        } @else {
-        حفظ البيانات
-        }
+    <button
+      type="submit"
+      [disabled]="isSubmitting() || simpleForm.invalid"
+      class="submit-btn mt-4"
+    >
+      @if (isSubmitting()) { جاري الحفظ... } @else { حفظ البيانات }
     </button>
-</form>
-
-
+  </form>
 </div>
 
-<app-footer>
-
-</app-footer>
+<app-footer> </app-footer>

@@ -47,41 +47,88 @@ a{
     cursor:default;
 }
 
-.table-wrapper {
-    overflow-x: auto;
+
+.table{
+  border-color:#000;
 }
 
-table {
+/* 1. Table/Row Controls Styling */
+.table-section {
+    position: relative; /* CRITICAL: Must be relative for absolute button positioning */
+    margin-top: 20px;
+    /* padding-bottom: 30px; Space below table for buttons */
+    border: 1px solid #000;
+    width:95%;
+    border-color:black;
+
+
+}
+
+th{
+  background-color:#f0f0f0;
+  border-color:black ;
+
+}
+
+td{
+
+  border-color:black ;
+
+}
+/* Base button styles */
+.add-row-button,
+.remove-row-button {
+    position: absolute;
+    bottom: -17.5px; /* Pulls button halfway below the table section */
+    background-color: var(--primary-color);
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 33px;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+    z-index: 10;
+    padding: 0;
+    font-size: 2em;
+}
+
+.add-row-button {
+    right: -3px; /* Halfway outside the right edge */
+}
+
+.remove-row-button {
+    left: -3px; /* Halfway outside the left edge */
+}
+
+/* 2. Submit Button Styling */
+.button-section {
+    display: flex;
+    justify-content: center; /* Centers the button horizontally */
     width: 100%;
-    border-collapse: collapse;
+    margin-top: 25px;
 }
 
-th {
-    border: 1px solid #333;
-    padding: 10px;
-    font-size: 14px;
-    background-color: #f0f0f0;
+.submit-btn {
+    padding: 10px 30px;
+    font-size: 1.1em;
     font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s, opacity 0.2s;
     text-align: center;
+    color: white;
 }
 
-td {
-    border: 1px solid #333;
-    padding: 8px;
-    text-align: center;
+.submit-btn:not(:disabled) {
+    background-color: var(--primary-color);
 }
 
-input {
-    width: 100%;
-    padding: 5px;
-    border: 1px solid #aaa;
-    border-radius: 4px;
-}
-.ledger-select {
-    width: 100%;
-    height: 40px;
-    border: 1px solid #444;
-    border-radius: 4px;
-    text-align: center;
-    font-size: 14px;
+.submit-btn:disabled {
+    background-color: var(--black-color);
+    cursor: not-allowed;
+    opacity: 0.7;
 }

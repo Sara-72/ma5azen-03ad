@@ -21,7 +21,7 @@
             </ul>
 </aside>
 
-<form [formGroup]="consumableForm" (ngSubmit)="onSubmit()" class="m-auto">
+<form *ngIf="consumableForm" [formGroup]="consumableForm" (ngSubmit)="onSubmit()" class="m-auto">
 <div class="form-container" dir="rtl">
 
     <header class="form-header">
@@ -140,14 +140,38 @@
                   @for (rowGroup of tableData.controls; track $index) {
                     <tr [formGroupName]="$index">
 
-                        <td>
-                            <select formControlName="itemName" class="table-input">
-                                <option value="" disabled selected hidden>اختر</option>
-                                @for (name of itemNames; track name) {
-                                    <option [value]="name">{{ name }}</option>
-                                }
-                            </select>
-                        </td>
+ <td class="search-dropdown-container">
+
+<input
+    type="text"
+    [formControlName]="'itemName'"
+    class="form-control text-center"
+    placeholder="ابحث عن صنف..."
+
+    #inputRef
+    (input)="filterItems(inputRef.value)"
+
+    (focus)="isDropdownOpen[$index] = true"
+
+    (blur)="closeDropdown($index)"
+
+    autocomplete="off"
+>
+    <div class="search-dropdown-list" [class.open]="isDropdownOpen[$index]">
+
+        @for (name of filteredItemNames; track trackByItem($index, name)) {
+            <div
+                class="dropdown-item"
+                (mousedown)="selectItem(name, $index)">
+                {{ name }}
+            </div>
+        }
+        @if (filteredItemNames.length === 0) {
+            <div class="dropdown-item disabled">لا توجد نتائج</div>
+        }
+    </div>
+
+</td>
 
                         <td><input type="text" formControlName="unit" class="table-input"></td>
                         <td><input type="text" formControlName="quantityRequired" class="table-input"></td>

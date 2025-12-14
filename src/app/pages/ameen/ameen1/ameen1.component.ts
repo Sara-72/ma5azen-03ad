@@ -16,7 +16,7 @@ import { StoreKeeperStockService } from '../../../services/store-keeper-stock.se
 interface SimpleRow {
   item: string;      // الصنف
   category: string;  // الفئة
-  date: string;      // التاريخ
+  // date: string;      // التاريخ
   count: string;     // العدد
 }
 
@@ -42,9 +42,9 @@ interface CategoryItemMap {
 export class Ameen1Component implements OnInit ,OnDestroy{
 
 
-    days: string[] = Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0')); // "01" to "31"
-    months: string[] = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0')); // "01" to "12"
-    years: string[] = Array.from({ length: 100 }, (_, i) => String(2000 + i));// "00" to "99" (Last 2 digits of year)
+    // days: string[] = Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0')); // "01" to "31"
+    // months: string[] = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0')); // "01" to "12"
+    // years: string[] = Array.from({ length: 100 }, (_, i) => String(2000 + i));// "00" to "99" (Last 2 digits of year)
 
 
     categoryItemMap: CategoryItemMap = {
@@ -112,11 +112,11 @@ ngOnInit(): void {
       item: [null,Validators.required],
       category: ['',Validators.required],
 
-      dateGroup: this.fb.group({
-        yy: ['', Validators.required],
-        mm: ['', Validators.required],
-        dd: ['', Validators.required]
-    }),
+    //   dateGroup: this.fb.group({
+    //     yy: ['', Validators.required],
+    //     mm: ['', Validators.required],
+    //     dd: ['', Validators.required]
+    // }),
       count: ['', Validators.required]
     });
   }

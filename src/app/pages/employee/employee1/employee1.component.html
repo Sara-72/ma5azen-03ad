@@ -19,61 +19,83 @@
             </ul>
         </aside>
 
+
+        <div class="d-flex align-items-center big-container">
+
         <!-- ======= Main Content ======= -->
-        <main class="content">
-            <div class="paper">
-              <div class="d-flex justify-content-center align-items-center">
-              <img src="assets/images/Hurghada-University.png" class="paper-logo" alt="logo">
-                <h2 class="title m-auto">مكتب أمين الكلية</h2>
+  <form [formGroup]="memoContainerForm" (ngSubmit)="onSubmit()" dir="rtl" class="mt-5 mx-5">
+
+    <div formArrayName="requests">
+        @for (memoGroup of requests.controls; track $index) {
+            <div class="paper" [formGroupName]="$index">
+                <div class="d-flex justify-content-center align-items-center">
+                    <img src="assets/images/Hurghada-University.png" class="paper-logo" alt="logo">
+                    <h2 class="title m-auto">مكتب أمين الكلية (طلب #{{ $index + 1 }})</h2>
                 </div>
 
                 <div class="paper-box">
-
                     <p>السيد الأستاذ/ أمين عام الجامعة المساعد</p>
                     <p>تحية طيبة وبعد،،،</p>
 
                     <p class="mt">الرجاء من سيادتكم بالموافقة على صرف عدد
-                      <input type="number" min="0">
-                      <input type="text">
+                        <input type="number" formControlName="count" min="0">
+                        <select formControlName="itemName" class="form-select-inline me-2">
+                            <option value="" disabled selected>--- اختر الصنف ---</option>
+                            @for (item of availableItemOptions; track item) {
+                                <option [value]="item">{{ item }}</option>
+                            }
+                        </select>
                     </p>
                     <br>
                     <p>وتفضلوا سيادتكم بقبول فائق التقدير و الاحترام،،،</p>
 
-                    <div class="signatures">
-                        <div>
-                            <strong>توقيع الموظف</strong><br>
-                           <input type="text">
-                        </div>
-                        <div>
-                          <strong>الكلية</strong><br>
-                          <select class="college-select">
-                            <option value="">اختر الكلية</option>
-                            <option value="computers">الحاسبات والذكاء الاصطناعى</option>
-                             <option value="languages">الألسن</option>
-                             <option value="education">التربية</option>
-                              <option value="tourism">السياحة والفنادق</option>
-                              </select>
+                    <div class="d-flex align-items-center">
+                        <div class="signatures">
+                            <div class="ms-3">
+                                <strong>توقيع الموظف</strong><br>
+                                <input type="text" formControlName="employeeSignature">
+                            </div>
+                            <div class="ms-3">
+                                <strong>الكلية</strong><br>
+                                <select formControlName="collegeName" class="form-select">
+                                    <option value="" disabled selected>--- اختر الكلية ---</option>
+                                    @for (college of collegeOptions; track college) {
+                                        <option [value]="college">{{ college }}</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="ms-3">
+                                <strong>تاريخ الطلب</strong><br>
+                                <input type="date" formControlName="requestDate">
+                            </div>
 
-                        </div>
-                        <div>
-                          <strong>تاريخ الطلب</strong><br>
-                          <input type="date">
-
-                        </div>
-
-                        <div>
-                            <strong>أمين الكلية</strong><br>
-                             أبو السعود الحبيشي
-
+                            <div class="ms-3">
+                                <strong>أمين الكلية</strong><br>
+                                {{ memoGroup.get('collegeAdminName')?.value }}
+                                <input type="hidden" formControlName="collegeAdminName">
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </main>
+                </div> </div> } </div> <div class="button-section">
+        <button type="submit" [disabled]="isSubmitting() || memoContainerForm.invalid" class="submit-btn mt-5">
+            @if (isSubmitting()) {
+                جاري الارسال...
+            } @else {
+            ارسال الطلب
+            }
+        </button>
     </div>
 
+</form>
 
+</div>
 
+    <div class="row-controls">
+        <button type="button" class="remove-row-button" (click)="removeRow()">-</button>
+        <button type="button" class="add-row-button" (click)="addRow()">+</button>
+    </div>
+
+</div>
 
 
 <app-footer>

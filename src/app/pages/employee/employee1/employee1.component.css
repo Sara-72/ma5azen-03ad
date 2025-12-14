@@ -49,18 +49,27 @@ a{
 
 /****************/
 
+
+
+
+
+
+
+
 /*  MAIN CONTENT  */
 .content {
     flex: 1;
     padding: 30px;
 }
 
+
 .paper {
     background: white;
     padding: 40px;
     border: 1px solid #ccc;
-    width: 70%;
+    width: 100%;
     margin: auto;
+    position: relative;
 }
 
 .title {
@@ -96,7 +105,7 @@ a{
 
 input[type="number"] {
     width: 10%;
-    height: 20px;
+    height: 27px;
     font-size: 15px;
 }
 
@@ -107,7 +116,7 @@ input[type="text"] {
 }
 
 .signatures input {
-  width: 90%;
+    width: 90%;
     height: 25px;
     padding: 4px 6px;
     font-size: 13px;
@@ -124,3 +133,119 @@ input[type="text"] {
     text-align: right;
 }
 
+
+
+/* Dynamic Row Button Styles (Exact Overlap) */
+.add-row-button,
+.remove-row-button {
+    position: absolute;
+    bottom: -17.5px; /* Pulls button halfway below the table section */
+    background-color: var(--primary-color);
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 33px;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+    z-index: 10;
+    padding: 0;
+}
+
+.add-row-button {
+    right: 250px; /* Halfway outside the right edge */
+    font-size: 2em;
+}
+
+.remove-row-button {
+    left: 30px; /* Halfway outside the left edge */
+    font-size: 2em;
+}
+
+
+
+/* Base Button Styles */
+.submit-btn {
+    padding: 10px 30px;
+    font-size: 1.1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s, opacity 0.2s;
+    text-align: center;
+    color: white;
+}
+
+/* Style for the button when it's enabled (valid form) */
+.submit-btn:not(:disabled) {
+    background-color: var(--primary-color);
+}
+
+/* Style for when the button is disabled (invalid form or submitting) */
+.submit-btn:disabled {
+    background-color: var(--black-color);
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+/* Container to center the submit button */
+.button-section {
+    display: flex;
+    justify-content: center; /* Centers the button horizontally */
+    width: 100%;
+    margin-top: 25px; /* Add some space above the button */
+}
+
+
+
+
+/* --- Uniform Styling for Signatures and Details Inputs --- */
+.big-container .form-select-inline{
+  width:20%;
+  background-color: white;
+  border: 1px solid gray;
+  height:27px;
+  border-radius: 2px;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  -ms-border-radius: 2px;
+  -o-border-radius: 2px;
+}
+/* Target all visible interactive form elements inside the signatures section */
+.big-container input[type="text"],
+.big-container input[type="date"]{
+    /* Set a unified width for consistency */
+    width: 100%;
+    max-width: 100%;
+
+    /* Set a unified height and padding for matching vertical size */
+    height: 40px; /* Adjust this value if needed, 40px is a standard height */
+    padding: 6px 12px;
+
+    /* Ensure border and background are consistent */
+    border: 1px solid #ced4da; /* Standard Bootstrap border color */
+    border-radius: 4px; /* Standard Bootstrap border radius */
+    background-color: #fff;
+
+    /* Font size consistency */
+    font-size: 1em;
+
+    /* Align text content to the right (RTL standard) */
+    text-align: right;
+
+    /* Ensure date picker icon and dropdown arrows are styled consistently */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+
+
+/* Specific adjustment for the Date Input to look like others */
+.big-container input[type="date"] {
+    /* Add any specific styles needed for date input padding/font if they differ */
+    line-height: 1.5; /* Helps align text in date field */
+}
