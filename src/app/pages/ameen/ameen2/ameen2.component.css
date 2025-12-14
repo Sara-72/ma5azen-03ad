@@ -221,3 +221,8 @@ a{
     background-color: var(--secondary-color);
 
 }
+
+.form-select{
+
+  width:20%;
+}

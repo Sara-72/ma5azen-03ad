@@ -18,6 +18,8 @@ import { FormBuilder, ReactiveFormsModule, FormGroup, Validators, FormArray } fr
 export class Ameen2Component implements OnInit {
 
 
+  assetTypes: string[] = ['مستهلك', 'مستديم'];
+
   inventoryLogForm!: FormGroup;
   isSubmitting = signal(false);
 
@@ -26,6 +28,7 @@ export class Ameen2Component implements OnInit {
   constructor() {
     this.inventoryLogForm = this.fb.group({
       storehouseName: ['',Validators.required], // For the single input field at the top (مخزن)
+      assetType: ['', Validators.required],
       tableData: this.fb.array([])
     });
   }
@@ -48,7 +51,8 @@ export class Ameen2Component implements OnInit {
       sourceOrDestination: ['',Validators.required], // وارد من / منصرف إلى
       addedValue: ['',Validators.required],       // قيمة الأصناف المضافة
       issuedValue: ['',Validators.required],      // قيمة الأصناف المنصرفة
-            
+      assetType: ['', Validators.required]
+
 
     });
   }

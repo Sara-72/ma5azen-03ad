@@ -104,5 +104,23 @@ input[type="text"] {
   width: 20%;
   height: 20px;
   font-size: 15px;
+}
+
+.signatures input {
+  width: 90%;
+    height: 25px;
+    padding: 4px 6px;
+    font-size: 13px;
+    box-sizing: border-box;
 
 }
+
+.college-select {
+    width: 90%;
+    height: 25px;
+    font-size: 13px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    text-align: right;
+}
+
