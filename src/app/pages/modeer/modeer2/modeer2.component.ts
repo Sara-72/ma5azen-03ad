@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { FormsModule, FormBuilder,ReactiveFormsModule, FormGroup, Validators ,FormArray } from '@angular/forms';
 import { HeaderComponent } from '../../../components/header/header.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
+import { CommonModule } from '@angular/common';
 // Assuming you have an ApiService to handle HTTP requests
 // import { ApiService } from '../services/api.service';
 
@@ -26,136 +27,216 @@ interface ConsumableRow {
     HeaderComponent,
     FooterComponent,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    CommonModule
   ],
   templateUrl: './modeer2.component.html',
   styleUrl: './modeer2.component.css'
 })
 
 export class Modeer2Component implements OnInit {
+// ------------------- SEARCHABLE DROPDOWN PROPERTIES (ADDED) -------------------
 
-// --- PROPERTIES FOR DROPDOWN OPTIONS (New) ---
-  // Date Arrays
-  days: string[] = Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0')); // "01" to "31"
-  months: string[] = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0')); // "01" to "12"
-  years: string[] = Array.from({ length: 100 }, (_, i) => String(2000 + i));// "00" to "99" (Last 2 digits of year)
+    // 🚨 Array to hold the list of item names currently displayed in the dropdown
+    filteredItemNames: string[] = [];
+    isDropdownOpen: boolean[] = [];
 
-  // Item Name and Condition Arrays (Example data - replace with your actual options)
-  itemNames: string[] = ['أثاث', 'قرطاسية', 'إلكترونيات', 'أدوات نظافة'];
-  itemConditions: string[] = ['جديدة', 'مستعمل', 'قابل للإصلاح', 'كهنة أو خردة'];
-  documentNumbers:string[]=[' كشف العجز',' سند خصم' ,' أصناف تالفة أو تالفة ',' محضر بيع جلب تشغيل-',' إهداءات ليست للنشاط الرئيسي للجهة']
+    // 🚨 Array to track the open/close state for EACH ROW's dropdown
+    // Initialized in ngOnInit/addRow
 
 
-  // --- FORM PROPERTIES ---
-  tableRows: ConsumableRow[] = [this.createEmptyRow()];
-  consumableForm!: FormGroup;
-  isSubmitting = signal(false);
+    // --- PROPERTIES FOR DROPDOWN OPTIONS ---
+    days: string[] = Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0')); // "01" to "31"
+    months: string[] = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0')); // "01" to "12"
+    years: string[] = Array.from({ length: 100 }, (_, i) => String(2000 + i));
 
-  // --- DEPENDENCY INJECTION ---
-  private router = inject(Router);
-  private fb = inject(FormBuilder);
+    // Item Name and Condition Arrays (Example data - replace with your actual options)
+    itemNames: string[] = ['أثاث', 'قرطاسية', 'إلكترونيات', 'أدوات نظافة', 'خزائن ملفات', 'أجهزة عرض', 'مواد كيميائية'];
+    itemConditions: string[] = ['جديدة', 'مستعمل', 'قابل للإصلاح', 'كهنة أو خردة'];
+    documentNumbers:string[]=[' كشف العجز',' سند خصم' ,' أصناف تالفة أو تالفة ',' محضر بيع جلب تشغيل-',' إهداءات ليست للنشاط الرئيسي للجهة'];
 
-  // --- CONSTRUCTOR & INITIALIZATION ---
-  constructor() {
-    this.consumableForm = this.fb.group({
-      // Top Info Section Fields - ALL REQUIRED
-      destinationName: ['', Validators.required],
-      storehouse: ['', Validators.required],
-
-      // Date Groups - Now relying on selection (dropdowns)
-      requestDateGroup: this.fb.group({
-          yy: ['', Validators.required],
-          mm: ['', Validators.required],
-          dd: ['', Validators.required]
-      }),
-      regularDateGroup: this.fb.group({
-          yy: ['', Validators.required],
-          mm: ['', Validators.required],
-          dd: ['', Validators.required]
-      }),
+    // --- FORM PROPERTIES ---
+    tableRows: ConsumableRow[] = [this.createEmptyRow()];
+    consumableForm!: FormGroup;
+    isSubmitting = signal(false);
 
 
-      requestorName: ['', Validators.required], // Matches 'اسم الطالب'
-      documentNumber: ['', Validators.required], // Matches 'سند الصرف'
+    // --- DEPENDENCY INJECTION ---
+    private router = inject(Router);
+    private fb = inject(FormBuilder);
 
-      // Table Data using FormArray
-      tableData: this.fb.array([])
-    });
-  }
+    // --- CONSTRUCTOR & INITIALIZATION ---
+    constructor() {
+        this.consumableForm = this.fb.group({
 
-  ngOnInit(): void {
-    // Initialize the FormArray with the initial row data
-    this.tableRows.forEach(() => {
-      this.tableData.push(this.createTableRowFormGroup());
-    });
-  }
+            destinationName: ['', Validators.required],
+            storehouse: ['', Validators.required],
 
-  // Helper getter to easily access the FormArray
-  get tableData(): FormArray {
-    return this.consumableForm.get('tableData') as FormArray;
-  }
+            // Date Groups - Now relying on selection (dropdowns)
+            requestDateGroup: this.fb.group({
+                yy: ['', Validators.required],
+                mm: ['', Validators.required],
+                dd: ['', Validators.required]
+            }),
+            regularDateGroup: this.fb.group({
+                yy: ['', Validators.required],
+                mm: ['', Validators.required],
+                dd: ['', Validators.required]
+            }),
 
-  // Helper function to create the form group for a single table row
-  private createTableRowFormGroup(): FormGroup {
-    return this.fb.group({
-      // MANDATORY FIELDS FOR VALIDATION
+            requestorName: ['', Validators.required], // Matches 'اسم الطالب'
+            documentNumber: ['', Validators.required], // Matches 'سند الصرف'
 
-      itemName: ['', Validators.required], // اسم الصنف (Dropdown)
-      unit: ['', Validators.required], // الوحدة
-      quantityRequired: ['', Validators.required], // الكمية المطلوبة
+            // Table Data using FormArray
+            tableData: this.fb.array([])
+        });
 
-      // OPTIONAL FIELDS
-      quantityAuthorized: [''], // الكمية المصرح بها
-      quantityIssued: [''], // الكمية المنصرفة
-      itemCondition: [''], // حالة الصنف (Dropdown - made optional but selection still works)
-      unitPrice: [''], // سعر الوحدة
-      value: [''] // القيمة
-    });
-  }
-
-  // Helper function to create an empty row object
-  private createEmptyRow(): ConsumableRow {
-    return {
-        itemName: '', unit: '', quantityRequired: '',
-        quantityAuthorized: '', quantityIssued: '', itemCondition: '',
-        unitPrice: '', value: ''
-    };
-  }
-
-  // --- ROW MANAGEMENT LOGIC ---
-  addRow(): void {
-    this.tableRows.push(this.createEmptyRow());
-    this.tableData.push(this.createTableRowFormGroup());
-  }
-
-  removeRow(): void {
-    if (this.tableRows.length > 1) {
-      this.tableRows.pop();
-      this.tableData.removeAt(this.tableData.length - 1);
-    } else if (this.tableRows.length === 1) {
-      // Clear data in the single remaining FormGroup but don't remove the row
-      this.tableData.at(0).reset();
-    }
-  }
-
-  // --- SAVE BUTTON LOGIC ---
-  onSubmit(): void {
-    if (this.consumableForm.invalid) {
-      // Marks all controls as touched to display validation errors
-      this.consumableForm.markAllAsTouched();
-      console.warn('Form is invalid. Cannot submit.');
-      return;
+        // Initialize the filtered list in the constructor
+        this.filteredItemNames = [...this.itemNames];
     }
 
-    this.isSubmitting.set(true);
-    const formData = this.consumableForm.value;
-    console.log('Sending Form Data:', formData);
+    ngOnInit(): void {
+        // Initialize the FormArray with the initial row data
+        this.tableRows.forEach(() => {
+            this.tableData.push(this.createTableRowFormGroup());
+        });
 
+        // 🚨 Initialize the dropdown state array (one entry for each row)
+      this.isDropdownOpen = new Array(this.tableData.length).fill(false);
+        // this.consumableForm.get('requestorName')?.setValue('New Name');
+    }
+
+    // Helper getter to easily access the FormArray
+    get tableData(): FormArray {
+        return this.consumableForm.get('tableData') as FormArray;
+    }
+
+    // Helper function to create the form group for a single table row
+    private createTableRowFormGroup(): FormGroup {
+        return this.fb.group({
+            // MANDATORY FIELDS FOR VALIDATION
+            itemName: ['', Validators.required], // اسم الصنف (Dropdown)
+            unit: ['', Validators.required], // الوحدة
+            quantityRequired: ['', Validators.required], // الكمية المطلوبة
+
+            quantityAuthorized: [''],
+            quantityIssued: [''],
+            itemCondition: [''],
+            unitPrice: [''],
+            value: ['']
+        });
+    }
+
+    // Helper function to create an empty row object
+    private createEmptyRow(): ConsumableRow {
+        return {
+            itemName: '', unit: '', quantityRequired: '',
+            quantityAuthorized: '', quantityIssued: '', itemCondition: '',
+            unitPrice: '', value: ''
+        };
+    }
+
+    // ------------------- SEARCHABLE DROPDOWN METHODS (ADDED) -------------------
+
+    /**
+     * Filters the global item list based on the user's input.
+     * This filtered list is used by all rows.
+     */
+    filterItems(searchTerm: string): void {
+        if (!searchTerm) {
+            this.filteredItemNames = [...this.itemNames];
+            return;
+        }
+        const term = searchTerm.toLowerCase();
+        this.filteredItemNames = this.itemNames.filter(name =>
+            name.toLowerCase().includes(term)
+        );
+    }
+
+    /**
+     * Sets the selected item name back to the correct form control in the correct row.
+     * @param selectedName The item name to set.
+     * @param rowIndex The index of the row being edited.
+     */
+// --- Modeer2Component.ts ---
+
+selectItem(selectedName: string, rowIndex: number): void {
+    // 1. Get the FormGroup for the specific row
+    const rowGroup = this.tableData.at(rowIndex) as FormGroup;
+
+    // 🚨 FIX: Add a guard clause to prevent access if the row doesn't exist
+    if (!rowGroup) {
+        console.error(`Row group not found at index: ${rowIndex}. Skipping value setting.`);
+        // If the row doesn't exist, we must also close the dropdown and exit.
+        this.isDropdownOpen[rowIndex] = false;
+        return;
+    }
+
+    // 2. Set the value safely
+    rowGroup.get('itemName')?.setValue(selectedName);
+
+    // 3. Close the dropdown for this row
+    this.isDropdownOpen[rowIndex] = false;
+
+    this.filteredItemNames = [...this.itemNames];
+}
+    /**
+     * Helper function for ngFor/trackBy (optional but good practice)
+     */
+    trackByItem(index: number, item: string): string {
+        return item;
+    }
+
+
+    closeDropdown(rowIndex: number): void {
+    // We delay closing the dropdown slightly to allow the (mousedown) on an item
+    // to complete before the dropdown disappears.
     setTimeout(() => {
-      console.log('Request submitted successfully!');
-      this.isSubmitting.set(false);
-    }, 2000);
-  }
+        if (this.isDropdownOpen[rowIndex]) {
+            this.isDropdownOpen[rowIndex] = false;
+        }
+    }, 150); // A small delay (e.g., 150ms)
+}
+
+    // ------------------- ROW MANAGEMENT LOGIC (UPDATED) -------------------
+    addRow(): void {
+        this.tableRows.push(this.createEmptyRow());
+        this.tableData.push(this.createTableRowFormGroup());
+
+        // 🚨 Update dropdown state for the new row
+        this.isDropdownOpen.push(false);
+    }
+
+    removeRow(): void {
+        if (this.tableRows.length > 1) {
+            this.tableRows.pop();
+            this.tableData.removeAt(this.tableData.length - 1);
+
+            // 🚨 Update dropdown state
+            this.isDropdownOpen.pop();
+        } else if (this.tableRows.length === 1) {
+            this.tableData.at(0).reset();
+        }
+    }
+
+    // --- SAVE BUTTON LOGIC ---
+    onSubmit(): void {
+        // ... (existing submission logic) ...
+        if (this.consumableForm.invalid) {
+            this.consumableForm.markAllAsTouched();
+            console.warn('Form is invalid. Cannot submit.');
+            return;
+        }
+
+        this.isSubmitting.set(true);
+        const formData = this.consumableForm.value;
+        console.log('Sending Form Data:', formData);
+
+        setTimeout(() => {
+            console.log('Request submitted successfully!');
+            this.isSubmitting.set(false);
+        }, 2000);
+    }
     // -------------------------------------
   }
 

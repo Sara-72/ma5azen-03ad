@@ -267,3 +267,44 @@ select{
   padding:0.5%;
 }
 
+.search-dropdown-list {
+    position: absolute;
+    z-index: 1000; /* Ensures it appears above other elements */
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+    /* Set dimensions to match or slightly exceed the table cell width */
+    width: 100%;
+    max-height: 200px; /* Limits the height and adds scroll */
+    overflow-y: auto;
+
+    /* Hide by default */
+    display: none;
+
+    /* Positioning right below the input */
+    top: 100%; /* Places it right below the bottom edge of the parent TD */
+    left: 0;
+    right: 0;
+}
+
+/* State when the dropdown is open (triggered by [class.open]="isDropdownOpen[$index]") */
+.search-dropdown-list.open {
+    display: block;
+}
+
+/* Style the individual items */
+.dropdown-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    text-align: right;
+}
+
+.dropdown-item:hover {
+    background-color: #f0f0f0;
+}
+
+.search-dropdown-container {
+    position: relative; /* Crucial for absolute positioning of the dropdown list */
+    padding: 0; /* Ensures the input takes up the full space */
+}
