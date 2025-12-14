@@ -108,7 +108,7 @@ export class Login3PageComponent {
     localStorage.setItem('role', 'INVENTORY_MANAGER');
 
 
-    this.router.navigate(['/modeer1']);
+    this.router.navigate(['/ameen1']);
   },
   error: () => {
     this.message.set({
