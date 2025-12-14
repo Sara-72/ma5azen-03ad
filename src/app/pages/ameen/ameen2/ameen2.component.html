@@ -26,11 +26,15 @@
             <h2 class="text-center">يومية المخزن</h2>
 
         </header>
-            <div class="storehouse-field">
-                <label>مخزن:</label>
-                <input type="text" formControlName="storehouseName" class="input-line">
-            </div>
+<div class="mb-4">
+    <label for="assetTypeSelect" class="form-label d-block text-end">مخزن</label>
+    <select id="assetTypeSelect" formControlName="assetType" class="form-select text-end">
+        <option value="" disabled selected>اختر نوع المخزن</option>
 
+<option *ngFor="let type of assetTypes" [value]="type">{{ type }}</option>
+
+    </select>
+</div>
 
         <div class="table-section">
             <table>

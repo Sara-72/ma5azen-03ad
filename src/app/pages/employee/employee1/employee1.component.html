@@ -1,4 +1,3 @@
-
 <app-header>
 
 </app-header>
@@ -33,19 +32,39 @@
                     <p>السيد الأستاذ/ أمين عام الجامعة المساعد</p>
                     <p>تحية طيبة وبعد،،،</p>
 
-                    <p class="mt">الرجاء من سيادتكم بالموافقة على صرف عدد 1 دباسة</p>
+                    <p class="mt">الرجاء من سيادتكم بالموافقة على صرف عدد
+                      <input type="number" min="0">
+                      <input type="text">
+                    </p>
                     <br>
                     <p>وتفضلوا سيادتكم بقبول فائق التقدير و الاحترام،،،</p>
 
                     <div class="signatures">
                         <div>
-                            <strong>أمين الكلية</strong><br>
-                            أبو السعود الحبيشي
+                            <strong>توقيع الموظف</strong><br>
+                           <input type="text">
+                        </div>
+                        <div>
+                          <strong>الكلية</strong><br>
+                          <select class="college-select">
+                            <option value="">اختر الكلية</option>
+                            <option value="computers">الحاسبات والذكاء الاصطناعى</option>
+                             <option value="languages">الألسن</option>
+                             <option value="education">التربية</option>
+                              <option value="tourism">السياحة والفنادق</option>
+                              </select>
+
+                        </div>
+                        <div>
+                          <strong>تاريخ الطلب</strong><br>
+                          <input type="date">
+
                         </div>
 
                         <div>
-                            <strong>موافقة أمين المخازن</strong><br>
-                            .........................
+                            <strong>أمين الكلية</strong><br>
+                             أبو السعود الحبيشي
+
                         </div>
                     </div>
                 </div>
@@ -59,4 +78,3 @@
 
 <app-footer>
 </app-footer>
-
