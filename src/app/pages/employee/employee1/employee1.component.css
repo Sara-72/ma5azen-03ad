@@ -8,7 +8,7 @@ a{
   -o-transition: 0.3s;
 }
 
-/*  PAGE LAYOUT */
+ /* PAGE LAYOUT */
 .page-container {
     display: flex;
 }
@@ -50,8 +50,96 @@ a{
 /****************/
 
 
+/* --- Item Line Container (Nested FormArray) --- */
+
+.item-lines-container {
+    border: 1px dashed #e0e0e0; /* Visually separates the item list */
+    padding: 15px 10px 5px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    background-color: #f7f7f7;
+}
+
+.item-line {
+    /* Styles for each individual item entry */
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    align-items: center; /* Vertically align items */
+}
+
+.item-line:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.item-line .field {
+    flex: 3; /* Give more space to the Item Name (الصنف) */
+}
+
+.item-line .count-input {
+    flex: 1; /* Keep the Count (العدد) input narrow */
+    max-width: 100px;
+}
+
+/* --- Item Line Buttons --- */
+
+.add-item-btn,
+.remove-item-btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-weight: bold;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.add-item-btn {
+    background-color: var(--primary-color);
+    /*GreenforAdd*/color: white;
+    margin-right: 10px;
+    display: block;
+    width: auto;
+    transition:0.3s ;
+    -webkit-transition:0.3s ;
+    -moz-transition:0.3s ;
+    -ms-transition:0.3s ;
+    -o-transition:0.3s ;
+}
+
+.add-item-btn:hover {
+    background-color:var(--secondary-color);
+}
 
 
+
+.remove-item-btn p{
+  white-space: nowrap;
+  text-align: center;
+}
+.remove-item-btn {
+    /*RedXbuttonnexttotheitemline*/background: none;
+    font-size: 18px;
+    padding: 0;
+    margin: 0 5px;
+
+    width: 30px;
+
+    line-height: 1;
+    text-align: center;
+    transition:0.3s ;
+    -webkit-transition:0.3s ;
+    -moz-transition:0.3s ;
+    -ms-transition:0.3s ;
+    -o-transition:0.3s ;
+}
+
+.remove-item-btn:hover {
+    color: #c82333;
+}
 
 
 
@@ -104,7 +192,7 @@ a{
 }
 
 input[type="number"] {
-    width: 10%;
+    width: 70%;
     height: 27px;
     font-size: 15px;
 }
