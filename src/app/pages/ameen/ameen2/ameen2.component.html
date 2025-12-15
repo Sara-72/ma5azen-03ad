@@ -52,7 +52,8 @@
                 <tbody formArrayName="tableData">
                     @for (rowGroup of tableData.controls; track $index) {
                         <tr [formGroupName]="$index">
-                            <td><input type="text" formControlName="date" class="table-input"></td>
+
+                            <td><input type="date" formControlName="date" class="table-input"></td>
 
                             <td><input type="text" formControlName="sourceOrDestination" class="table-input wide-col"></td>
                             <td><input type="text" formControlName="addedValue" class="table-input"></td>

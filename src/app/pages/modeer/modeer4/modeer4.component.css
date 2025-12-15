@@ -8,6 +8,11 @@ a{
   -o-transition: 0.3s;
 }
 
+li{
+  list-style: none;
+
+}
+
 /*  PAGE LAYOUT */
 .page-container {
     display: flex;

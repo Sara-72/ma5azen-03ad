@@ -27,7 +27,7 @@ export class Ameen2Component implements OnInit {
 
   constructor() {
     this.inventoryLogForm = this.fb.group({
-      storehouseName: ['',Validators.required], // For the single input field at the top (مخزن)
+      // storehouseName: ['',Validators.required], // For the single input field at the top (مخزن)
       assetType: ['', Validators.required],
       tableData: this.fb.array([])
     });
@@ -51,7 +51,7 @@ export class Ameen2Component implements OnInit {
       sourceOrDestination: ['',Validators.required], // وارد من / منصرف إلى
       addedValue: ['',Validators.required],       // قيمة الأصناف المضافة
       issuedValue: ['',Validators.required],      // قيمة الأصناف المنصرفة
-      assetType: ['', Validators.required]
+ 
 
 
     });
