@@ -32,37 +32,16 @@
                 </thead>
 
                 <tbody>
-<<<<<<< HEAD
-                    <tr>
-
-                        <td>كمبيوتر محمول</td>
-                        <td>أجهزة</td>
-                        <td>1</td>
-
-                    </tr>
-                    <tr>
-
-                        <td>ورق طباعة A4</td>
-                        <td>أدوات مكتبية</td>
-                        <td>5</td>
-
-                    </tr>
-                    <tr>
-
-                        <td></td>
-                        <td></td>
-                        <td></td>
-=======
+  
                     <tr *ngFor="let item of additions">
                         <td>-</td>
                         <td>{{ item.itemName }}</td>
                         <td>{{ item.unit }}</td>
                         <td>{{ item.quantity }}</td>
                     </tr>
-                
+
                     <tr *ngIf="additions.length === 0">
                         <td colspan="4">لا توجد بيانات</td>
->>>>>>> origin/modeer
                     </tr>
                 </tbody>
             </table>
