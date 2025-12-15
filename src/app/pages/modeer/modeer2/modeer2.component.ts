@@ -37,11 +37,11 @@ interface ConsumableRow {
 export class Modeer2Component implements OnInit {
 // ------------------- SEARCHABLE DROPDOWN PROPERTIES (ADDED) -------------------
 
-    // 🚨 Array to hold the list of item names currently displayed in the dropdown
+    //  Array to hold the list of item names currently displayed in the dropdown
     filteredItemNames: string[] = [];
     isDropdownOpen: boolean[] = [];
 
-    // 🚨 Array to track the open/close state for EACH ROW's dropdown
+    //  Array to track the open/close state for EACH ROW's dropdown
     // Initialized in ngOnInit/addRow
 
 
