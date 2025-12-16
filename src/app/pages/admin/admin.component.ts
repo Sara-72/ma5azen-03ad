@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy} from '@angular/core';
 import {
   ReactiveFormsModule,
   FormGroup,
@@ -7,14 +7,52 @@ import {
   ValidationErrors,
   AbstractControl,
   FormBuilder,
+  ValidatorFn
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Subscription } from 'rxjs';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { HeaderComponent } from '../../components/header/header.component';
 import { AuthService } from '../../services/auth.service';
 
+
+
+
+
+
+
+
+/**
+ * Validates that the input string contains exactly four distinct words (strings separated by spaces).
+ */
+export function fourStringsValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = control.value;
+
+    if (!value) {
+      return null; // Let Validators.required handle the empty state
+    }
+
+    // Trim whitespace and split by one or more spaces, filtering out empty strings.
+    const words = String(value).trim().split(/\s+/).filter(Boolean);
+
+    const isValid = words.length === 4;
+
+    // Return the validation error object if the count is not 4
+    return isValid ? null : {
+        fourStrings: {
+            requiredCount: 4,
+            actualCount: words.length
+        }
+    };
+  };
+}
+
+
+
 @Component({
   selector: 'app-admin',
+  standalone: true,
   imports: [
     HeaderComponent,
     FooterComponent ,CommonModule,
@@ -24,8 +62,14 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.css'
 })
-export class AdminComponent {
+
+
+
+
+
+export class AdminComponent implements OnInit, OnDestroy{
   adminForm: FormGroup;
+  private roleSubscription: Subscription | undefined;
 
   roles = ['موظف', 'موظف مخزن', 'أمين مخزن', 'مدير مخزن'];
   colleges = [
@@ -47,6 +91,8 @@ export class AdminComponent {
       password: ['', Validators.required],
       role: ['', Validators.required],
       college: ['', Validators.required],
+      name: ['', [Validators.required, fourStringsValidator()]]
+
     });
   }
 
@@ -61,7 +107,8 @@ export class AdminComponent {
     const body = {
       email: form.email,
       password: form.password,
-      faculty: form.college
+      faculty: form.college,
+      name:form.name
     };
 
     switch (form.role) {
@@ -87,7 +134,7 @@ export class AdminComponent {
 
   ngOnInit(): void {
     // 🚨 Add subscription to the role control
-    this.adminForm.get('role')?.valueChanges.subscribe(selectedRole => {
+   this.roleSubscription = this.adminForm.get('role')?.valueChanges.subscribe(selectedRole => {
         // Assuming the value for Employee is 'موظف'
         this.showCollegeSelection = (selectedRole === 'موظف');
 
@@ -102,4 +149,9 @@ export class AdminComponent {
         collegeControl?.updateValueAndValidity();
     })
 }
+
+// 🚨 Add ngOnDestroy to clean up the subscription
+  ngOnDestroy(): void {
+      this.roleSubscription?.unsubscribe();
+  }
 }

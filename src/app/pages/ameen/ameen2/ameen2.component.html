@@ -6,7 +6,7 @@
 
 <div class="d-flex">
 <aside class="sidebar">
-            <h5>مرحباً أستاذ/ة محمد أحمد</h5>
+            <h5>مرحباً بك </h5>
             <ul class="mt-5">
                 <li><a href="/ameen1">المخزن</a></li>
                 <li class="active"><a >دفتر اليومية</a></li>
@@ -26,17 +26,22 @@
             <h2 class="text-center">يومية المخزن</h2>
 
         </header>
-            <div class="storehouse-field">
-                <label>مخزن:</label>
-                <input type="text" formControlName="storehouseName" class="input-line">
-            </div>
+<div class="mb-4">
+    <label for="assetTypeSelect" class="form-label d-block text-end">مخزن</label>
+    <select id="assetTypeSelect" formControlName="assetType" class="form-select text-end">
+        <option value="" disabled selected>اختر نوع المخزن</option>
 
+<option *ngFor="let type of assetTypes" [value]="type">{{ type }}</option>
+
+    </select>
+</div>
 
         <div class="table-section">
             <table>
                 <thead>
                     <tr>
                         <th>التاريخ</th>
+                        
 
                         <th>وارد من / منصرف إلى</th>
                         <th>قيمة الأصناف المضافة</th>
@@ -48,7 +53,8 @@
                 <tbody formArrayName="tableData">
                     @for (rowGroup of tableData.controls; track $index) {
                         <tr [formGroupName]="$index">
-                            <td><input type="text" formControlName="date" class="table-input"></td>
+
+                            <td><input type="date" formControlName="date" class="table-input"></td>
 
                             <td><input type="text" formControlName="sourceOrDestination" class="table-input wide-col"></td>
                             <td><input type="text" formControlName="addedValue" class="table-input"></td>

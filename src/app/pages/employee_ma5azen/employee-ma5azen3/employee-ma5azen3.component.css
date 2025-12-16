@@ -1,5 +1,3 @@
-
-
 a{
   text-decoration: none;
   color:var(--black-color);
@@ -49,8 +47,9 @@ a{
     cursor:default;
 }
 
+/********************************************/
 
-/****************************************************/
+
 .form-part{
   margin-right: 10rem;
 
@@ -168,3 +167,13 @@ a{
     background-color: var(--secondary-color);
 
 }
+
+
+
+select{
+  background-color: white;
+  border:1px solid black;
+  padding:0.5%;
+
+}
+

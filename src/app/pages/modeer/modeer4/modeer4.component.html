@@ -6,7 +6,7 @@
 <div class="d-flex">
 
 <aside class="sidebar">
-            <h5>مرحباً أستاذ/ة محمد أحمد</h5>
+            <h5>مرحباً بك </h5>
             <ul class="mt-5">
                 <li><a href="/modeer1">المخزن</a></li>
                 <li ><a href="/modeer2">اذن الصرف</a></li>
@@ -19,7 +19,9 @@
             </ul>
 </aside>
 
+<ul>
 
+  <li>
 
 <form class="m-auto">
 <div class="form-container" dir="rtl">
@@ -111,27 +113,21 @@
                 </tr>
             </thead>
 
-            <tbody >
+        <tbody>
+            @for (item of spendPermissions; track $index) {
+            <tr>
+                <td>{{ item.itemName }}</td>
+                <td>{{ item.unit }}</td>
+                <td>{{ item.requestedQuantity }}</td>
+                <td>{{ item.approvedQuantity }}</td>
+                <td>{{ item.issuedQuantity }}</td>
+                <td>{{ item.stockStatus }}</td>
+                <td>{{ item.unitPrice }}</td>
+                <td>{{ item.totalValue }}</td>
+            </tr>
+        }
+        </tbody>
 
-
-                    <tr>
-
-                        <td>
-                                قلم أزرق
-                        </td>
-
-                        <td>مش عارفين</td>
-                        <td>11</td>
-                        <td>2</td>
-                        <td>3</td>
-
-                        <td>مستعمل</td>
-
-                        <td>2</td>
-                        <td>10</td>
-                    </tr>
-
-            </tbody>
         </table>
 
 
@@ -146,7 +142,7 @@
             <tr><td>محمد أحمد</td></tr>
 
         </div>
-        
+
         <div style="white-space:no-wrap">تم الصرف أمين المخازن</div>
         <div>كاتب الشطب</div>
         <div>توقيع المستلم</div>
@@ -159,6 +155,9 @@
 
 </div>
 </form>
+
+</li>
+</ul>
 </div>
 
 

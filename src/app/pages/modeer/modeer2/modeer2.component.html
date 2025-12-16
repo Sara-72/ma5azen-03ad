@@ -8,7 +8,7 @@
 <div class="d-flex">
 
 <aside class="sidebar">
-            <h5>مرحباً أستاذ/ة محمد أحمد</h5>
+            <h5>مرحباً بك </h5>
             <ul class="mt-5">
                 <li><a href="/modeer1">المخزن</a></li>
                 <li class="active"><a>اذن الصرف</a></li>
@@ -21,7 +21,7 @@
             </ul>
 </aside>
 
-<form [formGroup]="consumableForm" (ngSubmit)="onSubmit()" class="m-auto">
+<form *ngIf="consumableForm" [formGroup]="consumableForm" (ngSubmit)="onSubmit()" class="m-auto">
 <div class="form-container" dir="rtl">
 
     <header class="form-header">
@@ -99,13 +99,23 @@
 
         </div>
 
-        <div class="row">
+<div class="row">
+    <div class="field mb-2">
+        <label>اسم الطالب ( المخزن / الإدارة / العامل ) :</label>
+        <input type="text" formControlName="requestorName" class="input-line">
 
-            <div class="field mb-2">
-                <label>اسم الطالب ( المخزن / الإدارة / العامل ) :</label>
-                <input type="text" formControlName="requestorName" class="input-line">
+        @if (consumableForm.get('requestorName')?.invalid && consumableForm.get('requestorName')?.touched) {
+            <div class="text-danger mt-1 text-end small" style="white-space: normal; direction: rtl;">
+                @if (consumableForm.get('requestorName')?.hasError('required')) {
+                    اسم الطالب مطلوب.
+                }
+                @if (consumableForm.get('requestorName')?.hasError('fourStrings')) {
+                    يجب إدخال الاسم كاملاً (أربع كلمات بالضبط).
+                }
             </div>
-        </div>
+        }
+    </div>
+</div>
 
         <div class="row">
             <div class="field">
@@ -124,6 +134,7 @@
         <table>
             <thead>
                 <tr>
+                    <th>الفئة</th>
                     <th>اسم الصنف</th>
                     <th>الوحدة</th>
                     <th>الكمية المطلوبة</th>
@@ -140,15 +151,42 @@
                   @for (rowGroup of tableData.controls; track $index) {
                     <tr [formGroupName]="$index">
 
-                        <td>
-                            <select formControlName="itemName" class="table-input">
-                                <option value="" disabled selected hidden>اختر</option>
-                                @for (name of itemNames; track name) {
-                                    <option [value]="name">{{ name }}</option>
-                                }
-                            </select>
-                        </td>
+<td>
+                <select
+                    formControlName="category"
+                    class="table-input"
 
+                    (change)="updateFilteredItems(getCategoryValue($event), $index)"
+                    >
+
+                    <option value="" disabled selected hidden>اختر الفئة</option>
+                    @for (category of categories; track category) {
+                        <option [value]="category">{{ category }}</option>
+                    }
+                </select>
+            </td>
+<td>
+    <input
+        type="text"
+        formControlName="itemSearchText"
+        class="table-input"
+        placeholder="ابحث عن صنف"
+
+        [attr.list]="'itemList-' + $index"
+
+        (input)="filterItemOptions($event, $index)"
+
+        (change)="rowGroup.get('itemName')?.setValue(rowGroup.get('itemSearchText')?.value)">
+
+        <datalist [id]="'itemList-' + $index">
+        @for (item of getFilteredItemsForRow($index); track item) {
+            <option [value]="item"></option>
+        }
+    </datalist>
+
+    <input type="hidden" formControlName="itemName">
+
+    </td>
                         <td><input type="text" formControlName="unit" class="table-input"></td>
                         <td><input type="text" formControlName="quantityRequired" class="table-input"></td>
                         <td><input type="text" formControlName="quantityAuthorized" class="table-input"></td>
@@ -181,9 +219,20 @@
         <div>توقيع الطالب</div>
         <div>كاتب الشطب</div>
         <div class="d-flex flex-column">
-            <div>يصرح بالصرف مدير المخازن</div>
-            <input type="text">
-        </div>
+        <div>يصرح بالصرف مدير المخازن</div>
+        <input type="text" formControlName="managerApprovalName" class="signature-input">
+
+        @if (consumableForm.get('managerApprovalName')?.invalid && consumableForm.get('managerApprovalName')?.touched) {
+            <div class="text-danger mt-1 text-end small" style="white-space: normal; direction: rtl;">
+                @if (consumableForm.get('managerApprovalName')?.hasError('required')) {
+                    اسم مدير المخازن مطلوب.
+                }
+                @if (consumableForm.get('managerApprovalName')?.hasError('fourStrings')) {
+                    يجب إدخال الاسم كاملاً (أربع كلمات بالضبط).
+                }
+            </div>
+        }
+    </div>
         <div style="white-space:no-wrap">تم الصرف أمين المخازن</div>
         <div>كاتب الشطب</div>
         <div>توقيع المستلم</div>

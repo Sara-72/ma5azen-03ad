@@ -1,69 +1,45 @@
-<app-header>
-
-</app-header>
+<app-header> </app-header>
 
 <div class="d-flex flex-row">
-<aside class="sidebar">
-            <h5>مرحباً أستاذ/ة محمد أحمد</h5>
-            <ul class="mt-5">
-                <li class="active"><a>المخزن</a></li>
-                <li><a href="/modeer2">اذن الصرف</a></li>
-                <li><a href="/modeer3">مذكرات الصرف</a></li>
-                <li><a href="/modeer4">اذونات الصرف</a></li>
+  <aside class="sidebar">
+    <h5>مرحباً بك</h5>
+    <ul class="mt-5">
+      <li class="active"><a>المخزن</a></li>
+      <li><a href="/modeer2">اذن الصرف</a></li>
+      <li><a href="/modeer3">مذكرات الصرف</a></li>
+      <li><a href="/modeer4">اذونات الصرف</a></li>
+    </ul>
+  </aside>
 
+  <div class="container mt-5">
+    <div class="table-responsive-rtl">
+      <table
+        class="table table-bordered table-striped table-hover text-center"
+        dir="rtl"
+      >
+        <thead>
+          <tr>
+            <th>الفئة</th>
+            <th>الصنف</th>
+            <th>نوع الصنف</th>
+            <th>العدد</th>
+          </tr>
+        </thead>
 
-            </ul>
-</aside>
+        <tbody>
+          <tr *ngFor="let item of additions">
+            <td>{{ item.unit }}</td>
+            <td>{{ item.itemName }}</td>
+            <td></td>
+            <td>{{ item.quantity }}</td>
+          </tr>
 
-<div class="container mt-5">
-
-
-
-        <div class="table-responsive-rtl">
-            <table class="table table-bordered table-striped table-hover text-center" dir="rtl">
-
-                <thead>
-                    <tr>
-                        <th>التاريخ</th>
-                        <th>الصنف</th>
-                        <th>الفئة</th>
-                        <th>العدد</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <tr>
-                        <td>2024-05-10</td>
-                        <td>كمبيوتر محمول</td>
-                        <td>أجهزة</td>
-                        <td>1</td>
-
-                    </tr>
-                    <tr>
-                        <td>2024-05-12</td>
-                        <td>ورق طباعة A4</td>
-                        <td>أدوات مكتبية</td>
-                        <td>5</td>
-
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+          <tr *ngIf="additions.length === 0">
+            <td colspan="4">لا توجد بيانات</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-
-
-
-
-
-
+  </div>
 </div>
-<app-footer>
-</app-footer>
-
-
+<app-footer> </app-footer>
