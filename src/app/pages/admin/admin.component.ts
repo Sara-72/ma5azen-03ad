@@ -97,18 +97,26 @@ export class AdminComponent implements OnInit, OnDestroy{
   }
 
   submit() {
-    if (this.adminForm.invalid) {
-      this.adminForm.markAllAsTouched();
-      return;
+  if (this.adminForm.invalid) {
+    this.adminForm.markAllAsTouched();
+    return;
+  }
+
+  const form = this.adminForm.value;
+
+  this.auth.checkEmailExists(form.email, form.role).subscribe((res: any) => {
+    // لو السيرفر رجع موجود
+    if (res && res.length > 0) {
+      alert('الإيميل موجود بالفعل. يرجى إدخال إيميل آخر.');
+      return; // يمنع الإرسال
     }
 
-    const form = this.adminForm.value;
-
+    // لو مش موجود، نفذ الإضافة
     const body = {
       email: form.email,
       password: form.password,
       faculty: form.college,
-      name:form.name
+      name: form.name
     };
 
     switch (form.role) {
@@ -130,7 +138,12 @@ export class AdminComponent implements OnInit, OnDestroy{
     }
 
     this.adminForm.reset();
-  }
+  }, err => {
+    console.error('حدث خطأ أثناء التحقق من الإيميل', err);
+    alert('حدث خطأ أثناء التحقق من الإيميل');
+  });
+}
+
 
   ngOnInit(): void {
     // 🚨 Add subscription to the role control

@@ -20,9 +20,26 @@ export class Modeer1Component implements OnInit {
 
   constructor(private modeerSercive : ModeerSercive ) {}
 
-  ngOnInit(): void {
-    this.loadAdditions();
-  }
+  userName: string = '';
+  displayName: string = '';
+
+
+ngOnInit(): void {
+  this.userName = localStorage.getItem('name') || '';
+  this.displayName = this.getFirstTwoNames(this.userName);
+
+  this.loadAdditions();
+}
+getFirstTwoNames(fullName: string): string {
+  if (!fullName) return '';
+
+  return fullName
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .join(' ');
+}
+
 
   loadAdditions() {
     this.modeerSercive.getAdditions().subscribe({

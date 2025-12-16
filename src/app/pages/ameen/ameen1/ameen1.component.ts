@@ -2,7 +2,7 @@ import { Component ,OnInit, inject, signal ,OnDestroy} from '@angular/core';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '../../../components/header/header.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
-
+import { CommonModule } from '@angular/common';
 import { catchError, of } from 'rxjs';
 import { FormsModule, FormBuilder, ReactiveFormsModule, FormGroup, Validators, FormArray } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -11,8 +11,10 @@ import {
   StoreKeeperStockService,
   StockResponse
 } from '../../../services/store-keeper-stock.service';
+
 // Assuming you have an ApiService to handle HTTP requests
 // import { ApiService } from '../services/api.service';
+
 
 
 
@@ -35,7 +37,7 @@ interface CategoryItemMap {
     HeaderComponent,
     FooterComponent,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,CommonModule
   ],
   templateUrl: './ameen1.component.html',
   styleUrl: './ameen1.component.css'
@@ -59,6 +61,9 @@ export class Ameen1Component implements OnInit ,OnDestroy{
 
   // NEW: Array to hold subscriptions for cleaning up when the component is destroyed
   private subscriptions: Subscription[] = [];
+  userName: string = '';
+  displayName: string = '';
+
 
 
   simpleForm!: FormGroup;
@@ -81,7 +86,10 @@ export class Ameen1Component implements OnInit ,OnDestroy{
 
 
   }
-ngOnInit(): void {
+  ngOnInit(): void {
+    this.userName = localStorage.getItem('name') || '';
+    this.displayName = this.getFirstTwoNames(this.userName);
+
     // 1. Create the single instance of the first row
     const initialRowGroup = this.createTableRowFormGroup();
 
@@ -93,6 +101,15 @@ ngOnInit(): void {
 
     // 4. Attach the listener to the correct instance (initialRowGroup) at the correct index (0)
     this.addCategoryListener(initialRowGroup, 0);
+  }
+  getFirstTwoNames(fullName: string): string {
+    if (!fullName) return '';
+
+    return fullName
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .join(' ');
   }
 
   ngOnDestroy(): void {

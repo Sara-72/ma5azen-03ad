@@ -4,7 +4,11 @@
 <div class="page-container">
 
     <aside class="sidebar">
-        <h5>مرحباً بك</h5>
+        <h5>
+  مرحباً بك
+  <span *ngIf="displayName">، {{ displayName }}</span>
+</h5>
+
         <ul class="mt-5">
             <li class="active"><a>مذكرة الصرف</a></li>
             <li><a href="/employee2">العهد</a></li>

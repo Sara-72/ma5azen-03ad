@@ -47,4 +47,23 @@ export class AuthService {
   addInventoryManager(data: any) {
     return this.http.post(`${this.api}/InventoryManagers`, data);
   }
+  checkEmailExists(email: string, role: string) {
+  let url = '';
+  switch (role) {
+    case 'موظف':
+      url = `${this.api}/Users?email=${email}`;
+      break;
+    case 'موظف مخزن':
+      url = `${this.api}/Employees?email=${email}`;
+      break;
+    case 'أمين مخزن':
+      url = `${this.api}/StoreKeepers?email=${email}`;
+      break;
+    case 'مدير مخزن':
+      url = `${this.api}/InventoryManagers?email=${email}`;
+      break;
+  }
+  return this.http.get(url); // يفترض السيرفر يرجع [] لو مش موجود أو object لو موجود
+}
+
 }

@@ -105,6 +105,8 @@ export class Login2PageComponent {
   next: (res: any) => {
     localStorage.setItem('token', res.token);
     localStorage.setItem('role', 'EMPLOYEE');
+    localStorage.setItem('name', res.name);
+
 
 
     this.router.navigate(['/employee_ma5azen1']);

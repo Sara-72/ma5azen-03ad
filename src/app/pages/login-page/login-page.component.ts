@@ -121,6 +121,8 @@ onSubmit() {
       localStorage.setItem('token', res.token);
       localStorage.setItem('role', 'USER');
       localStorage.setItem('college', this.loginForm.value.college!);
+      localStorage.setItem('name', res.name);
+
 
       this.router.navigate(['/employee1']);
     },

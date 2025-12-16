@@ -122,7 +122,9 @@ export class Login5PageComponent {
       // ✅ هنا فقط
       localStorage.setItem('token', res.token);
       localStorage.setItem('role', 'ADMIN');
+      localStorage.setItem('name', res.name);
 
+        
       this.router.navigate(['/admin']);
     },
     error: () => {

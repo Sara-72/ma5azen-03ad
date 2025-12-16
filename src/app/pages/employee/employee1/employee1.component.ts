@@ -92,10 +92,25 @@ selectedCategory: string = ''
     });
   }
 
-  ngOnInit(): void {
-    // Initialization logic
-    this.filteredItemNames = this.itemData[this.categories[0]] || [];
-  }
+ userName: string = '';
+ displayName: string = '';
+
+ngOnInit(): void {
+  this.userName = localStorage.getItem('name') || '';
+  this.displayName = this.getFirstTwoNames(this.userName);
+
+  this.filteredItemNames = this.itemData[this.categories[0]] || [];
+}
+getFirstTwoNames(fullName: string): string {
+  if (!fullName) return '';
+
+  return fullName
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .join(' ');
+}
+
 
   // 🚨 Getter for the FormArray holding all the papers
   get requests(): FormArray {

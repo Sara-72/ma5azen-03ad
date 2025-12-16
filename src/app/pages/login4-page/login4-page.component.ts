@@ -106,6 +106,8 @@ export class Login4PageComponent {
     console.log('Login response:', res);
     localStorage.setItem('token', res.token);
     localStorage.setItem('role', 'INVENTORY_MANAGER');
+    localStorage.setItem('name', res.name);
+
 
 
     this.router.navigate(['/modeer1']);

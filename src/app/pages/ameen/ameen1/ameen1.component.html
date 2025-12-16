@@ -8,7 +8,11 @@
 <div class="content d-flex flex-row">
 
 <aside class="sidebar">
-            <h5>مرحباً بك </h5>
+            <h5>
+  مرحباً بك
+  <span *ngIf="displayName">، {{ displayName }}</span>
+</h5>
+
             <ul class="mt-5">
                 <li class="active"><a>المخزن</a></li>
                 <li><a href="/ameen2">دفتر اليومية</a></li>

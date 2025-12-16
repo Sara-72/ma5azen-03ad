@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { HeaderComponent } from '../../../components/header/header.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { FormBuilder, ReactiveFormsModule, FormGroup, Validators, FormArray } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 
 @Component({
@@ -10,7 +11,7 @@ import { FormBuilder, ReactiveFormsModule, FormGroup, Validators, FormArray } fr
   imports: [
     HeaderComponent,
     FooterComponent,
-    ReactiveFormsModule],
+    ReactiveFormsModule,CommonModule],
   templateUrl: './employee-ma5azen1.component.html',
   styleUrl: './employee-ma5azen1.component.css'
 })
@@ -44,10 +45,26 @@ export class EmployeeMa5azen1Component {
     });
   }
 
-  ngOnInit(): void {
-    // Start with at least one empty row when the page loads
-    this.tableData.push(this.createTableRowFormGroup());
-  }
+ userName: string = '';
+ displayName: string = '';
+
+
+ngOnInit(): void {
+  this.userName = localStorage.getItem('name') || '';
+  this.displayName = this.getFirstTwoNames(this.userName);
+
+  this.tableData.push(this.createTableRowFormGroup());
+}
+getFirstTwoNames(fullName: string): string {
+  if (!fullName) return '';
+
+  return fullName
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .join(' ');
+}
+
 
   // Helper getter to easily access the FormArray
   get tableData(): FormArray {
