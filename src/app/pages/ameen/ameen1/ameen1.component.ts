@@ -3,8 +3,14 @@ import { Router } from '@angular/router';
 import { HeaderComponent } from '../../../components/header/header.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 
+import { catchError, of } from 'rxjs';
 import { FormsModule, FormBuilder, ReactiveFormsModule, FormGroup, Validators, FormArray } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+import {
+  StoreKeeperStockService,
+  StockResponse
+} from '../../../services/store-keeper-stock.service';
 // Assuming you have an ApiService to handle HTTP requests
 // import { ApiService } from '../services/api.service';
 
@@ -61,6 +67,8 @@ export class Ameen1Component implements OnInit ,OnDestroy{
   // Dependency Injection
   private fb = inject(FormBuilder);
   private router = inject(Router);
+  private stockService = inject(StoreKeeperStockService);
+
 
   constructor() {
     this.simpleForm = this.fb.group({
@@ -133,6 +141,17 @@ ngOnInit(): void {
         this.subscriptions.push(sub);
     }
   }
+  private handleComplete(done: number, total: number) {
+  if (done === total) {
+    this.isSubmitting.set(false);
+    alert('تم حفظ البيانات بنجاح');
+
+    this.simpleForm.reset();
+    this.tableData.clear();
+    this.addRow();
+  }
+}
+
 
   // ➕ Method to add a new row
   addRow(): void {
@@ -170,22 +189,71 @@ ngOnInit(): void {
 
   // --- SAVE BUTTON LOGIC ---
 
+
+
 onSubmit(): void {
-      if (this.simpleForm.invalid) {
-        this.simpleForm.markAllAsTouched();
-        console.warn('Form is invalid. Cannot submit.');
-        return;
+  if (this.simpleForm.invalid) {
+    this.simpleForm.markAllAsTouched();
+    return;
+  }
+
+  this.isSubmitting.set(true);
+
+  const rows = this.simpleForm.value.tableData;
+  let completed = 0;
+  const total = rows.length;
+
+  rows.forEach((row: any) => {
+    const itemName = row.item;
+    const category = row.category;
+    const newQuantity = Number(row.count);
+
+    // جلب كل المخزون بدل getStock إذا getStock بيرجع null
+    this.stockService.getAllStocks().pipe(
+      catchError(() => of([])) // لو GET رجعت خطأ نحولها لمصفوفة فارغة
+    ).subscribe(stocks => {
+      // البحث عن الصنف بنفس الاسم والفئة
+      const existing = stocks.find((s: any) =>
+        s.itemName === itemName && s.category === category
+      );
+
+      if (existing) {
+        // UPDATE
+        const updatedBody = {
+          stock: {
+            itemName: existing.itemName,
+            category: existing.category,
+            quantity: existing.quantity + newQuantity
+          }
+        };
+
+        this.stockService.updateStock(existing.id, updatedBody).subscribe({
+          next: () => this.handleComplete(++completed, total),
+          error: () => this.handleComplete(++completed, total)
+        });
+      } else {
+        // ADD جديد
+        const addBody = {
+          stock: {
+            itemName: itemName,
+            category: category,
+            quantity: newQuantity
+          }
+        };
+
+        this.stockService.addStock(addBody).subscribe({
+          next: () => this.handleComplete(++completed, total),
+          error: () => this.handleComplete(++completed, total)
+        });
       }
+    });
+  });
+}
 
-      this.isSubmitting.set(true);
-      const formData = this.simpleForm.value;
-      console.log('Sending Form Data:', formData);
 
-      setTimeout(() => {
-        console.log('Request submitted successfully!');
-        this.isSubmitting.set(false);
-        // router navigation logic here
-      }, 2000);
-    }
+
+
+
+
 
 }

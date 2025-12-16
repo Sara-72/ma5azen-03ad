@@ -14,6 +14,7 @@ import { FooterComponent } from '../../components/footer/footer.component';
 import { Employee1Component } from '../employee/employee1/employee1.component';
 import { AuthService } from '../../services/auth.service';
 
+
 function passwordValidator(control: AbstractControl): ValidationErrors | null {
   const value = control.value || '';
 
@@ -37,26 +38,6 @@ function passwordValidator(control: AbstractControl): ValidationErrors | null {
 
   return null;
 }
-function collegeValidator(control: AbstractControl): ValidationErrors | null {
-  const value = control.value;
-
-  if (!value) {
-    return { required: true };
-  }
-
-  const allowedColleges = ['education', 'csai', 'alsun', 'tourism'];
-
-  if (!allowedColleges.includes(value)) {
-    return {
-      invalidCollege: {
-        message: 'الكلية غير صحيحة'
-      }
-    };
-  }
-
-  return null;
-}
-
 
 interface LoginForm {
   email: FormControl<string>;
@@ -76,34 +57,35 @@ interface LoginForm {
   styleUrl: './login-page.component.css'
 })
 export class LoginPageComponent {
+  // Dependency injection
+  private auth = inject(AuthService);
 
   isSubmitting = signal(false);
   message = signal<{ text: string; type: 'success' | 'error' } | null>(null);
 
-  // Form Group initialization using FormBuilder
-  private fb = new FormBuilder();
- // private router = inject(Router);
+// Form Group initialization using FormBuilder
+private fb = new FormBuilder();
+private router = inject(Router);
 
-  loginForm: FormGroup<LoginForm> = this.fb.group({
-    email: this.fb.nonNullable.control('', [
-      Validators.required,
-      Validators.email,
-    ]),
-    password: this.fb.nonNullable.control('', [
-      Validators.required,
-      passwordValidator, // Our custom validator
-    ]),
+loginForm: FormGroup<LoginForm> = this.fb.group({
+  email: this.fb.nonNullable.control('', [
+    Validators.required,
+    Validators.email,
+  ]),
+  password: this.fb.nonNullable.control('', [
+    Validators.required,
+    passwordValidator, // Our custom validator
+  ]),
 
-    college: this.fb.control<string | null>(null, [
-      Validators.required,
-      collegeValidator
+  college: this.fb.control<string | null>(null, [
+      Validators.required
   ]),
 
 
-  }) as FormGroup<LoginForm>;
+}) as FormGroup<LoginForm>;
 
 
-  constructor(private auth: AuthService, private router: Router) {
+constructor() {
     // Effect to clear messages when user starts typing again
     effect(() => {
         const emailValue = this.loginForm.controls.email.value;
@@ -121,43 +103,24 @@ export class LoginPageComponent {
   }
 
 
+
 onSubmit() {
-  if (this.loginForm.invalid) {
-    this.loginForm.markAllAsTouched();
-    return;
-  }
+  if (this.loginForm.invalid) return;
 
   this.isSubmitting.set(true);
 
   const data = {
-    email: this.loginForm.value.email!,
-    password: this.loginForm.value.password!
+    email: this.loginForm.value.email,
+    password: this.loginForm.value.password
   };
 
   this.auth.userLogin(data).subscribe({
+    
     next: (res: any) => {
-      console.log('Login response:', res);
-
-      const selectedCollege = this.auth.normalizeFaculty(
-        this.loginForm.value.college
-      );
-
-      const actualFaculty = this.auth.normalizeFaculty(
-        res.faculty
-      );
-
-      if (selectedCollege !== actualFaculty) {
-        this.isSubmitting.set(false);
-        this.message.set({
-          text: 'الكلية المختارة لا تطابق الكلية المسجلة لهذا الحساب',
-          type: 'error'
-        });
-        return;
-      }
-
+       console.log('Login response:', res); 
       localStorage.setItem('token', res.token);
       localStorage.setItem('role', 'USER');
-      localStorage.setItem('college', selectedCollege as string);
+      localStorage.setItem('college', this.loginForm.value.college!);
 
       this.router.navigate(['/employee1']);
     },
@@ -170,7 +133,5 @@ onSubmit() {
     }
   });
 }
-
-
 
 }
