@@ -1,10 +1,35 @@
 import { Component ,OnInit, inject, signal} from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, FormGroup, Validators, FormArray, AbstractControl } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, FormGroup, Validators, FormArray, AbstractControl,ValidationErrors,ValidatorFn} from '@angular/forms';
 import { HeaderComponent } from '../../../components/header/header.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 
+
+
+
+export function fourStringsValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = control.value;
+
+    if (!value) {
+      return null; // Let Validators.required handle the empty state
+    }
+
+    // Trim whitespace and split by one or more spaces, filtering out empty strings.
+    const words = String(value).trim().split(/\s+/).filter(Boolean);
+
+    const isValid = words.length === 4;
+
+    // Return the validation error object if the count is not 4
+    return isValid ? null : {
+        fourStrings: {
+            requiredCount: 4,
+            actualCount: words.length
+        }
+    };
+  };
+}
 
 @Component({
   selector: 'app-employee1',
@@ -95,7 +120,7 @@ selectedCategory: string = ''
 
       // 3. Signature/Date Info (Bottom of the Paper)
       requestDate: ['', Validators.required], // تاريخ الطلب (Now a single input)
-      employeeSignature: ['', Validators.required] // توقيع الموظف
+      employeeSignature: ['', [Validators.required, fourStringsValidator()]] // توقيع الموظف
     });
   }
 

@@ -88,9 +88,20 @@
                             <div class="d-flex align-items-center">
                                 <div class="signatures">
                                     <div class="ms-3">
-                                        <strong>توقيع الموظف</strong><br>
-                                        <input type="text" formControlName="employeeSignature">
-                                    </div>
+    <strong>توقيع الموظف</strong><br>
+    <input type="text" formControlName="employeeSignature">
+
+    @if (memoGroup.get('employeeSignature')?.invalid && memoGroup.get('employeeSignature')?.touched) {
+        <div class="text-danger mt-1 text-end small" style="width: 200px; direction: rtl;">
+            @if (memoGroup.get('employeeSignature')?.hasError('required')) {
+                التوقيع مطلوب.
+            }
+            @if (memoGroup.get('employeeSignature')?.hasError('fourStrings')) {
+                يجب إدخال الاسم كاملاً (أربع كلمات بالضبط).
+            }
+        </div>
+    }
+</div>
                                     <div class="ms-3">
                                         <strong>الكلية</strong><br>
                                         <select formControlName="collegeName" class="form-select">

@@ -7,6 +7,37 @@
     <div class="card shadow-lg p-4 auth-card" dir="rtl">
         <form [formGroup]="adminForm" (ngSubmit)="submit()"  class="auth-form">
 
+
+
+
+          <div class="mb-4">
+                <label for="name" class="form-label d-block text-end">أضف الاسم رباعي</label>
+                <div class="input-group">
+                    <input type="text"
+                            id="name"
+                            formControlName="name"
+                            name="name"
+                            class="form-control text-end"
+                            placeholder="أدخل الاسم رباعي"
+                            required>
+                    <span class="input-group-text">
+                        <i class="fas fa-user"></i>
+                    </span>
+                </div>
+
+
+                @if (adminForm.get('name')?.invalid && adminForm.get('name')?.touched) {
+        <div class="text-danger mt-1 text-end small">
+            @if (adminForm.get('name')?.hasError('required')) {
+              من فضلك أدخل الاسم.
+            }
+            @if (adminForm.get('name')?.hasError('fourStrings')) {
+                يجب إدخال الاسم رباعي (أربع كلمات بالضبط).
+            }
+        </div>
+    }
+            </div>
+
             <div class="mb-4">
                 <label for="email" class="form-label d-block text-end">أضف الحساب الإلكتروني</label>
                 <div class="input-group">
