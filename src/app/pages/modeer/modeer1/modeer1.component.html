@@ -26,24 +26,33 @@
             <th>الفئة</th>
             <th>الصنف</th>
             <th>نوع الصنف</th>
+            <th>الوحدة</th>
             <th>العدد</th>
           </tr>
         </thead>
 
-        <tbody>
-          <tr *ngFor="let item of additions">
-            <td>{{ item.unit }}</td>
-            <td>{{ item.itemName }}</td>
-            <td></td>
-            <td>{{ item.quantity }}</td>
-          </tr>
+                <tbody>
+                    <tr *ngFor="let item of getStoreKeeperStocks">
 
-          <tr *ngIf="additions.length === 0">
-            <td colspan="4">لا توجد بيانات</td>
-          </tr>
-        </tbody>
-      </table>
+                        <td>{{ item.category }}</td>
+                        <td>{{ item.itemName }}</td>
+                        <td></td>
+                        <td></td>
+                        <td>{{ item.quantity }}</td>
+                    </tr>
+
+                    <tr *ngIf="getStoreKeeperStocks.length === 0">
+                        <td colspan="4">لا توجد بيانات</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-  </div>
+
+
+
+
+
+
 </div>
 <app-footer> </app-footer>

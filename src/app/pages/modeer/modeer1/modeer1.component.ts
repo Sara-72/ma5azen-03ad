@@ -7,16 +7,17 @@ import { ModeerSercive } from '../../../services/modeer.service';
 @Component({
   selector: 'app-modeer1',
   imports: [
-    CommonModule,  
+    CommonModule,
     HeaderComponent,
     FooterComponent,
   ],
   templateUrl: './modeer1.component.html',
   styleUrl: './modeer1.component.css'
 })
+
 export class Modeer1Component implements OnInit {
 
-  additions: any[] = [];
+  getStoreKeeperStocks: any[] = [];
 
   constructor(private modeerSercive : ModeerSercive ) {}
 
@@ -41,15 +42,24 @@ getFirstTwoNames(fullName: string): string {
 }
 
 
-  loadAdditions() {
-    this.modeerSercive.getAdditions().subscribe({
-      next: (data) => {
-        console.log('API DATA:', data);
-        this.additions = data;
+  loadgetStoreKeeperStocks() {
+    this.modeerSercive.getStoreKeeperStocks().subscribe({
+      next: (data: any[]) => {
+        console.log('STORE KEEPER STOCKS:', data);
+
+        // 🔹 تحويل الداتا لنفس شكل getStoreKeeperStocks القديم
+        this.getStoreKeeperStocks = data.map(item => ({
+          id: item.id,
+          itemName: item.itemName,
+          category: item.category,
+          quantity: item.quantity
+          // زوّدي أي حقول كانت موجودة في getStoreKeeperStocks قبل كده
+        }));
       },
-      error: (err) => {
-        console.error('Error loading additions', err);
-      }
+      error: (err: any) => {
+  console.error('Error loading store keeper stocks', err);
+}
+
     });
   }
 }

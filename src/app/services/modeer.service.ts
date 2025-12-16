@@ -14,6 +14,11 @@ export class ModeerSercive {
   getAdditions(): Observable<any[]> {
     return this.http.get<any[]>(`${this.api}/Additions`);
   }
+  getStoreKeeperStocks() {
+  return this.http.get<any[]>(
+    'http://newwinventoryapi.runasp.net/api/StoreKeeperStocks'
+  );
+}
   //SpendPermission service
   getSpendPermissions(): Observable<any[]> {
     return this.http.get<any[]>(`${this.api}/SpendPermissions`);
