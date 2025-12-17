@@ -51,126 +51,173 @@ a{
 
 
 /***********************************************/
+/****************/
 
-
-
-
-.table-responsive-rtl {
-      overflow-x: auto;
+.paper{
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
 }
 
-.table-bordered th,
-.table-bordered td {
-    border-color: #dee2e6 !important;
+/* --- Item Line Container (Nested FormArray) --- */
+
+.item-lines-container {
+    border: 1px dashed #e0e0e0; /* Visually separates the item list */
+    padding: 15px 10px 5px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    background-color: #f7f7f7;
+}
+
+.item-line {
+    /* Styles for each individual item entry */
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    align-items: center; /* Vertically align items */
+}
+
+.item-line:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.item-line .field {
+    flex: 3; /* Give more space to the Item Name (الصنف) */
+}
+
+.item-line .count-input {
+    flex: 1; /* Keep the Count (العدد) input narrow */
+    max-width: 100px;
+}
+
+/* --- Item Line Buttons --- */
+
+
+/*  MAIN CONTENT  */
+.content {
+    flex: 1;
+    padding: 30px;
 }
 
 
-
-
-/* --- CORE LAYOUT FIX (CRITICAL) --- */
-
-/* Target the main wrapper */
-.d-flex {
-    flex-grow: 1;
+.paper {
+    background: white;
+    padding: 40px;
+    border: 1px solid #ccc;
     width: 100%;
+    margin: auto;
+    position: relative;
 }
 
-/* Ensure the container holding the table takes the remaining space on desktop */
-.d-flex > .container {
-    flex-grow: 1;
-    padding: 0 15px; /* Add padding to the sides */
-    margin-top: 20px !important; /* Adjust default top margin */
-    max-width: 100%; /* Ensure it can shrink */
+.title {
+    text-align: center;
+    margin-bottom: 20px;
 }
 
-/* Ensure the sidebar does not grow */
-.sidebar {
-    flex-shrink: 0;
-}
 
-/* Ensure table cells have appropriate padding for readability */
-.table-bordered th,
-.table-bordered td {
-    padding: 10px;
-    font-size: 0.9em;
-    white-space: nowrap; /* Prevent content from wrapping prematurely */
+.paper-logo {
+    width: 70px;
+    float: right;
+    margin-bottom: 10px;
 }
 
 
 
-/* --- RESPONSIVE ADJUSTMENTS (MEDIA QUERIES) --- */
-
-@media (max-width: 992px) {
-    /* Tablet/Small Desktop Adjustments */
-
-    .sidebar {
-        width: 25%;
-        padding: 15px;
-    }
+.paper-box {
+    border: 1px solid #000;
+    padding: 30px;
+    margin-top: 20px;
+    text-align: center;
 }
 
-@media (max-width: 768px) {
-    /* Mobile Layout Stacking & Fixes */
+.paper-box .mt {
+    margin-top: 25px;
+}
 
-    /* 1. LAYOUT STACKING FIX */
-    .d-flex {
-        flex-direction: column !important; /* Force stacking */
-        display: block !important;
-    }
+.signatures {
+    margin-top: 40px;
+    display: flex;
+    justify-content: space-between;
+}
 
-    /* 2. SIDEBAR COLLAPSE */
-    .sidebar {
-        width: 100% !important;
-        min-height: auto;
-        border-left: none;
-        border-bottom: 1px solid #ddd;
-        order: -1; /* Ensure sidebar appears BEFORE the main content */
-    }
+input[type="number"] {
+    width: 70%;
+    height: 27px;
+    font-size: 15px;
+}
 
-    /* Reorganize sidebar links for horizontal display on mobile */
-    .sidebar ul {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-around;
-        margin-top: 10px !important;
-    }
+input[type="text"] {
+  width: 20%;
+  height: 20px;
+  font-size: 15px;
+}
 
-    .sidebar li {
-        border-bottom: none;
-        padding: 8px 10px;
-        flex: 1 1 auto;
-        text-align: center;
-        border-right: 1px solid #ddd; /* Separator */
-    }
-    .sidebar li.active {
-        border-left: none;
-        border-bottom: 3px solid #0a3a63; /* Use the primary color */
-    }
+.signatures input {
+    width: 90%;
+    height: 25px;
+    padding: 4px 6px;
+    font-size: 13px;
+    box-sizing: border-box;
 
-    /* 3. MAIN CONTAINER ADJUSTMENTS */
-    .d-flex > .container {
-        width: 100% !important;
-        padding: 10px 5px; /* Minimal padding */
-        margin-top: 10px !important;
-    }
+}
 
-    /* 4. TABLE SCROLLING */
+.college-select {
+    width: 90%;
+    height: 25px;
+    font-size: 13px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    text-align: right;
+}
 
-    /* The HTML already uses .table-responsive-rtl, but we add fixes */
-    .table-responsive-rtl {
-        overflow-x: auto; /* Ensure horizontal scrolling is enabled */
-        width: 100%;
-        -webkit-overflow-scrolling: touch; /* Better scrolling experience on touch devices */
-    }
 
-    .table {
-        min-width: 500px; /* Min width for 5 columns of data */
-        width: auto;
-    }
 
-    .table-bordered th,
-    .table-bordered td {
-        font-size: 0.8em;
-        padding: 6px 4px; /* Tight padding */
-    }
+
+
+/* --- Uniform Styling for Signatures and Details Inputs --- */
+.big-container .form-select-inline{
+  width:20%;
+  background-color: white;
+  border: 1px solid gray;
+  height:27px;
+  border-radius: 2px;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  -ms-border-radius: 2px;
+  -o-border-radius: 2px;
+}
+/* Target all visible interactive form elements inside the signatures section */
+.big-container input[type="text"],
+.big-container input[type="date"]{
+    /* Set a unified width for consistency */
+    width: 100%;
+    max-width: 100%;
+
+    /* Set a unified height and padding for matching vertical size */
+    height: 40px; /* Adjust this value if needed, 40px is a standard height */
+    padding: 6px 12px;
+
+    /* Ensure border and background are consistent */
+    border: 1px solid #ced4da; /* Standard Bootstrap border color */
+    border-radius: 4px; /* Standard Bootstrap border radius */
+    background-color: #fff;
+
+    /* Font size consistency */
+    font-size: 1em;
+
+    /* Align text content to the right (RTL standard) */
+    text-align: right;
+
+    /* Ensure date picker icon and dropdown arrows are styled consistently */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+
+
+/* Specific adjustment for the Date Input to look like others */
+.big-container input[type="date"] {
+    /* Add any specific styles needed for date input padding/font if they differ */
+    line-height: 1.5; /* Helps align text in date field */
 }

@@ -52,3 +52,40 @@ a{
 
 
 /***********************************************/
+
+
+
+
+.table-container {
+
+  width: 100%;
+  max-width: 600px; /* Adjust as needed */
+  margin: 20px auto;
+
+}
+
+table {
+  /* Set the table to take full width of its container */
+  width: 100%;
+  border-collapse: collapse; /* Essential for clean borders */
+  border: 1px solid #000; /* Main outer border */
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+}
+
+th, td {
+  /* Style for all header and data cells */
+  border: 2px solid #dee2e6 ;
+  padding: 30px;
+  text-align: center; /* Center text alignment */
+  height: 85px;
+  vertical-align: top; /* Start content at the top of the large cells */
+  box-sizing: border-box;
+}
+
+th {
+  /* Style specifically for table headers */
+  background-color: #f8f8f8;
+  font-weight: bold;
+  font-size: 1.1em;
+  color: #333;
+}

@@ -25,7 +25,8 @@
           <tr>
             <th>الفئة</th>
             <th>الصنف</th>
-            <th>نوع الصنف</th>
+            <th>حالة الصنف</th>
+            <th>الوحدة</th>
             <th>العدد</th>
           </tr>
         </thead>
@@ -33,6 +34,7 @@
         <tbody formArrayName="tableData">
           @for (rowGroup of tableData.controls; track $index) {
           <tr [formGroupName]="$index">
+
             <td>
               <select formControlName="category" class="form-control">
                 <option value="" disabled selected hidden>اختر فئة</option>
@@ -41,6 +43,8 @@
                 }
               </select>
             </td>
+
+
 
             <td>
               <select formControlName="item" class="form-control">
@@ -60,6 +64,10 @@
                                     <option [value]="type">{{ type }}</option>
                                 }
                             </select>
+                        </td>
+
+                        <td>
+                          <input type="text" formControlName="unit" class="form-control">
                         </td>
 
             <td>

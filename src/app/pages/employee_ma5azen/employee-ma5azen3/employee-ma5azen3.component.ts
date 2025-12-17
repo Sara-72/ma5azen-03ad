@@ -15,6 +15,7 @@ interface SimpleRow {
   category: string;  // الفئة
   // date: string;      // الكود
   count: string;     // العدد
+  unit:string;
 }
 
 interface CategoryItemMap {
@@ -112,6 +113,7 @@ ngOnInit(): void {
     // }),
       count: ['', Validators.required],
       itemType: ['', Validators.required], // نوع الصنف
+      unit:[ '',Validators.required]
     });
   }
 

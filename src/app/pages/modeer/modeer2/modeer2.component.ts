@@ -90,17 +90,10 @@ export class Modeer2Component implements OnInit {
   private initForm() {
     this.consumableForm = this.fb.group({
       destinationName: ['', Validators.required],
-      category: ['', Validators.required],
-      requestDateGroup: this.fb.group({
-        yy: ['', Validators.required],
-        mm: ['', Validators.required],
-        dd: ['', Validators.required]
-      }),
-      regularDateGroup: this.fb.group({
-        yy: ['', Validators.required],
-        mm: ['', Validators.required],
-        dd: ['', Validators.required]
-      }),
+      category: ['', Validators.required], // الفئة الرئيسية في الأعلى
+      requestDateGroup: ['', Validators.required],
+      regularDateGroup: ['', Validators.required],
+
       requestorName: ['', [Validators.required, fourStringsValidator()]],
       documentNumber: ['', Validators.required],
       managerApprovalName: ['', [Validators.required, fourStringsValidator()]],
@@ -231,17 +224,9 @@ export class Modeer2Component implements OnInit {
 
     const basePayload = {
       destinationName: formVal.destinationName,
-      storeHouse: formVal.category,
-      requestDate: new Date(
-        Number(formVal.requestDateGroup.yy),
-        Number(formVal.requestDateGroup.mm) - 1,
-        Number(formVal.requestDateGroup.dd)
-      ).toISOString(),
-      documentDate: new Date(
-        Number(formVal.regularDateGroup.yy),
-        Number(formVal.regularDateGroup.mm) - 1,
-        Number(formVal.regularDateGroup.dd)
-      ).toISOString(),
+      storeHouse: formVal.category, // الفئة تُرسل كـ storeHouse
+      requestDate: new Date(formVal.requestDateGroup).toISOString(),
+      documentDate: new Date(formVal.regularDateGroup).toISOString(),
       requestorName: formVal.requestorName,
       documentNumber: formVal.documentNumber
     };
