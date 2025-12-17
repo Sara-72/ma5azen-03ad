@@ -13,6 +13,7 @@ import { Ameen1Component } from './pages/ameen/ameen1/ameen1.component';
 import { Ameen2Component } from './pages/ameen/ameen2/ameen2.component';
 import { Ameen3Component } from './pages/ameen/ameen3/ameen3.component';
 import { Ameen4Component } from './pages/ameen/ameen4/ameen4.component';
+import { Ameen5Component } from './pages/ameen/ameen5/ameen5.component';
 import { Modeer1Component } from './pages/modeer/modeer1/modeer1.component';
 import { Modeer2Component } from './pages/modeer/modeer2/modeer2.component';
 import { Modeer3Component } from './pages/modeer/modeer3/modeer3.component';
@@ -42,6 +43,7 @@ export const routes: Routes = [
   { path: 'ameen2', component: Ameen2Component, title: 'ameen2'},
   { path: 'ameen3', component: Ameen3Component, title: 'ameen3'},
   { path: 'ameen4', component: Ameen4Component, title: 'ameen4'},
+  { path: 'ameen5', component: Ameen5Component, title: 'ameen5'},
   { path: 'modeer1', component: Modeer1Component, title: 'modeer1'},
   { path: 'modeer2', component: Modeer2Component, title: 'modeer2'},
   { path: 'modeer3', component: Modeer3Component, title: 'modeer3'},
