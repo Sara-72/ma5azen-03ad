@@ -110,9 +110,9 @@
         </td>
 
               <td><input type="text" formControlName="unit" class="table-input"></td>
-              <td><input type="text" formControlName="quantityRequired" class="table-input"></td>
-              <td><input type="text" formControlName="quantityAuthorized" class="table-input"></td>
-              <td><input type="text" formControlName="quantityIssued" class="table-input"></td>
+              <td><input type="number" min="0" formControlName="quantityRequired" class="table-input"></td>
+              <td><input type="number" min="0" formControlName="quantityAuthorized" class="table-input"></td>
+              <td><input type="number" min="0" formControlName="quantityIssued" class="table-input"></td>
 
         <td>
           <select formControlName="storeType" class="table-input">
@@ -129,8 +129,8 @@
                 </select>
               </td>
 
-              <td><input type="text" formControlName="unitPrice" class="table-input"></td>
-              <td><input type="text" formControlName="value" class="table-input"></td>
+              <td><input type="number" min="0" formControlName="unitPrice" class="table-input"></td>
+              <td><input type="number" min="0" formControlName="value" class="table-input"></td>
             </tr>
             }
           </tbody>
