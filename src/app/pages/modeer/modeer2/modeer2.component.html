@@ -131,22 +131,24 @@
         </div>
       </div>
 
-      <div class="signature-section">
-        <div>توقيع الطالب</div>
-        <div>كاتب الشطب</div>
-        <div class="d-flex flex-column">
-          <div>يصرح بالصرف مدير المخازن</div>
-          <input type="text" formControlName="managerApprovalName" class="signature-input">
-          <div
-            *ngIf="consumableForm.get('managerApprovalName')?.invalid && consumableForm.get('managerApprovalName')?.touched"
-            class="text-danger mt-1 text-end small">
-            الاسم كاملاً مطلوب.
-          </div>
-        </div>
-        <div style="white-space:nowrap">تم الصرف أمين المخازن</div>
-        <div>كاتب الشطب</div>
-        <div>توقيع المستلم</div>
-      </div>
+<div class="signature-section">
+  <div class="sig-item">توقيع الطالب</div>
+  <div class="sig-item">كاتب الشطب</div>
+
+  <div class="sig-item approval-box">
+    <span>يصرح بالصرف مدير المخازن</span>
+    <input type="text" formControlName="managerApprovalName" class="signature-input">
+    <div *ngIf="consumableForm.get('managerApprovalName')?.invalid && consumableForm.get('managerApprovalName')?.touched"
+        class="error-text">
+      الاسم كاملاً مطلوب.
+    </div>
+  </div>
+
+  <div class="sig-item">تم الصرف أمين المخازن</div>
+  <div class="sig-item">كاتب الشطب</div>
+  <div class="sig-item">توقيع المستلم</div>
+</div>
+
 
       <div class="footnotes">
         <p>(*) كشف العجز - سند خصم - أصناف تالفة أو تالفة - محضر بيع جلب تشغيل - إهداءات ليست للنشاط الرئيسي للجهة</p>
@@ -162,6 +164,11 @@
       </div>
 
     </div>
-</div>
 
-<app-footer></app-footer>
+    </div>
+  </form>
+
+</div>
+<app-footer>
+
+</app-footer>

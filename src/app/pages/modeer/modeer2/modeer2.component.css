@@ -147,7 +147,7 @@ a{
 .table-section th {
     background-color: #f0f0f0;
     font-size: 0.9em;
-    padding: 10px 30px;
+    padding: 10px 20px;
 }
 
 .table-section .table-input {
@@ -195,19 +195,48 @@ a{
 /* Signature Section Styling */
 .signature-section {
     display: flex;
+    flex-wrap: nowrap; /* يمنع العناصر من النزول لسطر جديد */
     justify-content: space-between;
-    margin-top: 50px;
-    padding-bottom: 20px;
+    align-items: flex-start;
+    margin-top: 40px;
+    padding: 10px;
+    gap: 10px;
+    border-top: 1px solid #eee;
+    direction: rtl;
 }
 
-.signature-section div {
-
+.sig-item {
+    flex: 1; /* يوزع المساحة بالتساوي بين العناصر */
     text-align: center;
-    /* border-bottom: 1px dotted #000; */
-    padding-bottom: 15px;
     font-weight: bold;
-    font-size: 0.9em;
+    font-size: 0.85em;
+    white-space: nowrap; /* يمنع انقسام الجمل الطويلة */
 }
+
+/* تنسيق خاص بصندوق المدير */
+.approval-box {
+    display: flex;
+    flex-direction: column;
+    min-width: 180px; /* ضمان مساحة كافية للحقل */
+}
+
+.signature-input {
+    width: 90%;
+    margin: 5px auto;
+    border: none;
+    border-bottom: 1px solid #000;
+    background: transparent;
+    text-align: center;
+    outline: none;
+    font-size: 14px;
+}
+
+.error-text {
+    color: #dc3545;
+    font-size: 14px;
+    font-weight: bold;
+}
+
 
 /* Footnotes Styling */
 .footnotes {
@@ -358,7 +387,7 @@ select{
 /*
 /* Ensure signature input matches the parent signature div */
 .signature-section .signature-input {
-    width: 30%;
+    width: 80%;
     margin: 5px auto 0;
     border: 1px solid #000;
     padding: 2px 5px;
