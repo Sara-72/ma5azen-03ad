@@ -23,6 +23,7 @@ interface SimpleRow {
   category: string;  // الفئة
   // date: string;      // التاريخ
   count: string;     // العدد
+  unit:string;
 }
 
 
@@ -134,6 +135,7 @@ export class Ameen1Component implements OnInit ,OnDestroy{
     // }),
       count: ['', Validators.required],
       itemType: ['', Validators.required], // نوع الصنف
+      unit:['',Validators.required]
     });
   }
 

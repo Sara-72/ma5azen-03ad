@@ -18,6 +18,7 @@
                 <li><a href="/ameen2">دفتر اليومية</a></li>
                 <li><a href="/ameen3">أذونات الصرف</a></li>
                 <li><a href="/ameen4">دفاتر اليومية</a></li>
+                <li><a href="/ameen5">مخزنك</a></li>
 
             </ul>
         </aside>
@@ -37,7 +38,8 @@
           <tr>
             <th>الفئة</th>
             <th>الصنف</th>
-            <th>نوع الصنف</th>
+            <th>حالة الصنف</th>
+            <th>الوحدة</th>
             <th>العدد</th>
           </tr>
         </thead>
@@ -73,9 +75,11 @@
                                 }
                             </select>
                         </td>
-
+<td>
+<input type="number" min="0" formControlName="unit" class="form-control"/>
+</td>
             <td>
-              <input type="number" min="0" formControlName="count" class="form-control" />
+              <input type="number" min="0" formControlName="count" class="form-control"/>
             </td>
           </tr>
           }

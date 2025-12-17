@@ -1,268 +1,170 @@
-<app-header>
-
-</app-header>
-
-
-
+<app-header></app-header>
 
 <div class="d-flex">
+  <aside class="sidebar">
+    <h5>مرحباً بك</h5>
+    <ul class="mt-5">
+      <li><a href="/modeer1">المخزن</a></li>
+      <li class="active"><a>اذن الصرف</a></li>
+      <li><a href="/modeer3">مذكرات الصرف</a></li>
+      <li><a href="/modeer4">اذونات الصرف</a></li>
+    </ul>
+  </aside>
 
-<aside class="sidebar">
-            <h5>مرحباً بك </h5>
-            <ul class="mt-5">
-                <li><a href="/modeer1">المخزن</a></li>
-                <li class="active"><a>اذن الصرف</a></li>
-                <li><a href="/modeer3">مذكرات الصرف</a></li>
-                <li><a href="/modeer4">اذونات الصرف</a></li>
+  <form *ngIf="consumableForm" [formGroup]="consumableForm" (ngSubmit)="onSubmit()" class="m-auto">
+    <div class="form-container" dir="rtl">
 
-
-
-
-            </ul>
-</aside>
-
-<form *ngIf="consumableForm" [formGroup]="consumableForm" (ngSubmit)="onSubmit()" class="m-auto">
-<div class="form-container" dir="rtl">
-
-    <header class="form-header">
-        <h2 class="title">طلب و إذن صرف </h2>
+      <header class="form-header">
+        <h2 class="title">طلب و إذن صرف</h2>
         <h3 class="subtitle">مستديم | مستهلك</h3>
-    </header>
+      </header>
 
-    <div class="info-section">
+      <div class="info-section">
         <div class="row">
-            <div class="field mb-2">
-                <label>اسم الجهة :</label>
-                <input type="text" formControlName="destinationName" class="input-line">
-            </div>
-            <div class="field mb-2">
-                <label>مخزن:</label>
-                <input type="text" formControlName="storehouse" class="input-line">
-            </div>
-        </div>
+          <div class="field mb-2">
+            <label>اسم الجهة :</label>
+            <input type="text" formControlName="destinationName" class="input-line">
+          </div>
 
-        <div class="row">
-              <div class="field mb-2 date-group" formGroupName="requestDateGroup">
-                <label>تاريخ الطلب :</label>
-
-                <select formControlName="dd" class="input-box date-box text-center">
-                    <option value="" disabled selected hidden>DD</option>
-                    @for (day of days; track day) {
-                        <option [value]="day">{{ day }}</option>
-                    }
-                </select>
-                <p class="mb-0"> / </p>
-
-                  <select formControlName="mm" class="input-box date-box text-center">
-                    <option value="" disabled selected hidden>MM</option>
-                    @for (month of months; track month) {
-                        <option [value]="month">{{ month }}</option>
-                    }
-                </select>
-                <p class="mb-0"> / </p>
-
-                <select formControlName="yy" class="input-box date-box text-center">
-                    <option value="" disabled selected hidden>YY</option>
-                    @for (year of years; track year) {
-                        <option [value]="year">{{ year }}</option>
-                    }
-                </select>
-
-            </div>
-
-              <div class="field d-flex align-items-center mb-2 date-group" formGroupName="regularDateGroup">
-                <label>التاريخ :</label>
-
-                <select formControlName="dd" class="input-box date-box text-center">
-                    <option value="" disabled selected hidden>DD</option>
-                    @for (day of days; track day) {
-                        <option [value]="day">{{ day }}</option>
-                    }
-                </select>
-                <p class="mb-0"> / </p>
-
-                <select formControlName="mm" class="input-box date-box text-center">
-                    <option value="" disabled selected hidden>MM</option>
-                    @for (month of months; track month) {
-                        <option [value]="month">{{ month }}</option>
-                    }
-                </select>
-                <p class="mb-0"> / </p>
-
-                <select formControlName="yy" class="input-box date-box text-center">
-                    <option value="" disabled selected hidden>YY</option>
-                    @for (year of years; track year) {
-                        <option [value]="year">{{ year }}</option>
-                    }
-              </select>
-            </div>
-
-        </div>
-
-<div class="row">
-    <div class="field mb-2">
-        <label>اسم الطالب ( المخزن / الإدارة / العامل ) :</label>
-        <input type="text" formControlName="requestorName" class="input-line">
-
-        @if (consumableForm.get('requestorName')?.invalid && consumableForm.get('requestorName')?.touched) {
-            <div class="text-danger mt-1 text-end small" style="white-space: normal; direction: rtl;">
-                @if (consumableForm.get('requestorName')?.hasError('required')) {
-                    اسم الطالب مطلوب.
-                }
-                @if (consumableForm.get('requestorName')?.hasError('fourStrings')) {
-                    يجب إدخال الاسم كاملاً (أربع كلمات بالضبط).
-                }
-            </div>
+<div class="field mb-2">
+      <label>الفئة :</label>
+      <select formControlName="category" class="table-input"
+              (change)="onGlobalCategoryChange($event)">
+        <option value="" disabled selected hidden>اختر الفئة</option>
+        @for (category of categories; track category) {
+          <option [value]="category">{{ category }}</option>
         }
+      </select>
     </div>
-</div>
+
+        </div>
+        <div class="row">
+          <div class="field mb-2 date-group" formGroupName="requestDateGroup">
+            <label>تاريخ الطلب :</label>
+        <input type="date">
+          </div>
+
+          <div class="field d-flex align-items-center mb-2 date-group" formGroupName="regularDateGroup">
+            <label>التاريخ :</label>
+          <input type="date">
+          </div>
+
+
+        </div> <div class="row">
+          <div class="field mb-2">
+            <label>اسم الطالب ( المخزن / الإدارة / العامل ) :</label>
+            <input type="text" formControlName="requestorName" class="input-line">
+            @if (consumableForm.get('requestorName')?.invalid && consumableForm.get('requestorName')?.touched) {
+            <div class="text-danger mt-1 text-end small">يجب إدخال الاسم كاملاً (4 كلمات).</div>
+            }
+          </div>
+        </div>
 
         <div class="row">
-            <div class="field">
-                <label>(*) سند الصرف :</label>
-                  <select formControlName="documentNumber" class="table-input">
-                                <option value="" disabled selected hidden>الحالة</option>
-                                @for (condition of documentNumbers; track condition) {
-                                    <option [value]="condition">{{ condition }}</option>
-                                }
-                  </select>
-            </div>
+          <div class="field">
+            <label>(*) سند الصرف :</label>
+            <select formControlName="documentNumber" class="table-input">
+              <option value="" disabled selected hidden>اختر السند</option>
+              @for (condition of documentNumbers; track condition) {
+              <option [value]="condition">{{ condition }}</option>
+              }
+            </select>
+          </div>
         </div>
-    </div>
-
-    <div class="table-section">
+      </div> <div class="table-section">
         <table>
-            <thead>
-                <tr>
-                    <th>الفئة</th>
-                    <th>اسم الصنف</th>
-                    <th>الوحدة</th>
-                    <th>الكمية المطلوبة</th>
-                    <th>الكمية المصرح بها</th>
-                    <th>الكمية المنصرفة</th>
-                    <th>حالة الصنف (**)</th>
-                    <th>سعر الوحدة</th>
-                    <th>القيمة</th>
-                </tr>
-            </thead>
+          <thead>
+            <tr>
 
-            <tbody formArrayName="tableData">
-
-                  @for (rowGroup of tableData.controls; track $index) {
-                    <tr [formGroupName]="$index">
+              <th>اسم الصنف</th>
+              <th>الوحدة</th>
+              <th>الكمية المطلوبة</th>
+              <th>الكمية المصرح بها</th>
+              <th>الكمية المنصرفة</th>
+              <th>المخزن</th>
+              <th>حالة الصنف (**)</th>
+              <th>سعر الوحدة</th>
+              <th>القيمة</th>
+            </tr>
+          </thead>
+          <tbody formArrayName="tableData">
+            @for (rowGroup of tableData.controls; track $index) {
+            <tr [formGroupName]="$index">
 
 <td>
-                <select
-                    formControlName="category"
-                    class="table-input"
+          <input
+            type="text"
+            formControlName="itemSearchText"
+            class="table-input"
+            placeholder="ابحث عن صنف..."
+            [attr.list]="'list-' + $index"
+            (input)="filterItemOptions($event, $index)"
+            (blur)="syncItemName($index)">
 
-                    (change)="updateFilteredItems(getCategoryValue($event), $index)"
-                    >
+          <datalist [id]="'list-' + $index">
+            @for (item of getFilteredItemsForRow($index); track item) {
+              <option [value]="item">{{ item }}</option>
+            }
+          </datalist>
+          <input type="hidden" formControlName="itemName">
+        </td>
 
-                    <option value="" disabled selected hidden>اختر الفئة</option>
-                    @for (category of categories; track category) {
-                        <option [value]="category">{{ category }}</option>
-                    }
+              <td><input type="text" formControlName="unit" class="table-input"></td>
+              <td><input type="text" formControlName="quantityRequired" class="table-input"></td>
+              <td><input type="text" formControlName="quantityAuthorized" class="table-input"></td>
+              <td><input type="text" formControlName="quantityIssued" class="table-input"></td>
+
+        <td>
+          <select formControlName="storeType" class="table-input">
+            <option value="" disabled selected hidden>اختر النوع</option>
+            @for (type of storeTypes; track type) {
+              <option [value]="type">{{ type }}</option>
+            }
+          </select>
+        </td>
+              <td>
+                <select formControlName="itemCondition" class="table-input">
+                  <option value="" disabled selected hidden>الحالة</option>
+                  @for (condition of itemConditions; track condition) { <option [value]="condition">{{ condition }}</option> }
                 </select>
-            </td>
-<td>
-    <input
-        type="text"
-        formControlName="itemSearchText"
-        class="table-input"
-        placeholder="ابحث عن صنف"
+              </td>
 
-        [attr.list]="'itemList-' + $index"
-
-        (input)="filterItemOptions($event, $index)"
-
-        (change)="rowGroup.get('itemName')?.setValue(rowGroup.get('itemSearchText')?.value)">
-
-        <datalist [id]="'itemList-' + $index">
-        @for (item of getFilteredItemsForRow($index); track item) {
-            <option [value]="item"></option>
-        }
-    </datalist>
-
-    <input type="hidden" formControlName="itemName">
-
-    </td>
-                        <td><input type="text" formControlName="unit" class="table-input"></td>
-                        <td><input type="text" formControlName="quantityRequired" class="table-input"></td>
-                        <td><input type="text" formControlName="quantityAuthorized" class="table-input"></td>
-                        <td><input type="text" formControlName="quantityIssued" class="table-input"></td>
-
-                        <td>
-                            <select formControlName="itemCondition" class="table-input">
-                                <option value="" disabled selected hidden>الحالة</option>
-                                @for (condition of itemConditions; track condition) {
-                                    <option [value]="condition">{{ condition }}</option>
-                                }
-                            </select>
-                        </td>
-
-                        <td><input type="text" formControlName="unitPrice" class="table-input"></td>
-                        <td><input type="text" formControlName="value" class="table-input"></td>
-                    </tr>
-                }
-            </tbody>
+              <td><input type="text" formControlName="unitPrice" class="table-input"></td>
+              <td><input type="text" formControlName="value" class="table-input"></td>
+            </tr>
+            }
+          </tbody>
         </table>
-
-      <div class="row-controls">
-        <button type="button" class="remove-row-button" (click)="removeRow()">-</button>
-        <button type="button" class="add-row-button" (click)="addRow()">+</button>
+        <div class="row-controls">
+          <button type="button" class="remove-row-button" (click)="removeRow()">-</button>
+          <button type="button" class="add-row-button" (click)="addRow()">+</button>
+        </div>
       </div>
 
-    </div>
-
-    <div class="signature-section">
+      <div class="signature-section">
         <div>توقيع الطالب</div>
         <div>كاتب الشطب</div>
         <div class="d-flex flex-column">
-        <div>يصرح بالصرف مدير المخازن</div>
-        <input type="text" formControlName="managerApprovalName" class="signature-input">
-
-        @if (consumableForm.get('managerApprovalName')?.invalid && consumableForm.get('managerApprovalName')?.touched) {
-            <div class="text-danger mt-1 text-end small" style="white-space: normal; direction: rtl;">
-                @if (consumableForm.get('managerApprovalName')?.hasError('required')) {
-                    اسم مدير المخازن مطلوب.
-                }
-                @if (consumableForm.get('managerApprovalName')?.hasError('fourStrings')) {
-                    يجب إدخال الاسم كاملاً (أربع كلمات بالضبط).
-                }
-            </div>
-        }
-    </div>
-        <div style="white-space:no-wrap">تم الصرف أمين المخازن</div>
+          <div>يصرح بالصرف مدير المخازن</div>
+          <input type="text" formControlName="managerApprovalName" class="signature-input">
+          @if (consumableForm.get('managerApprovalName')?.invalid && consumableForm.get('managerApprovalName')?.touched) {
+          <div class="text-danger mt-1 text-end small">الاسم كاملاً مطلوب.</div>
+          }
+        </div>
+        <div style="white-space:nowrap">تم الصرف أمين المخازن</div>
         <div>كاتب الشطب</div>
         <div>توقيع المستلم</div>
-    </div>
+      </div>
 
-    <div class="footnotes">
+      <div class="footnotes">
         <p>(*) كشف العجز - سند خصم - أصناف تالفة أو تالفة - محضر بيع جلب تشغيل - إهداءات ليست للنشاط الرئيسي للجهة</p>
         <p>(**) جديدة - مستعمل - قابل للإصلاح - كهنة أو خردة</p>
-    </div>
+      </div>
 
-
-<div class="button-section">
+      <div class="button-section">
         <button type="submit" [disabled]="isSubmitting() || consumableForm.invalid" class="submit-btn text-white fw-medium p-3 fs-5">
-            @if (isSubmitting()) {
-                جاري الحفظ...
-            } @else {
-
-حفظ الاذن
-            }
+          @if (isSubmitting()) { جاري الحفظ... } @else { حفظ الاذن }
         </button>
-    </div>
+      </div>
 
-</div>
-
-</form>
-
-</div>
-
-
-<app-footer>
-</app-footer>
-
-
+    </div> </form> </div> <app-footer></app-footer>
