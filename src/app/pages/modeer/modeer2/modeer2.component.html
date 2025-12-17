@@ -39,14 +39,14 @@
 
         </div>
         <div class="row">
-          <div class="field mb-2 date-group" formGroupName="requestDateGroup">
+          <div class="field mb-2 date-group">
             <label>تاريخ الطلب :</label>
-        <input type="date">
+        <input formControlName="requestDateGroup" type="date">
           </div>
 
-          <div class="field d-flex align-items-center mb-2 date-group" formGroupName="regularDateGroup">
+          <div class="field d-flex align-items-center mb-2 date-group">
             <label>التاريخ :</label>
-          <input type="date">
+          <input formControlName="regularDateGroup" type="date">
           </div>
 
 

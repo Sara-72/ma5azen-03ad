@@ -62,16 +62,8 @@ export class Modeer2Component implements OnInit {
     this.consumableForm = this.fb.group({
       destinationName: ['', Validators.required],
       category: ['', Validators.required], // الفئة الرئيسية في الأعلى
-      requestDateGroup: this.fb.group({
-        yy: ['', Validators.required],
-        mm: ['', Validators.required],
-        dd: ['', Validators.required]
-      }),
-      regularDateGroup: this.fb.group({
-        yy: ['', Validators.required],
-        mm: ['', Validators.required],
-        dd: ['', Validators.required]
-      }),
+      requestDateGroup: ['', Validators.required],
+      regularDateGroup: ['', Validators.required],
 
       requestorName: ['', [Validators.required, fourStringsValidator()]],
       documentNumber: ['', Validators.required],
@@ -195,8 +187,8 @@ export class Modeer2Component implements OnInit {
     const basePayload = {
       destinationName: formVal.destinationName,
       storeHouse: formVal.category, // الفئة تُرسل كـ storeHouse
-      requestDate: new Date(Number(formVal.requestDateGroup.yy), Number(formVal.requestDateGroup.mm) - 1, Number(formVal.requestDateGroup.dd)).toISOString(),
-      documentDate: new Date(Number(formVal.regularDateGroup.yy), Number(formVal.regularDateGroup.mm) - 1, Number(formVal.regularDateGroup.dd)).toISOString(),
+      requestDate: new Date(formVal.requestDateGroup).toISOString(),
+      documentDate: new Date(formVal.regularDateGroup).toISOString(),
       requestorName: formVal.requestorName,
       documentNumber: formVal.documentNumber
     };
