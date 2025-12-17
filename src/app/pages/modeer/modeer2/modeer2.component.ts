@@ -1,10 +1,20 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, FormGroup, FormArray, ValidationErrors, ValidatorFn, Validators, AbstractControl } from '@angular/forms';
+import {
+  FormBuilder,
+  ReactiveFormsModule,
+  FormGroup,
+  FormArray,
+  ValidationErrors,
+  ValidatorFn,
+  Validators,
+  AbstractControl
+} from '@angular/forms';
 import { HeaderComponent } from '../../../components/header/header.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
+import { ModeerSercive } from '../../../services/modeer.service';
 
 /**
  * Validator for exactly four words
@@ -14,7 +24,9 @@ export function fourStringsValidator(): ValidatorFn {
     const value = control.value;
     if (!value) return null;
     const words = String(value).trim().split(/\s+/).filter(Boolean);
-    return words.length === 4 ? null : { fourStrings: { requiredCount: 4, actualCount: words.length } };
+    return words.length === 4
+      ? null
+      : { fourStrings: { requiredCount: 4, actualCount: words.length } };
   };
 }
 
@@ -26,27 +38,21 @@ export function fourStringsValidator(): ValidatorFn {
   styleUrl: './modeer2.component.css'
 })
 export class Modeer2Component implements OnInit {
+
   private fb = inject(FormBuilder);
   private http = inject(HttpClient);
+  private modeerService = inject(ModeerSercive);
 
-  // --- DATA PROPERTIES ---
-  days = Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0'));
-  months = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'));
-  years = Array.from({ length: 100 }, (_, i) => String(2025 - i));
-
+  // -------------------- DATA --------------------
   storeTypes = ['مستديم', 'مستهلك'];
 
-  allItemsByCategory: { [key: string]: string[] } = {
-    'أدوات مكتبية': ['قلم جاف', 'ورق A4', 'دباسة', 'ممحاة', 'مسطرة', 'مقص'],
-    'أجهزة حاسب': ['شاشة 24 بوصة', 'لوحة مفاتيح', 'ماوس لاسلكي', 'طابعة HP'],
-    'أثاث': ['كرسي مكتب', 'طاولة اجتماعات', 'خزانة ملفات', 'مكتب مدير']
-  };
+  storeKeeperStocks: any[] = [];      // بيانات المخزن من API
+  filteredItemsByRow: string[][] = [];
+  allCategories: string[] = [];       // 👈 هتتملأ من category (camelCase)
 
-  categories = Object.keys(this.allItemsByCategory);
   itemConditions = ['جديدة', 'مستعمل', 'قابل للإصلاح', 'كهنة أو خردة'];
   documentNumbers = [' كشف العجز', ' سند خصم', ' أصناف تالفة', ' محضر بيع', ' إهداءات'];
 
-  rowFilteredItems: string[][] = [];
   consumableForm!: FormGroup;
   isSubmitting = signal(false);
 
@@ -54,14 +60,37 @@ export class Modeer2Component implements OnInit {
     this.initForm();
   }
 
+  // -------------------- INIT --------------------
   ngOnInit(): void {
-    this.addRow();
+    this.modeerService.getStoreKeeperStocks().subscribe({
+      next: (response: any[]) => {
+
+        console.log('Raw API response:', response);
+
+        this.storeKeeperStocks = response || [];
+
+        // ✅ FIX 1: استخدام camelCase بدل PascalCase
+        this.allCategories = Array.from(
+          new Set(
+            this.storeKeeperStocks
+              .map(s => s.category)       // 👈 كان Category
+              .filter(c => c && c.trim() !== '')
+          )
+        );
+
+        console.log('All categories:', this.allCategories);
+
+        this.addRow();
+      },
+      error: err => console.error('Error fetching stocks:', err)
+    });
   }
 
+  // -------------------- FORM --------------------
   private initForm() {
     this.consumableForm = this.fb.group({
       destinationName: ['', Validators.required],
-      category: ['', Validators.required], // الفئة الرئيسية في الأعلى
+      category: ['', Validators.required],
       requestDateGroup: this.fb.group({
         yy: ['', Validators.required],
         mm: ['', Validators.required],
@@ -72,7 +101,6 @@ export class Modeer2Component implements OnInit {
         mm: ['', Validators.required],
         dd: ['', Validators.required]
       }),
-
       requestorName: ['', [Validators.required, fourStringsValidator()]],
       documentNumber: ['', Validators.required],
       managerApprovalName: ['', [Validators.required, fourStringsValidator()]],
@@ -99,40 +127,34 @@ export class Modeer2Component implements OnInit {
     });
   }
 
-  // ------------------- NEW & UPDATED LOGIC FUNCTIONS -------------------
-
-  /**
-   * تُستدعى عند تغيير الفئة من القائمة العلوية
-   */
+  // -------------------- CATEGORY CHANGE --------------------
   onGlobalCategoryChange(event: Event) {
     const selectedCategory = (event.target as HTMLSelectElement).value;
 
-    // تحديث قائمة الأصناف المتاحة لكل صف في الجدول بناءً على الفئة الجديدة
     this.tableData.controls.forEach((_, index) => {
       this.updateFilteredItemsForSingleRow(selectedCategory, index);
     });
   }
 
-  /**
-   * تحديث الأصناف المفلترة لصف واحد محدد
-   */
   private updateFilteredItemsForSingleRow(category: string, index: number) {
-    const cleanCategory = category.trim();
 
-    if (this.allItemsByCategory[cleanCategory]) {
-      this.rowFilteredItems[index] = [...this.allItemsByCategory[cleanCategory]];
-    } else {
-      this.rowFilteredItems[index] = [];
-    }
+    // ✅ FIX 2: camelCase في الفلترة
+    const itemsForCategory = this.storeKeeperStocks
+      .filter(stock => stock.category === category)
+      .map(stock => stock.itemName);
 
-    // إعادة ضبط قيم البحث لضمان عدم بقاء صنف من فئة قديمة
+    this.filteredItemsByRow[index] = itemsForCategory;
+
     const row = this.tableData.at(index);
     row.patchValue({
       itemSearchText: '',
-      itemName: ''
+      itemName: '',
+      unit: '',
+      unitPrice: ''
     });
   }
 
+  // -------------------- ROWS --------------------
   addRow(): void {
     const newGroup = this.createTableRowFormGroup();
     this.tableData.push(newGroup);
@@ -140,49 +162,64 @@ export class Modeer2Component implements OnInit {
     const index = this.tableData.length - 1;
     const currentCategory = this.consumableForm.get('category')?.value;
 
-    // إذا كانت الفئة مختارة مسبقاً، جهز قائمة الأصناف لهذا الصف الجديد
     if (currentCategory) {
       this.updateFilteredItemsForSingleRow(currentCategory, index);
     } else {
-      this.rowFilteredItems.push([]);
+      this.filteredItemsByRow.push([]);
     }
   }
 
   removeRow(): void {
     if (this.tableData.length > 1) {
       this.tableData.removeAt(this.tableData.length - 1);
-      this.rowFilteredItems.pop();
+      this.filteredItemsByRow.pop();
     }
   }
 
+  // -------------------- SEARCH --------------------
   filterItemOptions(event: any, index: number) {
     const searchTerm = event.target.value.toLowerCase();
-    const selectedCategory = this.consumableForm.get('category')?.value; // البحث يعتمد على الفئة الرئيسية
+    const category = this.consumableForm.get('category')?.value;
+    if (!category) return;
 
-    if (selectedCategory) {
-      const originalItems = this.allItemsByCategory[selectedCategory] || [];
-      if (!searchTerm) {
-        this.rowFilteredItems[index] = [...originalItems];
-      } else {
-        this.rowFilteredItems[index] = originalItems.filter(item =>
-          item.toLowerCase().includes(searchTerm)
-        );
-      }
-    }
+    // ✅ FIX 3
+    this.filteredItemsByRow[index] = this.storeKeeperStocks
+      .filter(s => s.category === category)
+      .map(s => s.itemName)
+      .filter(name => name.toLowerCase().includes(searchTerm));
   }
 
   syncItemName(index: number) {
     const row = this.tableData.at(index);
     const searchText = row.get('itemSearchText')?.value;
-    row.get('itemName')?.setValue(searchText);
+
+    // ✅ FIX 4
+    const selectedItem = this.storeKeeperStocks.find(
+      stock =>
+        stock.itemName === searchText &&
+        stock.category === this.consumableForm.get('category')?.value
+    );
+
+    if (selectedItem) {
+      row.patchValue({
+        itemName: selectedItem.itemName,
+        unit: selectedItem.unit,
+        unitPrice: selectedItem.unitPrice 
+      });
+    } else {
+      row.patchValue({
+        itemName: searchText,
+        unit: '',
+        unitPrice: 0
+      });
+    }
   }
 
   getFilteredItemsForRow(index: number): string[] {
-    return this.rowFilteredItems[index] || [];
+    return this.filteredItemsByRow[index] || [];
   }
 
-  // ------------------- SUBMISSION -------------------
-
+  // -------------------- SUBMIT --------------------
   onSubmit(): void {
     if (this.consumableForm.invalid) {
       this.consumableForm.markAllAsTouched();
@@ -194,26 +231,37 @@ export class Modeer2Component implements OnInit {
 
     const basePayload = {
       destinationName: formVal.destinationName,
-      storeHouse: formVal.category, // الفئة تُرسل كـ storeHouse
-      requestDate: new Date(Number(formVal.requestDateGroup.yy), Number(formVal.requestDateGroup.mm) - 1, Number(formVal.requestDateGroup.dd)).toISOString(),
-      documentDate: new Date(Number(formVal.regularDateGroup.yy), Number(formVal.regularDateGroup.mm) - 1, Number(formVal.regularDateGroup.dd)).toISOString(),
+      storeHouse: formVal.category,
+      requestDate: new Date(
+        Number(formVal.requestDateGroup.yy),
+        Number(formVal.requestDateGroup.mm) - 1,
+        Number(formVal.requestDateGroup.dd)
+      ).toISOString(),
+      documentDate: new Date(
+        Number(formVal.regularDateGroup.yy),
+        Number(formVal.regularDateGroup.mm) - 1,
+        Number(formVal.regularDateGroup.dd)
+      ).toISOString(),
       requestorName: formVal.requestorName,
       documentNumber: formVal.documentNumber
     };
 
     const requests = this.tableData.value.map((row: any) => {
-      return this.http.post('http://newwinventoryapi.runasp.net/api/SpendPermissions', {
-        ...basePayload,
-        itemName: row.itemName,
-        unit: row.unit,
-        storeType: row.storeType,
-        requestedQuantity: Number(row.quantityRequired),
-        approvedQuantity: Number(row.quantityAuthorized || 0),
-        issuedQuantity: Number(row.quantityIssued || 0),
-        stockStatus: row.itemCondition || 'جديدة',
-        unitPrice: Number(row.unitPrice || 0),
-        totalValue: Number(row.value || 0)
-      });
+      return this.http.post(
+        'http://newwinventoryapi.runasp.net/api/SpendPermissions',
+        {
+          ...basePayload,
+          itemName: row.itemName,
+          unit: row.unit,
+          storeType: row.storeType,
+          requestedQuantity: Number(row.quantityRequired),
+          approvedQuantity: Number(row.quantityAuthorized || 0),
+          issuedQuantity: Number(row.quantityIssued || 0),
+          stockStatus: row.itemCondition || 'جديدة',
+          unitPrice: Number(row.unitPrice || 0),
+          totalValue: Number(row.value)
+        }
+      );
     });
 
     Promise.all(requests.map((r: Observable<any>) => r.toPromise()))
