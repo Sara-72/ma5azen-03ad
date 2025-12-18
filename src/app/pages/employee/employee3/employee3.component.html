@@ -2,21 +2,23 @@
 
 </app-header>
 
-<div class="d-flex">
-
-<aside class="sidebar">
-            <h5>مرحباً بك </h5>
-            <ul class="mt-5">
-                <li><a href="/modeer1">المخزن</a></li>
-                <li ><a href="/modeer2">اذن الصرف</a></li>
-                <li class="active"><a>مذكرات الصرف</a></li>
-                <li><a href="/modeer4">اذونات الصرف</a></li>
 
 
+<div class="page-container">
 
+    <aside class="sidebar">
+        <h5>
+  مرحباً بك
+  <!-- <span *ngIf="displayName">، {{ displayName }}</span> -->
+</h5>
 
-            </ul>
-</aside>
+        <ul class="mt-5">
+            <li><a href="/employee1">مذكرة الصرف</a></li>
+            <li><a href="/employee2">العهد</a></li>
+            <li class="active"><a >استعلم عن مذكراتك</a></li>
+        </ul>
+    </aside>
+
 
 
 
@@ -25,13 +27,18 @@
 
     <div class="d-flex align-items-center big-container mx-auto my-3">
 
-        <form dir="rtl" class="mt-5 mx-5">
+        <form dir="rtl" class="m-auto">
 
 
+                      <div class="mb-4">
+                        <button type="button" class="btn btn-success">تم قبول طلبك</button>
+                        <button type="button" class="btn btn-secondary">بانتظار المراجعة</button>
+                        <button type="button" class="btn btn-danger">تم رفض طلبك</button>
+                      </div>
+
+                    <div class="paper">
 
 
-
-                    <div class="paper mb-4">
 
                         <div class="d-flex justify-content-center align-items-center">
                             <img src="assets/images/Hurghada-University.png" class="paper-logo" alt="logo">
@@ -42,7 +49,7 @@
                             <p>السيد الأستاذ/ أمين عام الجامعة المساعد</p>
                             <p>تحية طيبة وبعد،،،</p>
 
-                            <p class="mt">الرجاء من سيادتكم بالموافقة على صرف </p>
+                            <p class="mt">الرجاء من سيادتكم بالموافقة على صرف</p>
 
                             <div class="row">
 
@@ -103,18 +110,16 @@
                             </div>
                         </div> </div> </div>
 
-
-
-                      <div class="d-flex mb-4 justify-content-evenly">
-                        <button type="button" class="btn btn-success">قبول الطلب</button>
-                        <button type="button" class="btn btn-secondary">يتم مراجعة الطلب</button>
-                        <button type="button" class="btn btn-danger">رفض الطلب</button>
-                      </div>
-
         </form>
 
     </div>
-</div>
+
+
+
+    </div>
+
+
+
 
 <app-footer>
 

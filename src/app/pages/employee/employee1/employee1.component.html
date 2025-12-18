@@ -12,6 +12,7 @@
         <ul class="mt-5">
             <li class="active"><a>مذكرة الصرف</a></li>
             <li><a href="/employee2">العهد</a></li>
+            <li><a href="/employee3">استعلم عن مذكراتك</a></li>
         </ul>
     </aside>
 
@@ -43,7 +44,7 @@
                                     <label>الفئة :</label>
                                     <select
                                         formControlName="category"
-                                        class="table-input"
+                                        class="table-input form-select"
                                         (change)="updateFilteredItems(getCategoryValue($event), $index)">
 
                                         <option value="" disabled selected hidden>اختر الفئة</option>
@@ -59,7 +60,7 @@
     <div class="row item-line" [formGroupName]="i">
         <div class="field">
             <label>الصنف #{{ i + 1 }}:</label>
-            <select formControlName="itemName" class="table-input">
+            <select formControlName="itemName" class="table-input form-select">
                 <option value="" disabled selected hidden>اختر الصنف</option>
                 @for (item of filteredItemNames; track item) {
                     <option [value]="item">{{ item }}</option>
@@ -74,7 +75,7 @@
 
         <div class="remove-btn-container">
             @if (getItemLines($index).length > 1) {
-                <button type="button" class="remove-item-btn d-flex" (click)="removeItemLine($index, i)">
+                <button type="button" class="remove-item-btn d-flex mt-3" (click)="removeItemLine($index, i)">
                     ❌ <p>أحذف الصنف </p>
                 </button>
             }
