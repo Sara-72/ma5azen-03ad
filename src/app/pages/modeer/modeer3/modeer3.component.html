@@ -55,7 +55,7 @@
                         <br>
                         <p>وتفضلوا سيادتكم بقبول فائق التقدير و الاحترام،،،</p>
 
-                        <div class="d-flex align-items-center">
+                        <div class="d-flex align-items-center justify-content-around">
                             <div class="signatures">
                                 <div class="ms-3">
                                     <strong>توقيع الموظف</strong><br>
@@ -78,20 +78,20 @@
                         </div>
 
                         <div class="d-flex mb-4 justify-content-evenly mt-4" *ngIf="note.showButtons">
-                            <button type="button" class="btn btn-success" (click)="changeStatus(note, 'الطلب مقبول')">
+                            <button type="button" class="btn btn-success" (click)="changeStatus(note, 'مقبول')">
                                 قبول الطلب
                             </button>
-                        
-                            <button type="button" class="btn btn-danger" (click)="changeStatus(note, 'الطلب مرفوض')">
+
+                            <button type="button" class="btn btn-danger" (click)="changeStatus(note, 'مرفوض')">
                                 رفض الطلب
                             </button>
                         </div>
-                        
+
                         <div *ngIf="!note.showButtons" class="d-flex align-items-center justify-content-between mt-3">
-                            <span class="text-success">{{ note.currentStatus }}</span>
+                            <span class="text-primary-emphasis fw-bold">{{ note.currentStatus }}</span>
                             <div>
-                                <button class="btn btn-primary btn-sm me-2" (click)="confirmNote(note)">تأكيد</button>
-                                <button class="btn btn-warning btn-sm" (click)="cancelChange(note)">تراجع</button>
+                                <button class="btn btn-primary mx-2" (click)="confirmNote(note)">تأكيد</button>
+                                <button class="btn btn-warning" (click)="cancelChange(note)">تراجع</button>
                             </div>
                         </div>
 
