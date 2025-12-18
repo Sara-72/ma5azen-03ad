@@ -1,11 +1,11 @@
-<app-header> </app-header>
+<app-header></app-header>
 
 <div class="d-flex flex-row">
   <aside class="sidebar">
     <h5>
-  مرحباً بك
-  <span *ngIf="displayName">، {{ displayName }}</span>
-</h5>
+      مرحباً بك
+      <span *ngIf="displayName">، {{ displayName }}</span>
+    </h5>
 
     <ul class="mt-5">
       <li class="active"><a>المخزن</a></li>
@@ -16,11 +16,16 @@
   </aside>
 
   <div class="container mt-5">
+    <div class="mb-3">
+      <label for="categorySelect" class="form-label">اختر الفئة:</label>
+      <select id="categorySelect" class="form-select" [(ngModel)]="selectedCategory" (change)="filterByCategory()">
+        <option value="">الكل</option>
+        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+      </select>
+    </div>
+
     <div class="table-responsive-rtl">
-      <table
-        class="table table-bordered table-striped table-hover text-center"
-        dir="rtl"
-      >
+      <table class="table table-bordered table-striped table-hover text-center" dir="rtl">
         <thead>
           <tr>
             <th>الفئة</th>
@@ -31,28 +36,22 @@
           </tr>
         </thead>
 
-                <tbody>
-                    <tr *ngFor="let item of getStoreKeeperStocks">
+        <tbody>
+          <tr *ngFor="let item of filteredStocks">
+            <td>{{ item.category }}</td>
+            <td>{{ item.itemName }}</td>
+            <td>{{ item.storeType }}</td>
+            <td>{{ item.unit }}</td>
+            <td>{{ item.quantity }}</td>
+          </tr>
 
-                        <td>{{ item.category }}</td>
-                        <td>{{ item.itemName }}</td>
-                        <td>{{ item.storeType }}</td> 
-                        <td>{{ item.unit }}</td>
-                        <td>{{ item.quantity }}</td>
-                    </tr>
-
-                    <tr *ngIf="getStoreKeeperStocks.length === 0">
-                        <td colspan="4">لا توجد بيانات</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+          <tr *ngIf="filteredStocks.length === 0">
+            <td colspan="5">لا توجد بيانات</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-
-
-
-
-
-
+  </div>
 </div>
-<app-footer> </app-footer>
+
+<app-footer></app-footer>

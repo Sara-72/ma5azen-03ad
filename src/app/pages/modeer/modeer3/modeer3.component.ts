@@ -46,6 +46,7 @@ export class Modeer3Component implements OnInit {
           category: note.category,
           userSignature: note.userSignature,
           college: note.college,
+          collageKeeper: note.collageKeeper,
           permissinStatus: note.permissinStatus,
           showButtons: true,      
           currentStatus: '',       

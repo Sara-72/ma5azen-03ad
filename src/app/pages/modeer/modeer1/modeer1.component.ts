@@ -3,52 +3,48 @@ import { HeaderComponent } from '../../../components/header/header.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { CommonModule } from '@angular/common';
 import { ModeerSercive } from '../../../services/modeer.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-modeer1',
+  templateUrl: './modeer1.component.html',
+  styleUrls: ['./modeer1.component.css'],
   imports: [
     CommonModule,
+    FormsModule,      
     HeaderComponent,
     FooterComponent,
-  ],
-  templateUrl: './modeer1.component.html',
-  styleUrl: './modeer1.component.css'
+  ]
 })
-
 export class Modeer1Component implements OnInit {
 
   getStoreKeeperStocks: any[] = [];
-
-  constructor(private modeerSercive : ModeerSercive ) {}
+  filteredStocks: any[] = [];
+  categories: string[] = [];
+  selectedCategory: string = '';
 
   userName: string = '';
   displayName: string = '';
 
+  constructor(private modeerSercive: ModeerSercive) {}
 
-ngOnInit(): void {
-  this.userName = localStorage.getItem('name') || '';
-  this.displayName = this.getFirstTwoNames(this.userName);
+  ngOnInit(): void {
+    this.userName = localStorage.getItem('name') || '';
+    this.displayName = this.getFirstTwoNames(this.userName);
 
-  this.loadgetStoreKeeperStocks();
-}
+    this.loadStoreKeeperStocks();
+  }
 
-getFirstTwoNames(fullName: string): string {
-  if (!fullName) return '';
+  getFirstTwoNames(fullName: string): string {
+    if (!fullName) return '';
+    return fullName.trim().split(/\s+/).slice(0, 2).join(' ');
+  }
 
-  return fullName
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .join(' ');
-}
-
-
-  loadgetStoreKeeperStocks() {
+  loadStoreKeeperStocks() {
     this.modeerSercive.getStoreKeeperStocks().subscribe({
       next: (data: any[]) => {
         console.log('STORE KEEPER STOCKS:', data);
 
-        // 🔹 تحويل الداتا لنفس شكل getStoreKeeperStocks القديم
         this.getStoreKeeperStocks = data.map(item => ({
           id: item.id,
           itemName: item.itemName,
@@ -56,14 +52,29 @@ getFirstTwoNames(fullName: string): string {
           quantity: item.quantity,
           storeType: item.storeType, 
           unit: item.unit
-
-          // زوّدي أي حقول كانت موجودة في getStoreKeeperStocks قبل كده
         }));
-      },
-      error: (err: any) => {
-  console.error('Error loading store keeper stocks', err);
-}
 
+        // 🔹 جمع جميع الفئات بدون تكرار
+        this.categories = Array.from(new Set(this.getStoreKeeperStocks.map(i => i.category)));
+
+        // 🔹 عرض كل الأصناف مبدئيًا
+        this.filteredStocks = [...this.getStoreKeeperStocks];
+      },
+      error: (err: any) => console.error('Error loading store keeper stocks', err)
     });
   }
+
+  // =========================
+  // فلترة حسب الفئة
+  // =========================
+  filterByCategory() {
+    if (!this.selectedCategory) {
+      this.filteredStocks = [...this.getStoreKeeperStocks];
+    } else {
+      this.filteredStocks = this.getStoreKeeperStocks.filter(
+        s => s.category === this.selectedCategory
+      );
+    }
+  }
+
 }
