@@ -3,13 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface StockResponse {
-  stock: {
-    id: number;
-    itemName: string;
-    category: string;
-    quantity: number;
-    // تم حذف الـ date
-  };
+  id: number;
+  itemName: string;
+  category: string;
+  storeType: string; // مستهلك أو مستديم
+  unit: string;
+  quantity: number;
+  additionId?: number;
+  spendPermissionId?: number;
 }
 
 @Injectable({

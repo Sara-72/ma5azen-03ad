@@ -32,19 +32,25 @@
           </tr>
         </thead>
 
-        <tbody>
-          <tr >
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
+       <tbody>
+  @if (stocks.length === 0) {
+    <tr>
+      <td colspan="5">لا توجد بيانات</td>
+    </tr>
+  }
+  @else {
+    @for (stock of stocks; track stock.id) {
+      <tr>
+        <td>{{ stock.category }}</td>
+        <td>{{ stock.itemName }}</td>
+        <td>{{ stock.storeType }}</td>
+        <td>{{ stock.unit }}</td>
+        <td>{{ stock.quantity }}</td>
+      </tr>
+    }
+  }
+</tbody>
 
-          <!-- <tr>
-            <td colspan="4">لا توجد بيانات</td>
-          </tr> -->
-        </tbody>
       </table>
     </div>
   </div>

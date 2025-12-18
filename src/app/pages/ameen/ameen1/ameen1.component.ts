@@ -225,38 +225,48 @@ onSubmit(): void {
   rows.forEach((row: any) => {
     const itemName = row.item;
     const category = row.category;
+    const itemType = row.itemType;
     const newQuantity = Number(row.count);
+    const unit = row.unit;
 
-    // جلب كل المخزون بدل getStock إذا getStock بيرجع null
+    // جلب كل المخزون
     this.stockService.getAllStocks().pipe(
-      catchError(() => of([])) // لو GET رجعت خطأ نحولها لمصفوفة فارغة
+      catchError(() => of([]))
     ).subscribe(stocks => {
-      // البحث عن الصنف بنفس الاسم والفئة
+      // البحث عن الصنف بنفس الاسم، الفئة، ونوع الصنف
       const existing = stocks.find((s: any) =>
-        s.itemName === itemName && s.category === category
-      );
+  s.itemName === itemName &&
+  s.category === category &&
+  s.storeType === itemType &&
+  s.unit === unit
+);
 
-      if (existing) {
-        // UPDATE
-        const updatedBody = {
-          stock: {
-            itemName: existing.itemName,
-            category: existing.category,
-            quantity: existing.quantity + newQuantity
-          }
-        };
 
-        this.stockService.updateStock(existing.id, updatedBody).subscribe({
-          next: () => this.handleComplete(++completed, total),
-          error: () => this.handleComplete(++completed, total)
-        });
-      } else {
+     if (existing) {
+  const updatedBody = {
+    stock: {
+      itemName: existing.itemName,
+      category: existing.category,
+      storeType: existing.storeType,
+      unit: existing.unit, // نفس الوحدة القديمة
+      quantity: existing.quantity + newQuantity
+    }
+  };
+
+  this.stockService.updateStock(existing.id, updatedBody).subscribe({
+    next: () => this.handleComplete(++completed, total),
+    error: () => this.handleComplete(++completed, total)
+  });
+}
+ else {
         // ADD جديد
         const addBody = {
           stock: {
             itemName: itemName,
             category: category,
-            quantity: newQuantity
+            storeType: itemType,
+            quantity: newQuantity,
+            unit: unit
           }
         };
 
@@ -268,6 +278,8 @@ onSubmit(): void {
     });
   });
 }
+
+
 
 
 
