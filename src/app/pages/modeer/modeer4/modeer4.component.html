@@ -1,166 +1,95 @@
-<app-header>
-
-</app-header>
-
+<app-header></app-header>
 
 <div class="d-flex">
+    <aside class="sidebar">
+        <h5>مرحباً بك</h5>
+        <ul class="mt-5">
+            <li><a href="/modeer1">المخزن</a></li>
+            <li><a href="/modeer2">اذن الصرف</a></li>
+            <li><a href="/modeer3">مذكرات الصرف</a></li>
+            <li class="active"><a>اذونات الصرف</a></li>
+        </ul>
+    </aside>
 
-<aside class="sidebar">
-            <h5>مرحباً بك </h5>
-            <ul class="mt-5">
-                <li><a href="/modeer1">المخزن</a></li>
-                <li ><a href="/modeer2">اذن الصرف</a></li>
-                <li><a href="/modeer3">مذكرات الصرف</a></li>
-                <li class="active"><a>اذونات الصرف</a></li>
+    <div class="big-container m-5">
+        <div *ngFor="let perm of groupedPermissions" class="form-container mb-5" dir="rtl">
+            <header class="form-header">
+                <h2 class="title">طلب و إذن صرف</h2>
+                <h3 class="subtitle">مستديم | مستهلك</h3>
+            </header>
 
-            </ul>
-</aside>
-
-<ul>
-
-  <li>
-
-<form class="m-auto">
-<div class="form-container m-5" dir="rtl">
-
-    <header class="form-header">
-        <h2 class="title">طلب و إذن صرف </h2>
-        <h3 class="subtitle">مستديم | مستهلك</h3>
-    </header>
-
-    <div class="info-section">
-
-        <div class="row">
-            <div class="field mb-2">
-                <label>اسم الجهة :</label>
-              <table><tr><td>كلية الحاسبات</td></tr></table>
-            </div>
-            <div class="field mb-2">
-                <label>الفئة</label>
-                  <tr><td>أدوات مكتبية</td></tr>
-            </div>
-        </div>
-
-        <div class="row">
-              <div class="field mb-2 date-group">
-                <label>تاريخ الطلب :</label>
-
-                <tr><td>2</td></tr>
-
-
-                <p class="mb-0"> / </p>
-
-                  <tr><td>4</td></tr>
-                <p class="mb-0"> / </p>
-
-                <tr><td>3</td></tr>
-
-
+            <div class="info-section">
+                <div class="row">
+                    <div class="field mb-2"><label>اسم الجهة :</label>
+                        <td>{{ perm.destinationName }}</td>
+                    </div>
+                    <div class="field mb-2"><label>الفئة :</label>
+                        <td>{{ perm.category }}</td>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="field mb-2"><label>تاريخ الطلب :</label>
+                        <td>{{ perm.requestDate | date:'shortDate' }}</td>
+                    </div>
+                    <div class="field mb-2"><label>التاريخ :</label>
+                        <td>{{ perm.documentDate | date:'shortDate' }}</td>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="field mb-2"><label>اسم الطالب :</label>
+                        <td>{{ perm.requestorName }}</td>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="field mb-2">
+                        <label>(*) سند الصرف :</label>
+                        <td>{{ perm.DocumentNumber }}</td>
+                    </div>
+                </div>
             </div>
 
-              <div class="field d-flex align-items-center mb-2 date-group">
-                <label>التاريخ :</label>
-
-
-                <tr><td>2</td></tr>
-
-
-                <p class="mb-0"> / </p>
-
-                  <tr><td>4</td></tr>
-                <p class="mb-0"> / </p>
-
-                <tr><td>3</td></tr>
-
-
+            <div class="table-section">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>اسم الصنف</th>
+                            <th>الوحدة</th>
+                            <th>الكمية المطلوبة</th>
+                            <th>الكمية المصرح بها</th>
+                            <th>الكمية المنصرفة</th>
+                            <th>المخزن</th>
+                            <th>حالة الصنف</th>
+                            <th>سعر الوحدة</th>
+                            <th>القيمة</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of perm.items">
+                            <td>{{ item.itemName }}</td>
+                            <td>{{ item.unit }}</td>
+                            <td>{{ item.requestedQuantity }}</td>
+                            <td>{{ item.approvedQuantity }}</td>
+                            <td>{{ item.issuedQuantity }}</td>
+                            <td>{{ item.storeHouse }}</td>
+                            <td>{{ item.stockStatus }}</td>
+                            <td>{{ item.unitPrice }}</td>
+                            <td>{{ item.totalValue }}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
-        </div>
-
-        <div class="row">
-
-            <div class="field mb-2">
-                <label>اسم الطالب ( المخزن / الإدارة / العامل ) :</label>
-                <tr><td>محمد أحمد</td></tr>
-
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="field">
-                <label>(*) سند الصرف :</label>
-                <tr><td>سند العجز</td></tr>
-
+            <div class="signature-section mt-3">
+                <div>توقيع الطالب</div>
+                <div>كاتب الشطب</div>
+                <div>يصرح بالصرف مدير المخازن: <td>{{ perm.ManagerSignature }}</td>
+                </div>
+                <div>تم الصرف أمين المخازن</div>
+                <div>كاتب الشطب</div>
+                <div>توقيع المستلم</div>
             </div>
         </div>
     </div>
-
-    <div class="table-section">
-        <table>
-            <thead>
-                <tr>
-                    <th>اسم الصنف</th>
-                    <th>الوحدة</th>
-                    <th>الكمية المطلوبة</th>
-                    <th>الكمية المصرح بها</th>
-                    <th>الكمية المنصرفة</th>
-                    <th>المخزن</th>
-                    <th>حالة الصنف (**)</th>
-                    <th>سعر الوحدة</th>
-                    <th>القيمة</th>
-                </tr>
-            </thead>
-
-        <tbody>
-            @for (item of spendPermissions; track $index) {
-            <tr>
-                <td>{{ item.itemName }}</td>
-                <td>{{ item.unit }}</td>
-                <td>{{ item.requestedQuantity }}</td>
-                <td>{{ item.approvedQuantity }}</td>
-                <td>{{ item.issuedQuantity }}</td>
-                <td></td>
-                <td>{{ item.stockStatus }}</td>
-                <td>{{ item.unitPrice }}</td>
-                <td>{{ item.totalValue }}</td>
-            </tr>
-        }
-        </tbody>
-
-        </table>
-
-
-    </div>
-
-    <div class="signature-section">
-        <div>توقيع الطالب</div>
-        <div>كاتب الشطب</div>
-
-        <div class="d-flex flex-column">
-            <div>يصرح بالصرف مدير المخازن</div>
-            <tr><td>محمد أحمد</td></tr>
-
-        </div>
-
-        <div style="white-space:no-wrap">تم الصرف أمين المخازن</div>
-        <div>كاتب الشطب</div>
-        <div>توقيع المستلم</div>
-    </div>
-
-    <div class="footnotes">
-        <p>(*) كشف العجز - سند خصم - أصناف تالفة أو تالفة - محضر بيع جلب تشغيل - إهداءات ليست للنشاط الرئيسي للجهة</p>
-        <p>(**) جديدة - مستعمل - قابل للإصلاح - كهنة أو خردة</p>
-    </div>
-
-</div>
-</form>
-
-</li>
-</ul>
 </div>
 
-
-
-<app-footer>
-
-</app-footer>
+<app-footer></app-footer>

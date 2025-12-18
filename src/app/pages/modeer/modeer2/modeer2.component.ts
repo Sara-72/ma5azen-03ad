@@ -91,12 +91,16 @@ export class Modeer2Component implements OnInit {
     this.consumableForm = this.fb.group({
       destinationName: ['', Validators.required],
       category: ['', Validators.required], // الفئة الرئيسية في الأعلى
+
       requestDateGroup: ['', Validators.required],
       regularDateGroup: ['', Validators.required],
 
       requestorName: ['', [Validators.required, fourStringsValidator()]],
       documentNumber: ['', Validators.required],
-      managerApprovalName: ['', [Validators.required, fourStringsValidator()]],
+
+      // ✅ FIX 2: تغيير اسم control لإمضاء المدير ليكون متطابق مع Backend
+      managerSignature: ['', [Validators.required, fourStringsValidator()]],
+
       tableData: this.fb.array([])
     });
   }
@@ -131,7 +135,7 @@ export class Modeer2Component implements OnInit {
 
   private updateFilteredItemsForSingleRow(category: string, index: number) {
 
-    // ✅ FIX 2: camelCase في الفلترة
+    // ✅ FIX 3: camelCase في الفلترة
     const itemsForCategory = this.storeKeeperStocks
       .filter(stock => stock.category === category)
       .map(stock => stock.itemName);
@@ -175,7 +179,7 @@ export class Modeer2Component implements OnInit {
     const category = this.consumableForm.get('category')?.value;
     if (!category) return;
 
-    // ✅ FIX 3
+    // ✅ FIX 4
     this.filteredItemsByRow[index] = this.storeKeeperStocks
       .filter(s => s.category === category)
       .map(s => s.itemName)
@@ -186,7 +190,7 @@ export class Modeer2Component implements OnInit {
     const row = this.tableData.at(index);
     const searchText = row.get('itemSearchText')?.value;
 
-    // ✅ FIX 4
+    // ✅ FIX 5
     const selectedItem = this.storeKeeperStocks.find(
       stock =>
         stock.itemName === searchText &&
@@ -222,9 +226,12 @@ export class Modeer2Component implements OnInit {
     this.isSubmitting.set(true);
     const formVal = this.consumableForm.value;
 
+    // ✅ FIX 6: إضافة الفئة وامضاء المدير في payload
     const basePayload = {
       destinationName: formVal.destinationName,
-      storeHouse: formVal.category, // الفئة تُرسل كـ storeHouse
+      category: formVal.category,              // 👈 الفئة الرئيسية
+      managerSignature: formVal.managerSignature, // 👈 إمضاء المدير
+      storeHouse: formVal.category,            // لو لازمه للـ API
       requestDate: new Date(formVal.requestDateGroup).toISOString(),
       documentDate: new Date(formVal.regularDateGroup).toISOString(),
       requestorName: formVal.requestorName,

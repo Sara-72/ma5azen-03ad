@@ -137,9 +137,9 @@
 
   <div class="sig-item approval-box">
     <span>يصرح بالصرف مدير المخازن</span>
-    <input type="text" formControlName="managerApprovalName" class="signature-input">
-    <div *ngIf="consumableForm.get('managerApprovalName')?.invalid && consumableForm.get('managerApprovalName')?.touched"
-        class="error-text">
+    <input type="text" formControlName="managerSignature" class="signature-input">
+    <div *ngIf="consumableForm.get('managerSignature')?.invalid
+             && consumableForm.get('managerSignature')?.touched" class="error-text">
       الاسم كاملاً مطلوب.
     </div>
   </div>

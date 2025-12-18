@@ -28,5 +28,10 @@ export class ModeerSercive {
   getSpendPermissionById(id: number): Observable<any> {
     return this.http.get<any>(`${this.api}/SpendPermissions/${id}`);
   }
+  // modeer.service.ts
+getSpendNotes(): Observable<any[]> {
+  return this.http.get<any[]>(`${this.api}/SpendNotes`);
+}
+
 }
 

@@ -1,113 +1,81 @@
-<app-header>
-
-</app-header>
+<app-header></app-header>
 
 <div class="d-flex">
-
-<aside class="sidebar">
-            <h5>مرحباً بك </h5>
-            <ul class="mt-5">
-                <li><a href="/modeer1">المخزن</a></li>
-                <li ><a href="/modeer2">اذن الصرف</a></li>
-                <li class="active"><a>مذكرات الصرف</a></li>
-                <li><a href="/modeer4">اذونات الصرف</a></li>
-
-
-
-
-            </ul>
-</aside>
-
-
-
-
-
+    <aside class="sidebar">
+        <h5>مرحباً بك </h5>
+        <ul class="mt-5">
+            <li><a href="/modeer1">المخزن</a></li>
+            <li><a href="/modeer2">اذن الصرف</a></li>
+            <li class="active"><a>مذكرات الصرف</a></li>
+            <li><a href="/modeer4">اذونات الصرف</a></li>
+        </ul>
+    </aside>
 
     <div class="d-flex align-items-center big-container my-3">
-
         <form dir="rtl" class="mt-5 mx-5">
 
+            <div *ngFor="let note of groupedNotes" class="paper">
 
+                <div class="d-flex justify-content-center align-items-center">
+                    <img src="assets/images/Hurghada-University.png" class="paper-logo" alt="logo">
+                    <h2 class="title m-auto">مكتب أمين الكلية </h2>
+                </div>
 
+                <div class="paper-box">
+                    <p>السيد الأستاذ/ أمين عام الجامعة المساعد</p>
+                    <p>تحية طيبة وبعد،،،</p>
 
+                    <p class="mt">الرجاء من سيادتكم بالموافقة على صرف عدد</p>
 
-                    <div class="paper">
-
-                        <div class="d-flex justify-content-center align-items-center">
-                            <img src="assets/images/Hurghada-University.png" class="paper-logo" alt="logo">
-                            <h2 class="title m-auto">مكتب أمين الكلية </h2>
+                    <div class="row">
+                        <div class="field d-flex">
+                            <label>الفئة :</label>
+                            <td>{{ note.category }}</td>
                         </div>
+                    </div>
 
-                        <div class="paper-box">
-                            <p>السيد الأستاذ/ أمين عام الجامعة المساعد</p>
-                            <p>تحية طيبة وبعد،،،</p>
-
-                            <p class="mt">الرجاء من سيادتكم بالموافقة على صرف عدد</p>
-
-                            <div class="row">
-
-                                <div class="field d-flex">
-                                    <label>الفئة :</label>
-                                    <td>أدوات مكتبية</td>
-
-                                </div>
+                    <div class="item-lines-container">
+                        <div *ngFor="let item of note.items" class="row item-line d-flex">
+                            <div class="field d-flex">
+                                <label>الصنف: </label>
+                                <td>{{ item.itemName }}</td>
                             </div>
 
-        <div class="item-lines-container">
-
-
-    <div class="row item-line d-flex">
-
-        <div class="field d-flex">
-            <label>الصنف: </label>
-            <td>قلم أزرق</td>
-
-        </div>
-
-        <div class="field count-input d-flex">
-            <label>العدد:</label>
-            <td>12</td>
-
-        </div>
-
-  </div>
-
-<br>
-                            <p>وتفضلوا سيادتكم بقبول فائق التقدير و الاحترام،،،</p>
-
-                            <div class="d-flex align-items-center">
-                                <div class="signatures">
-                                    <div class="ms-3">
-    <strong>توقيع الموظف</strong><br>
-
-<td>أحمد محمد أحمد</td>
-
-
-</div>
-                                    <div class="ms-3">
-                                      <strong>الكلية</strong><br>
-                                    <td>حاسبات و ذكاء اصطناعي</td>
-                                    </div>
-                                    <div class="ms-3">
-                                        <strong>تاريخ الطلب</strong><br>
-                                        <td>3/3/2026</td>
-
-                                    </div>
-
-                                    <div class="ms-3">
-                                        <strong>أمين الكلية</strong><br>
-
-
-                                    </div>
-                                </div>
+                            <div class="field count-input d-flex">
+                                <label>العدد:</label>
+                                <td>{{ item.quantity }}</td>
                             </div>
-                        </div> </div> </div>
+                        </div>
+                    </div>
+
+                    <br>
+                    <p>وتفضلوا سيادتكم بقبول فائق التقدير و الاحترام،،،</p>
+
+                    <div class="d-flex align-items-center">
+                        <div class="signatures">
+                            <div class="ms-3">
+                                <strong>توقيع الموظف</strong><br>
+                                <td>{{ note.userSignature }}</td>
+                            </div>
+                            <div class="ms-3">
+                                <strong>الكلية</strong><br>
+                                <td>{{ note.college }}</td>
+                            </div>
+                            <div class="ms-3">
+                                <strong>تاريخ الطلب</strong><br>
+                                <td>{{ note.requestDate | date:'shortDate' }}</td>
+                            </div>
+                            <div class="ms-3">
+                                <strong>أمين الكلية</strong><br>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
 
         </form>
-
     </div>
 </div>
 
-<app-footer>
-
-</app-footer>
+<app-footer></app-footer>
