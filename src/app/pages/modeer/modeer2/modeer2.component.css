@@ -47,6 +47,8 @@ a{
     font-weight: bold;
     border-left: 4px solid #0a3a63;
     cursor:default;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+
 }
 
 /***********************************************************************/

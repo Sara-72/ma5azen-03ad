@@ -12,7 +12,14 @@
     </ul>
   </aside>
 
-   <div class="container mt-5">
+  <div class="container mt-5">
+      <!-- <div class="mb-3">
+      <label for="categorySelect" class="form-label">اختر الفئة:</label>
+      <select id="categorySelect" class="form-select" [(ngModel)]="selectedCategory" (change)="filterByCategory()">
+        <option value="">الكل</option>
+        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+      </select>
+    </div> -->
     <div class="table-responsive-rtl">
       <table
         class="table table-bordered table-striped table-hover text-center"

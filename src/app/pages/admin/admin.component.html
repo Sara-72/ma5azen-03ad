@@ -76,7 +76,7 @@
             <div class="mb-4" *ngIf="showCollegeSelection">
                 <div class="d-flex justify-content-end flex-wrap gap-3 college-selection">
                     <div class="form-check form-check-inline m-auto"
-                        *ngFor="let college of ['كلية التربية', 'كلية الحاسبات والذكاء الاصطناعي', 'كلية الألسن', 'كلية السياحة والفنادق' ,'مركزي']">
+                        *ngFor="let college of ['كلية التربية', 'كلية الحاسبات والذكاء الاصطناعي', 'كلية الألسن', 'كلية السياحة والفنادق' ]">
                         <input class="form-check-input mx-2" type="radio" name="college" formControlName="college"
     [value]="college"
     [id]="college">
