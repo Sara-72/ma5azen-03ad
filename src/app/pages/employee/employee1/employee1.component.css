@@ -336,10 +336,6 @@ input[type="text"] {
     /* Align text content to the right (RTL standard) */
     text-align: right;
 
-    /* Ensure date picker icon and dropdown arrows are styled consistently */
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
 }
 
 

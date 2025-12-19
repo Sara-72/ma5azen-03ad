@@ -1,126 +1,92 @@
-<app-header>
-
-</app-header>
-
-
+<app-header></app-header>
 
 <div class="page-container">
 
-    <aside class="sidebar">
-        <h5>
-  مرحباً بك
-  <!-- <span *ngIf="displayName">، {{ displayName }}</span> -->
-</h5>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h5>مرحباً بك</h5>
+    <ul class="mt-5">
+      <li><a href="/employee1">مذكرة الصرف</a></li>
+      <li><a href="/employee2">العهد</a></li>
+      <li class="active"><a>استعلم عن مذكراتك</a></li>
+    </ul>
+  </aside>
 
-        <ul class="mt-5">
-            <li><a href="/employee1">مذكرة الصرف</a></li>
-            <li><a href="/employee2">العهد</a></li>
-            <li class="active"><a >استعلم عن مذكراتك</a></li>
-        </ul>
-    </aside>
+  <!-- Main Content -->
+  <div class="d-flex align-items-center big-container mx-auto my-3">
+    <form dir="rtl" class="m-auto">
 
+      <!-- Status Buttons -->
+      <div class="mb-4">
+        <button type="button" class="btn btn-success">تم قبول طلبك</button>
+        <button type="button" class="btn btn-secondary">بانتظار المراجعة</button>
+        <button type="button" class="btn btn-danger">تم رفض طلبك</button>
+      </div>
 
-
-
-
-
-
-    <div class="d-flex align-items-center big-container mx-auto my-3">
-
-        <form dir="rtl" class="m-auto">
-
-
-                      <div class="mb-4">
-                        <button type="button" class="btn btn-success">تم قبول طلبك</button>
-                        <button type="button" class="btn btn-secondary">بانتظار المراجعة</button>
-                        <button type="button" class="btn btn-danger">تم رفض طلبك</button>
-                      </div>
-
-                    <div class="paper">
-
-
-
-                        <div class="d-flex justify-content-center align-items-center">
-                            <img src="assets/images/Hurghada-University.png" class="paper-logo" alt="logo">
-                            <h2 class="title m-auto">مكتب أمين الكلية </h2>
-                        </div>
-
-                        <div class="paper-box">
-                            <p>السيد الأستاذ/ أمين عام الجامعة المساعد</p>
-                            <p>تحية طيبة وبعد،،،</p>
-
-                            <p class="mt">الرجاء من سيادتكم بالموافقة على صرف</p>
-
-                            <div class="row">
-
-                                <div class="field d-flex justify-content-center">
-                                    <label>الفئة :</label>
-                                    <td>أدوات مكتبية</td>
-
-                                </div>
-                            </div>
-
-        <div class="item-lines-container">
-
-
-    <div class="row item-line d-flex">
-
-        <div class="field d-flex">
-            <label>الصنف: </label>
-            <td>قلم أزرق</td>
-
+      <!-- Paper / Spend Note -->
+      <div class="paper">
+        <div class="d-flex justify-content-center align-items-center">
+          <img src="assets/images/Hurghada-University.png" class="paper-logo" alt="logo">
+          <h2 class="title m-auto">مكتب أمين الكلية</h2>
         </div>
 
-        <div class="field count-input d-flex">
-            <label>العدد:</label>
-            <td>12</td>
+        <div class="paper-box">
+          <p>السيد الأستاذ/ أمين عام الجامعة المساعد</p>
+          <p>تحية طيبة وبعد،،،</p>
+          <p class="mt">الرجاء من سيادتكم بالموافقة على صرف</p>
+
+          <!-- Category -->
+          <div class="row">
+            <div class="field d-flex justify-content-center">
+              <label>الفئة :</label>
+              <td>أدوات مكتبية</td>
+            </div>
+          </div>
+
+          <!-- Items -->
+          <div class="item-lines-container">
+            <div class="row item-line d-flex">
+              <div class="field d-flex">
+                <label>الصنف: </label>
+                <td>قلم أزرق</td>
+              </div>
+              <div class="field count-input d-flex">
+                <label>العدد:</label>
+                <td>12</td>
+              </div>
+            </div>
+          </div>
+
+          <br>
+          <p>وتفضلوا سيادتكم بقبول فائق التقدير و الاحترام،،،</p>
+
+          <!-- Signatures -->
+          <div class="d-flex align-items-center">
+            <div class="signatures">
+              <div class="ms-3">
+                <strong>توقيع الموظف</strong><br>
+                <td>أحمد محمد أحمد</td>
+              </div>
+              <div class="ms-3">
+                <strong>الكلية</strong><br>
+                <td>حاسبات و ذكاء اصطناعي</td>
+              </div>
+              <div class="ms-3">
+                <strong>تاريخ الطلب</strong><br>
+                <td>3/3/2026</td>
+              </div>
+              <div class="ms-3">
+                <strong>أمين الكلية</strong><br>
+              </div>
+            </div>
+          </div>
 
         </div>
+      </div>
 
+    </form>
   </div>
 
-<br>
-                            <p>وتفضلوا سيادتكم بقبول فائق التقدير و الاحترام،،،</p>
-
-                            <div class="d-flex align-items-center">
-                                <div class="signatures">
-                                    <div class="ms-3">
-    <strong>توقيع الموظف</strong><br>
-
-<td>أحمد محمد أحمد</td>
-
-
 </div>
-                                    <div class="ms-3">
-                                      <strong>الكلية</strong><br>
-                                    <td>حاسبات و ذكاء اصطناعي</td>
-                                    </div>
-                                    <div class="ms-3">
-                                        <strong>تاريخ الطلب</strong><br>
-                                        <td>3/3/2026</td>
 
-                                    </div>
-
-                                    <div class="ms-3">
-                                        <strong>أمين الكلية</strong><br>
-
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div> </div> </div>
-
-        </form>
-
-    </div>
-
-
-
-    </div>
-
-
-
-
-<app-footer>
-
-</app-footer>
+<app-footer></app-footer>

@@ -64,18 +64,22 @@
           },
           "defaultConfiguration": "production"
         },
-        "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
-          "configurations": {
-            "production": {
-              "buildTarget": "ma5azen-o3ad:build:production"
-            },
-            "development": {
-              "buildTarget": "ma5azen-o3ad:build:development"
-            }
-          },
-          "defaultConfiguration": "development"
-        },
+       "serve": {
+  "builder": "@angular-devkit/build-angular:dev-server",
+  "options": {
+    "proxyConfig": "src/proxy.conf.json"
+  },
+  "configurations": {
+    "production": {
+      "buildTarget": "ma5azen-o3ad:build:production"
+    },
+    "development": {
+      "buildTarget": "ma5azen-o3ad:build:development"
+    }
+  },
+  "defaultConfiguration": "development"
+}
+,
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n"
         },
