@@ -1,20 +1,19 @@
-import { Component ,OnInit, inject, signal} from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, FormGroup, Validators, FormArray, AbstractControl,ValidationErrors,ValidatorFn} from '@angular/forms';
 import { HeaderComponent } from '../../../components/header/header.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
-
+import { SpendNotesService } from '../../../services/spend-notes.service';
 
 @Component({
   selector: 'app-employee3',
-  imports: [
-    HeaderComponent,
-    FooterComponent,
-  ],
+  standalone: true,
+  imports: [HeaderComponent, FooterComponent, CommonModule],
   templateUrl: './employee3.component.html',
-  styleUrl: './employee3.component.css'
+  styleUrls: ['./employee3.component.css']
 })
-export class Employee3Component {
-
+export class Employee3Component implements OnInit {
+  ngOnInit(): void {
+    throw new Error('Method not implemented.');
+  }
+ 
 }
