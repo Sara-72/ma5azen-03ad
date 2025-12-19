@@ -1,8 +1,6 @@
 <app-header></app-header>
 
 <div class="page-container">
-
-  <!-- Sidebar -->
   <aside class="sidebar">
     <h5>مرحباً بك</h5>
     <ul class="mt-5">
@@ -12,14 +10,23 @@
     </ul>
   </aside>
 
-  <!-- Main Content -->
-  <div class="d-flex align-items-center big-container mx-auto my-3">
-    <form dir="rtl" class="m-auto">
+  <div class="big-container mx-auto my-3">
 
+  <form dir="rtl" class="m-auto">
 
+    <!-- ⏳ تحميل -->
+    <div *ngIf="isLoading">جاري تحميل المذكرات...</div>
 
-      <!-- Paper / Spend Note -->
-      <div class="paper">
+    <!-- ❌ لا يوجد -->
+    <div *ngIf="!isLoading && filteredNotes.length === 0">
+      {{ noNotesMessage }}
+    </div>
+
+    <!-- 📄 عرض البيانات -->
+    <div *ngIf="!isLoading && filteredNotes.length > 0">
+
+      <div *ngFor="let note of filteredNotes" class="paper mb-0">
+
         <div class="d-flex justify-content-center align-items-center">
           <img src="assets/images/Hurghada-University.png" class="paper-logo" alt="logo">
           <h2 class="title m-auto">مكتب أمين الكلية</h2>
@@ -28,70 +35,85 @@
         <div class="paper-box">
           <p>السيد الأستاذ/ أمين عام الجامعة المساعد</p>
           <p>تحية طيبة وبعد،،،</p>
-          <p class="mt">الرجاء من سيادتكم بالموافقة على صرف</p>
+          <p class="mt">الرجاء من سيادتكم بالموافقة على صرف:</p>
 
-          <!-- Category -->
-          <div class="row">
-            <div class="field d-flex justify-content-center">
-              <label>الفئة :</label>
-              <td>أدوات مكتبية</td>
-            </div>
-          </div>
-
-          <!-- Items -->
+          <!-- 🧾 الصنف -->
           <div class="item-lines-container">
             <div class="row item-line d-flex">
+
               <div class="field d-flex">
-                <label>الصنف: </label>
-                <td>قلم أزرق</td>
+                <label>الفئة:</label>
+                <span>{{ note.category || 'غير محدد' }}</span>
               </div>
-              <div class="field count-input d-flex">
+
+              <div class="field d-flex">
+                <label>الصنف:</label>
+                <span>{{ note.itemName || 'غير محدد' }}</span>
+              </div>
+
+              <div class="field d-flex">
                 <label>العدد:</label>
-                <td>12</td>
+                <span>{{ note.quantity || 0 }}</span>
               </div>
+
+
             </div>
           </div>
 
-          <br>
           <p>وتفضلوا سيادتكم بقبول فائق التقدير و الاحترام،،،</p>
 
-          <!-- Signatures -->
-          <div class="d-flex align-items-center">
-            <div class="signatures">
-              <div class="ms-3">
-                <strong>توقيع الموظف</strong><br>
-                <td>أحمد محمد أحمد</td>
-              </div>
-              <div class="ms-3">
-                <strong>الكلية</strong><br>
-                <td>حاسبات و ذكاء اصطناعي</td>
-              </div>
-              <div class="ms-3">
-                <strong>تاريخ الطلب</strong><br>
-                <td>3/3/2026</td>
-              </div>
-              <div class="ms-3">
-                <strong>أمين الكلية</strong><br>
-              </div>
-            </div>
-          </div>
+          <div class="signatures mt-3">
+  <div>
+    <strong>توقيع الموظف</strong><br>
+    {{ note.userSignature }}
+  </div>
+
+  <div>
+    <strong>الكلية</strong><br>
+    {{ note.college }}
+  </div>
+
+  <div>
+    <strong>تاريخ الطلب</strong><br>
+    {{ note.requestDate | date:'yyyy-MM-dd' }}
+  </div>
+
+  <div>
+    <strong>أمين الكلية</strong><br>
+    {{ note.collageKeeper }}
+  </div>
+
+
+</div>
+<!-- بطن الحالة -->
+
+
+
+
+
 
 
 
 
         </div>
-
-                        <!-- Status Buttons -->
-      <div class="mb-4 mt-4">
-        <button type="button" class="btn btn-success" style="display:none;">تم قبول طلبك</button>
-        <button type="button" class="btn btn-secondary">بانتظار المراجعة</button>
-        <button type="button" class="btn btn-danger" style="display:none;">تم رفض طلبك</button>
+        <div class="status-belly">
+  <span
+    [ngClass]="{
+      'pending': isPending(note.permissinStatus),
+      'approved': isApproved(note.permissinStatus),
+      'rejected': isRejected(note.permissinStatus)
+    }"
+  >
+    {{ getStatusText(note.permissinStatus) }}
+  </span>
+</div>
       </div>
-      </div>
+    </div>
 
-    </form>
+
+
+
   </div>
-
 </div>
 
 <app-footer></app-footer>

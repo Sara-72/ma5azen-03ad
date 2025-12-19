@@ -163,9 +163,10 @@ a{
     padding: 40px;
     border: 1px solid #ccc;
     width: 100%;
-    margin: auto;
+    margin: 20px auto; /* هنا اضفنا 20px فوق وتحت */
     position: relative;
 }
+
 
 .title {
     text-align: center;
@@ -284,4 +285,52 @@ input[type="text"] {
 
 .btn{
   cursor:default;
+}
+/* زر الحالة العامة */
+.status-belly {
+  width: 100%;
+  text-align: center;
+  margin-top: 15px;
+}
+
+.status-belly span {
+  display: inline-block;
+  padding: 5px 15px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 14px;
+  color: #fff; /* نص أبيض عشان يظهر على الخلفية */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  min-width: 120px; 
+}
+
+/* الخلفيات حسب الحالة */
+.status-belly span.pending {
+  background-color: #6c757d;
+}
+
+.status-belly span.approved {
+  background-color: #28a745;
+}
+
+.status-belly span.rejected {
+  background-color: #dc3545;
+}
+
+
+.status-belly.inside-frame {
+  margin-top: 10px;      /* تحت البيبر مباشرة */
+  margin-bottom: 25px;  /* مسافة بسيطة قبل اللي بعده */
+  text-align: center;
+}
+
+.status-belly.inside-frame span {
+  display: inline-block;
+  padding: 10px 30px;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  background-color: #6c757d; /* قيد المراجعة */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
