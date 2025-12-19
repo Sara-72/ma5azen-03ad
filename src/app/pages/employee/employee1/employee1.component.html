@@ -1,149 +1,141 @@
-<app-header>
-</app-header>
+<app-header></app-header>
 
 <div class="page-container">
 
-    <aside class="sidebar">
-        <h5>
-  مرحباً بك
-  <span *ngIf="displayName">، {{ displayName }}</span>
-</h5>
+  <aside class="sidebar">
+    <h5>
+      مرحباً بك
+      <span *ngIf="displayName">، {{ displayName }}</span>
+    </h5>
 
-        <ul class="mt-5">
-            <li class="active"><a>مذكرة الصرف</a></li>
-            <li><a href="/employee2">العهد</a></li>
-            <li><a href="/employee3">استعلم عن مذكراتك</a></li>
-        </ul>
-    </aside>
+    <ul class="mt-5">
+      <li class="active"><a>مذكرة الصرف</a></li>
+      <li><a href="/employee2">العهد</a></li>
+      <li><a href="/employee3">استعلم عن مذكراتك</a></li>
+    </ul>
+  </aside>
 
+  <div class="d-flex align-items-center big-container my-3">
+    <form [formGroup]="memoContainerForm" (ngSubmit)="onSubmit()" dir="rtl" class="mt-5 mx-5">
+      <div formArrayName="requests">
 
-    <div class="d-flex align-items-center big-container my-3">
+        <div *ngFor="let memoGroup of requests.controls; let $index = index" [formGroupName]="$index" class="paper">
 
-        <form [formGroup]="memoContainerForm" (ngSubmit)="onSubmit()" dir="rtl" class="mt-5 mx-5">
+          <div class="d-flex justify-content-center align-items-center">
+            <img src="assets/images/Hurghada-University.png" class="paper-logo" alt="logo">
+            <h2 class="title m-auto">مكتب أمين الكلية (طلب #{{ $index + 1 }})</h2>
+          </div>
 
-            <div formArrayName="requests">
+          <div class="paper-box">
+            <p>السيد الأستاذ/ أمين عام الجامعة المساعد</p>
+            <p>تحية طيبة وبعد،،،</p>
+            <p class="mt">الرجاء من سيادتكم بالموافقة على صرف عدد</p>
 
-                @for (memoGroup of requests.controls; track $index) {
-
-                    <div class="paper" [formGroupName]="$index">
-
-                        <div class="d-flex justify-content-center align-items-center">
-                            <img src="assets/images/Hurghada-University.png" class="paper-logo" alt="logo">
-                            <h2 class="title m-auto">مكتب أمين الكلية (طلب #{{ $index + 1 }})</h2>
-                        </div>
-
-                        <div class="paper-box">
-                            <p>السيد الأستاذ/ أمين عام الجامعة المساعد</p>
-                            <p>تحية طيبة وبعد،،،</p>
-
-                            <p class="mt">الرجاء من سيادتكم بالموافقة على صرف عدد</p>
-
-                            <div class="row">
-
-                                <div class="field">
-                                    <label>الفئة :</label>
-                                    <select
-                                        formControlName="category"
-                                        class="table-input form-select"
-                                        (change)="updateFilteredItems(getCategoryValue($event), $index)">
-
-                                        <option value="" disabled selected hidden>اختر الفئة</option>
-                                        @for (category of categories; track category) {
-                                            <option [value]="category">{{ category }}</option>
-                                        }
-                                    </select>
-                                </div>
-                            </div>@if (memoGroup.get('category')?.value) {
-                              <div formArrayName="itemLines" class="item-lines-container">
-@for (itemLine of getItemLines($index).controls; track i; let i = $index) {
-
-    <div class="row item-line" [formGroupName]="i">
-        <div class="field">
-            <label>الصنف #{{ i + 1 }}:</label>
-            <select formControlName="itemName" class="table-input form-select">
-                <option value="" disabled selected hidden>اختر الصنف</option>
-                @for (item of filteredItemNames; track item) {
-                    <option [value]="item">{{ item }}</option>
-                }
-            </select>
-        </div>
-
-        <div class="field count-input">
-            <label>العدد:</label>
-            <input type="number" formControlName="count" min="1" class="table-input">
-        </div>
-
-        <div class="remove-btn-container">
-            @if (getItemLines($index).length > 1) {
-                <button type="button" class="remove-item-btn d-flex mt-3" (click)="removeItemLine($index, i)">
-                    ❌ <p>أحذف الصنف </p>
-                </button>
-            }
-        </div>
-
-    </div> }</div>
-
-    <button type="button" class="add-item-btn" (click)="addItemLine($index)">
-                                + أضف صنف آخر
-                            </button>
-
-                          }<br>
-                            <p>وتفضلوا سيادتكم بقبول فائق التقدير و الاحترام،،،</p>
-
-                            <div class="d-flex align-items-center">
-                                <div class="signatures">
-                                    <div class="ms-3">
-    <strong>توقيع الموظف</strong><br>
-    <input type="text" formControlName="employeeSignature">
-
-    @if (memoGroup.get('employeeSignature')?.invalid && memoGroup.get('employeeSignature')?.touched) {
-        <div class="text-danger mt-1 text-end small" style="width: 200px; direction: rtl;">
-            @if (memoGroup.get('employeeSignature')?.hasError('required')) {
-                التوقيع مطلوب.
-            }
-            @if (memoGroup.get('employeeSignature')?.hasError('fourStrings')) {
-                يجب إدخال الاسم كاملاً (أربع كلمات بالضبط).
-            }
-        </div>
-    }
-</div>
-                                    <div class="ms-3">
-                                        <strong>الكلية</strong><br>
-                                        <select formControlName="collegeName" class="form-select">
-                                            <option value="" disabled selected>--- اختر الكلية ---</option>
-                                            @for (college of collegeOptions; track college) {
-                                                <option [value]="college">{{ college }}</option>
-                                            }
-                                        </select>
-                                    </div>
-                                    <div class="ms-3">
-                                        <strong>تاريخ الطلب</strong><br>
-                                        <input type="date" formControlName="requestDate">
-                                    </div>
-
-                                    <div class="ms-3">
-                                        <strong>أمين الكلية</strong><br>
-                                        {{ memoGroup?.get('collegeAdminName')?.value }}
-                                        <input type="hidden" formControlName="collegeAdminName">
-                                    </div>
-                                </div>
-                            </div>
-                        </div> </div> } </div> <div class="button-section">
-                <button type="submit" [disabled]="isSubmitting() || memoContainerForm.invalid" class="submit-btn mt-5">
-                    @if (isSubmitting()) {
-                        جاري الارسال...
-                    } @else {
-                        ارسال الطلب
-                    }
-                </button>
+            <div class="row">
+              <div class="field">
+                <label>الفئة :</label>
+                <select
+                  formControlName="category"
+                  class="table-input form-select"
+                  (change)="updateFilteredItems(getCategoryValue($event), $index)">
+                  <option value="" disabled hidden>اختر الفئة</option>
+                  <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+                </select>
+              </div>
             </div>
 
-        </form>
+            <div *ngIf="memoGroup.get('category')?.value" formArrayName="itemLines" class="item-lines-container">
+              <div *ngFor="let itemLine of getItemLines($index).controls; let i = index" [formGroupName]="i" class="row item-line">
+                <div class="field">
+                  <label>الصنف #{{ i + 1 }}:</label>
+                  <select formControlName="itemName" class="table-input form-select">
+                    <option value="" disabled hidden>اختر الصنف</option>
+                    <option *ngFor="let item of getAvailableItems($index, i)" [value]="item">
+{{ item }}</option>
+                  </select>
+                </div>
 
-    </div> <div class="row-controls align-items-center big-container my-3">
-        <button type="button" class="remove-row-button" (click)="removeRow()">-</button>
-        <button type="button" class="add-row-button" (click)="addRow()">+</button>
-    </div>
+                <div class="field count-input">
+                  <label>العدد:</label>
+                  <input type="number" formControlName="count" min="1" class="table-input">
+                </div>
 
-</div> <app-footer>
-</app-footer>
+                <div class="remove-btn-container" *ngIf="getItemLines($index).length > 1">
+                  <button type="button" class="remove-item-btn d-flex mt-3" (click)="removeItemLine($index, i)">
+                    ❌ <p>أحذف الصنف </p>
+                  </button>
+                </div>
+
+              </div>
+
+              <button
+                type="button"
+                class="add-item-btn"
+                (click)="addItemLine($index)"
+                [disabled]="!memoGroup.get('category')?.value">
+                + أضف صنف آخر
+              </button>
+            </div>
+
+            <br>
+            <p>وتفضلوا سيادتكم بقبول فائق التقدير و الاحترام،،،</p>
+
+            <div class="d-flex align-items-center">
+              <div class="signatures">
+
+                <div class="ms-3">
+                  <strong>توقيع الموظف</strong><br>
+                  <input type="text" formControlName="employeeSignature" placeholder="أدخل الاسم الرباعي" />
+                  <div *ngIf="memoGroup.get('employeeSignature')?.invalid && memoGroup.get('employeeSignature')?.touched" class="text-danger mt-1 text-end small" style="width: 200px; direction: rtl;">
+                    <div *ngIf="memoGroup.get('employeeSignature')?.hasError('required')">التوقيع مطلوب.</div>
+                    <div *ngIf="memoGroup.get('employeeSignature')?.hasError('fourStrings')">يجب إدخال الاسم كاملاً (أربع كلمات بالضبط).</div>
+                  </div>
+                </div>
+
+                <div class="ms-3">
+                  <strong>الكلية</strong><br>
+                  <select
+                    formControlName="collegeName"
+                    class="form-select"
+                    (change)="onCollegeChange($any($event.target).value, $index)">
+                    <option value="" disabled>--- اختر الكلية ---</option>
+                    <option *ngFor="let college of collegeOptions" [value]="college">{{ college }}</option>
+                  </select>
+                </div>
+
+                <div class="ms-3">
+                  <strong>تاريخ الطلب</strong><br>
+                  <input type="date" formControlName="requestDate">
+                </div>
+
+                <div class="ms-3">
+                  <strong>أمين الكلية</strong><br>
+                  {{ memoGroup.get('collegeAdminName')?.value || '—' }}
+                  <input type="hidden" formControlName="collegeAdminName">
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <div class="button-section">
+        <button type="submit" [disabled]="isSubmitting() || memoContainerForm.invalid" class="submit-btn mt-5">
+          {{ isSubmitting() ? 'جاري الارسال...' : 'ارسال الطلب' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+  <div class="row-controls align-items-center big-container my-3">
+    <button type="button" class="remove-row-button" (click)="removeRow()">-</button>
+    <button type="button" class="add-row-button" (click)="addRow()">+</button>
+  </div>
+
+</div>
+
+<app-footer></app-footer>
