@@ -340,59 +340,64 @@ onSubmit(): void {
 
   this.isSubmitting.set(true);
 
-  const totalRequests = this.requests.length;
+  let requestsToSend = 0;
   let successCount = 0;
   let hasError = false;
 
-  this.requests.controls.forEach((ctrl, index) => {
-    const memo = ctrl as FormGroup;
+  this.requests.controls.forEach((memoCtrl, memoIndex) => {
+    const memo = memoCtrl as FormGroup;
     const itemLines = memo.get('itemLines')?.value || [];
 
-    const payload = {
-      itemName: itemLines.map((i: any) => i.itemName).join(', '),
-      quantity: itemLines.reduce((sum: number, i: any) => sum + i.count, 0),
-      requestDate: new Date(memo.get('requestDate')?.value).toISOString(),
-      userSignature: memo.get('employeeSignature')?.value,
-      college: memo.get('collegeName')?.value,
-      category: memo.get('category')?.value,
-      permissinStatus: 'قيد المراجعة',
-      collageKeeper: memo.get('collegeAdminName')?.value,
-      employeeId: 1
-    };
+    itemLines.forEach((item: any) => {
+      requestsToSend++;
 
-    console.log(`🚀 Sending memo #${index + 1}`, payload);
+      const payload = {
+        itemName: item.itemName,        // ✅ صنف واحد
+        quantity: item.count,           // ✅ كميته فقط
+        requestDate: new Date(
+          memo.get('requestDate')?.value
+        ).toISOString(),
+        userSignature: memo.get('employeeSignature')?.value,
+        college: memo.get('collegeName')?.value,
+        category: memo.get('category')?.value,
+        permissinStatus: 'قيد المراجعة',
+        collageKeeper: memo.get('collegeAdminName')?.value,
+        employeeId: 1
+      };
 
-    this.spendNotesService.createSpendNote(payload).subscribe({
-      next: () => {
-        successCount++;
+      console.log('🚀 Sending item:', payload);
 
-        // ✅ لما كل المذكرات تتحفظ
-        if (successCount === totalRequests && !hasError) {
-          alert('تم إرسال جميع مذكرات الصرف بنجاح ✅');
+      this.spendNotesService.createSpendNote(payload).subscribe({
+        next: () => {
+          successCount++;
 
-          const employeeSig =
-            this.requests.at(0)?.get('employeeSignature')?.value || '';
+          if (successCount === requestsToSend && !hasError) {
+            alert('تم إرسال جميع الأصناف بنجاح ✅');
 
-          this.memoContainerForm.reset();
-          this.requests.clear();
-          this.filteredItemNamesMap = {};
+            const employeeSig =
+              this.requests.at(0)?.get('employeeSignature')?.value || '';
 
-          const newMemo = this.createRequestMemoGroup();
-          newMemo.get('employeeSignature')?.setValue(employeeSig);
-          this.requests.push(newMemo);
+            this.memoContainerForm.reset();
+            this.requests.clear();
 
+            const newMemo = this.createRequestMemoGroup();
+            newMemo.get('employeeSignature')?.setValue(employeeSig);
+            this.requests.push(newMemo);
+
+            this.isSubmitting.set(false);
+          }
+        },
+        error: err => {
+          hasError = true;
+          console.error('❌ فشل حفظ الصنف', err);
+          alert('حدث خطأ أثناء حفظ أحد الأصناف ❌');
           this.isSubmitting.set(false);
         }
-      },
-      error: err => {
-        hasError = true;
-        console.error(`❌ فشل حفظ المذكرة رقم ${index + 1}`, err);
-        alert(`فشل حفظ المذكرة رقم ${index + 1} ❌`);
-        this.isSubmitting.set(false);
-      }
+      });
     });
   });
 }
+
 
 
 
