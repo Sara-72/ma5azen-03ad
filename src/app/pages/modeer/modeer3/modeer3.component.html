@@ -77,7 +77,12 @@
                             </div>
                         </div>
 
-                        <div class="d-flex mb-4 justify-content-evenly mt-4" *ngIf="note.showButtons">
+
+
+                    </div>
+
+
+                                            <div class="d-flex mb-4 justify-content-evenly mt-4" *ngIf="note.showButtons">
                             <button type="button" class="btn btn-success" (click)="changeStatus(note, 'مقبول')">
                                 قبول الطلب
                             </button>
@@ -87,6 +92,7 @@
                             </button>
                         </div>
 
+
                         <div *ngIf="!note.showButtons" class="d-flex align-items-center justify-content-between mt-3">
                             <span class="text-primary-emphasis fw-bold">{{ note.currentStatus }}</span>
                             <div>
@@ -95,10 +101,6 @@
                             </div>
                         </div>
 
-
-
-
-                    </div>
                 </div>
 
             </ng-container>
