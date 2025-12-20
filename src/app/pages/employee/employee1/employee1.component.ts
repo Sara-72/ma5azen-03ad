@@ -5,6 +5,7 @@ import { FormBuilder, ReactiveFormsModule, FormGroup, Validators, FormArray, Abs
 import { HeaderComponent } from '../../../components/header/header.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { SpendNotesService } from '../../../services/spend-notes.service';
+import { StoreKeeperStockService } from '../../../services/store-keeper-stock.service';
 
 
 
@@ -44,6 +45,7 @@ export function fourStringsValidator(): ValidatorFn {
   styleUrl: './employee1.component.css'
 })
 export class Employee1Component implements OnInit {
+ private stockService = inject(StoreKeeperStockService);
 
  collegeOptions: string[] = [
   'كلية الحاسبات والذكاء الاصطناعي',
@@ -59,6 +61,9 @@ collegeAdminMap: { [key: string]: string } = {
   'كلية الألسن': 'أمل عبدالعظيم سنوسي',
   'كلية السياحة والفنادق': 'أبوالسعود حبيشي احمد'
 };
+allStocks: any[] = [];
+categoriesFromStock: string[] = [];
+itemDataFromStock: { [key: string]: string[] } = {};
 
 
 availableItemOptions: string[] = [
@@ -116,14 +121,27 @@ ngOnInit(): void {
   this.userName = localStorage.getItem('name') || '';
   this.displayName = this.getFirstTwoNames(this.userName);
 
-  // الاسم الثنائي للترحيب
-  this.displayName = this.getFirstTwoNames(this.userName);
+  // جلب المخزون من الخدمة
+  this.stockService.getAllStocks().subscribe(stocks => {
+    this.allStocks = stocks;
 
-   // أضف أول مذكرة بعد معرفة userName
-  const firstMemo = this.createRequestMemoGroup();
-  this.requests.push(firstMemo);
+    // استخراج الفئات
+    this.categoriesFromStock = [...new Set(stocks.map(s => s.category))];
 
+    // بناء خريطة الفئة -> الأصناف
+    this.itemDataFromStock = {};
+    this.categoriesFromStock.forEach(cat => {
+      this.itemDataFromStock[cat] = [
+        ...new Set(stocks.filter(s => s.category === cat).map(s => s.itemName))
+      ];
+    });
+
+    // إضافة أول مذكرة بعد معرفة userName
+    const firstMemo = this.createRequestMemoGroup();
+    this.requests.push(firstMemo);
+  });
 }
+
 
 
 getFirstTwoNames(fullName: string): string {
@@ -213,22 +231,17 @@ private createItemLineGroup(): FormGroup {
 updateFilteredItems(category: string, memoIndex: number): void {
   if (!category) return;
 
-  // 1️⃣ حدثي الأصناف حسب الفئة
-  const availableItems = this.itemData[category] || [];
- 
+  const availableItems = this.itemDataFromStock[category] || [];
 
-  // 2️⃣ امسحي أي أصناف قديمة
   const itemLinesArray = this.getItemLines(memoIndex);
   itemLinesArray.clear();
 
-  // 3️⃣ أضيفي صنف واحد افتراضي مع اختيار أول عنصر إذا موجود
   const firstItemName = availableItems.length > 0 ? availableItems[0] : '';
   itemLinesArray.push(this.fb.group({
-  itemName: [null, Validators.required], // ✅ فاضي
-  count: [1, [Validators.required, Validators.min(1)]]
-}));
+    itemName: [null, Validators.required],
+    count: [1, [Validators.required, Validators.min(1)]]
+  }));
 }
-
    
 
 getAvailableItems(memoIndex: number, itemLineIndex: number): string[] {
@@ -237,19 +250,15 @@ getAvailableItems(memoIndex: number, itemLineIndex: number): string[] {
 
   if (!category) return [];
 
-  const allItems = this.itemData[category] || [];
+  const allItems = this.itemDataFromStock[category] || [];
 
   const itemLines = this.getItemLines(memoIndex).controls;
-
   const selectedItems = itemLines
-    .map((ctrl, idx) =>
-      idx !== itemLineIndex ? ctrl.get('itemName')?.value : null
-    )
+    .map((ctrl, idx) => idx !== itemLineIndex ? ctrl.get('itemName')?.value : null)
     .filter(Boolean);
 
   return allItems.filter(item => !selectedItems.includes(item));
 }
-
 
 
 

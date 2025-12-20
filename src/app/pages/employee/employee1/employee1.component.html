@@ -35,12 +35,13 @@
               <div class="field">
                 <label>الفئة :</label>
                 <select
-                  formControlName="category"
-                  class="table-input form-select"
-                  (change)="updateFilteredItems(getCategoryValue($event), $index)">
-                  <option value="" disabled hidden>اختر الفئة</option>
-                  <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
-                </select>
+  formControlName="category"
+  class="table-input form-select"
+  (change)="updateFilteredItems(getCategoryValue($event), $index)">
+  <option value="" disabled hidden>اختر الفئة</option>
+  <option *ngFor="let category of categoriesFromStock" [value]="category">{{ category }}</option>
+</select>
+
               </div>
             </div>
 
