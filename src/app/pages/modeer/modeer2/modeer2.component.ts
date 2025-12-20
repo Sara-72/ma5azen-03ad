@@ -39,6 +39,8 @@ export class Modeer2Component implements OnInit {
   private fb = inject(FormBuilder);
   private http = inject(HttpClient);
   private modeerService = inject(ModeerSercive);
+  userName: string = '';
+  displayName: string = '';
 
   storeTypes = ['مستديم', 'مستهلك'];
   storeKeeperStocks: any[] = [];
@@ -52,6 +54,8 @@ export class Modeer2Component implements OnInit {
   isSubmitting = signal(false);
 
   ngOnInit(): void {
+    this.userName = localStorage.getItem('name') || '';
+    this.displayName = this.getFirstTwoNames(this.userName);
     this.modeerService.getStoreKeeperStocks().subscribe({
       next: (response: any[]) => {
         this.storeKeeperStocks = response || [];
@@ -63,7 +67,11 @@ export class Modeer2Component implements OnInit {
       },
       error: err => console.error('Error fetching stocks:', err)
     });
+  } getFirstTwoNames(fullName: string): string {
+    if (!fullName) return '';
+    return fullName.trim().split(/\s+/).slice(0, 2).join(' ');
   }
+
 
   /** إنشاء فورم جاهز */
   private createForm(): FormGroup {

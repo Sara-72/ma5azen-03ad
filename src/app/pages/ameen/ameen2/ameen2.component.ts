@@ -20,6 +20,9 @@ import { LedgerService, LedgerEntry } from '../../../services/ledger.service';
 })
 export class Ameen2Component implements OnInit {
 
+ userName: string = '';
+  displayName: string = '';
+
 
   assetTypes: string[] = ['مستهلك', 'مستديم'];
 
@@ -38,8 +41,20 @@ export class Ameen2Component implements OnInit {
 }
 
   ngOnInit(): void {
+     this.userName = localStorage.getItem('name') || '';
+    this.displayName = this.getFirstTwoNames(this.userName);
+
     // Start with one empty row
     this.tableData.push(this.createTableRowFormGroup());
+  }
+ getFirstTwoNames(fullName: string): string {
+    if (!fullName) return '';
+
+    return fullName
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .join(' ');
   }
 
   // Helper getter to easily access the FormArray

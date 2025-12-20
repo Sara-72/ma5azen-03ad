@@ -45,9 +45,6 @@ export class EmployeeMa5azen1Component {
     });
   }
 
- userName: string = '';
- displayName: string = '';
-
 
 ngOnInit(): void {
   this.userName = localStorage.getItem('name') || '';
@@ -55,6 +52,10 @@ ngOnInit(): void {
 
   this.tableData.push(this.createTableRowFormGroup());
 }
+ userName: string = '';
+ displayName: string = '';
+
+
 getFirstTwoNames(fullName: string): string {
   if (!fullName) return '';
 

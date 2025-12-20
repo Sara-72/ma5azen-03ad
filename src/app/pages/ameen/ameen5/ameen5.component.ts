@@ -19,6 +19,9 @@ import { CommonModule } from '@angular/common';
   styleUrl: './ameen5.component.css'
 })
 export class Ameen5Component implements OnInit {
+userName: string = '';
+  displayName: string = '';
+
 
   private stockService = inject(StoreKeeperStockService);
 
@@ -26,7 +29,19 @@ export class Ameen5Component implements OnInit {
   isLoading = true;
 
   ngOnInit(): void {
+     this.userName = localStorage.getItem('name') || '';
+    this.displayName = this.getFirstTwoNames(this.userName);
+
     this.loadStocks();
+  }
+ getFirstTwoNames(fullName: string): string {
+    if (!fullName) return '';
+
+    return fullName
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .join(' ');
   }
 
   loadStocks(): void {

@@ -74,16 +74,28 @@
             <hr>
 
             <div class="mb-4" *ngIf="showCollegeSelection">
-                <div class="d-flex justify-content-end flex-wrap gap-3 college-selection">
-                    <div class="form-check form-check-inline m-auto"
-                        *ngFor="let college of ['كلية التربية', 'كلية الحاسبات والذكاء الاصطناعي', 'كلية الألسن', 'كلية السياحة والفنادق' ]">
-                        <input class="form-check-input mx-2" type="radio" name="college" formControlName="college"
-    [value]="college"
-    [id]="college">
-                        <label class="form-check-label" [for]="college">{{ college }}</label>
-                    </div>
-                </div>
-            </div>
+  <div class="d-flex justify-content-end flex-wrap gap-3 college-selection">
+
+    <div class="form-check form-check-inline m-auto"
+         *ngFor="let college of colleges">
+
+      <input
+        class="form-check-input mx-2"
+        type="radio"
+        name="college"
+        formControlName="college"
+        [value]="college.value"
+        [id]="college.value">
+
+      <label class="form-check-label" [for]="college.value">
+        {{ college.label }}
+      </label>
+
+    </div>
+
+  </div>
+</div>
+
 
             <button type="submit" class="btn btn-primary submit-button w-100 mt-4">
                 حفظ

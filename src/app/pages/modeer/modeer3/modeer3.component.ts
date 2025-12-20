@@ -11,6 +11,8 @@ import { HeaderComponent } from "../../../components/header/header.component";
   imports: [CommonModule, FooterComponent, HeaderComponent]
 })
 export class Modeer3Component implements OnInit {
+userName: string = '';
+  displayName: string = '';
 
   spendNotes: any[] = [];
   groupedNotes: any[] = [];
@@ -18,7 +20,13 @@ export class Modeer3Component implements OnInit {
   constructor(private modeerService: ModeerSercive) {}
 
   ngOnInit(): void {
+    this.userName = localStorage.getItem('name') || '';
+    this.displayName = this.getFirstTwoNames(this.userName);
     this.loadNotes();
+  }
+  getFirstTwoNames(fullName: string): string {
+    if (!fullName) return '';
+    return fullName.trim().split(/\s+/).slice(0, 2).join(' ');
   }
 
   loadNotes(): void {

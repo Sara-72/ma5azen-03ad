@@ -73,12 +73,12 @@ export class AdminComponent implements OnInit, OnDestroy{
 
   roles = ['موظف', 'موظف مخزن', 'أمين مخزن', 'مدير مخزن'];
   colleges = [
-    'كلية التربية',
-    'كلية الحاسبات والذكاء الاصطناعي',
-    'كلية الألسن',
-    'كلية السياحة والفنادق',
-    'مركزية'
-  ];
+  { label: 'كلية التربية', value: 'كلية التربية' },
+  { label: 'كلية الحاسبات والذكاء الاصطناعي', value: 'كلية الحاسبات والذكاء الاصطناعي' },
+  { label: 'كلية الألسن', value: 'كلية الألسن' },
+  { label: 'كلية السياحة والفنادق', value: 'كلية السياحة والفنادق' },
+  { label: 'مركزية', value: 'مركزية' }
+];
 
   showCollegeSelection: boolean = false;
 
@@ -90,7 +90,8 @@ export class AdminComponent implements OnInit, OnDestroy{
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
       role: ['', Validators.required],
-      college: ['', Validators.required],
+      college: [''],
+
       name: ['', [Validators.required, fourStringsValidator()]]
 
     });

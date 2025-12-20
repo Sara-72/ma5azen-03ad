@@ -38,15 +38,22 @@ interface SpendPermissionGroup {
   styleUrls: ['./modeer4.component.css']
 })
 export class Modeer4Component implements OnInit {
+userName: string = '';
+  displayName: string = '';
 
   groupedPermissions: SpendPermissionGroup[] = [];
 
   constructor(private modeerService: ModeerSercive) {}
 
   ngOnInit(): void {
+    this.userName = localStorage.getItem('name') || '';
+    this.displayName = this.getFirstTwoNames(this.userName);
     this.loadSpendPermissions();
   }
-
+ getFirstTwoNames(fullName: string): string {
+    if (!fullName) return '';
+    return fullName.trim().split(/\s+/).slice(0, 2).join(' ');
+  }
   loadSpendPermissions(): void {
   this.modeerService.getSpendPermissions().subscribe({
     next: (data: any[]) => {

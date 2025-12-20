@@ -8,7 +8,10 @@
 
 
   <aside class="sidebar">
-            <h5>مرحباً بك </h5>
+             <h5>
+  مرحباً بك
+  <span *ngIf="displayName">، {{ displayName }}</span>
+</h5>
             <ul class="mt-5">
 
                 <li><a href="/employee_ma5azen1">دفتر المالية</a></li>

@@ -15,6 +15,9 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./ameen4.component.css']
 })
 export class Ameen4Component implements OnInit {
+userName: string = '';
+  displayName: string = '';
+
 
   private ledgerService = inject(LedgerService);
 
@@ -28,7 +31,19 @@ export class Ameen4Component implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
+     this.userName = localStorage.getItem('name') || '';
+    this.displayName = this.getFirstTwoNames(this.userName);
+
     this.loadLedgerEntries();
+  }
+ getFirstTwoNames(fullName: string): string {
+    if (!fullName) return '';
+
+    return fullName
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .join(' ');
   }
 
   loadLedgerEntries() {

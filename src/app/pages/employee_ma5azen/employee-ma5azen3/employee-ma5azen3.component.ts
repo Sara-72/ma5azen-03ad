@@ -4,6 +4,7 @@ import { HeaderComponent } from '../../../components/header/header.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { FormsModule, FormBuilder, ReactiveFormsModule, FormGroup, Validators, FormArray } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { CommonModule } from '@angular/common';
 // Assuming you have an ApiService to handle HTTP requests
 // import { ApiService } from '../services/api.service';
 
@@ -29,12 +30,25 @@ interface CategoryItemMap {
     HeaderComponent,
     FooterComponent,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,CommonModule
   ],
   templateUrl: './employee-ma5azen3.component.html',
   styleUrl: './employee-ma5azen3.component.css'
 })
 export class EmployeeMa5azen3Component implements OnInit,OnDestroy{
+ userName: string = '';
+ displayName: string = '';
+
+
+getFirstTwoNames(fullName: string): string {
+  if (!fullName) return '';
+
+  return fullName
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .join(' ');
+}
 
     // days: string[] = Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0')); // "01" to "31"
     // months: string[] = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0')); // "01" to "12"
@@ -78,6 +92,8 @@ export class EmployeeMa5azen3Component implements OnInit,OnDestroy{
 
   }
 ngOnInit(): void {
+  this.userName = localStorage.getItem('name') || '';
+  this.displayName = this.getFirstTwoNames(this.userName);
     // 1. Create the single instance of the first row
     const initialRowGroup = this.createTableRowFormGroup();
 

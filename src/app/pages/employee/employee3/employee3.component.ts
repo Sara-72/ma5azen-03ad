@@ -27,6 +27,8 @@ interface SpendNote {
 })
 export class Employee3Component implements OnInit {
 
+ userName: string = '';
+ displayName: string = '';
   spendNotes: SpendNote[] = [];
   isLoading = true;
   noNotesMessage = '';
@@ -66,6 +68,9 @@ applyFilters(): void {
 }
 
  ngOnInit(): void {
+    this.userName = localStorage.getItem('name') || '';
+  this.displayName = this.getFirstTwoNames(this.userName);
+
   const userName = localStorage.getItem('name') || '';
 
   this.spendNotesService.getMySpendNotes().subscribe({
@@ -95,6 +100,15 @@ applyFilters(): void {
       this.isLoading = false;
     }
   });
+}
+getFirstTwoNames(fullName: string): string {
+  if (!fullName) return '';
+
+  return fullName
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .join(' ');
 }
 
 isPending(status: string): boolean {

@@ -16,13 +16,28 @@ import { SpendPermissionService } from '../../../services/spend-permission.servi
   styleUrls: ['./ameen3.component.css']
 })
 export class Ameen3Component implements OnInit {
+userName: string = '';
+  displayName: string = '';
+
 
   spendPermissions: any[] = [];
 
   constructor(private spendService: SpendPermissionService) {}
 
   ngOnInit(): void {
+     this.userName = localStorage.getItem('name') || '';
+    this.displayName = this.getFirstTwoNames(this.userName);
+
     this.loadSpendPermissions();
+  }
+ getFirstTwoNames(fullName: string): string {
+    if (!fullName) return '';
+
+    return fullName
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .join(' ');
   }
 
   loadSpendPermissions() {
