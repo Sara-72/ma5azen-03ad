@@ -51,7 +51,12 @@ export class Modeer4Component implements OnInit {
   this.modeerService.getSpendPermissions().subscribe({
     next: (data: any[]) => {
       this.groupedPermissions = this.groupPermissions(data)
-        .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
+        .sort((a, b) => {
+          const docA = new Date(a.documentDate).getTime();
+          const docB = new Date(b.documentDate).getTime();
+          return docB - docA; 
+        });
+
       console.log(this.groupedPermissions);
     },
     error: (err) => console.error(err)
@@ -59,11 +64,14 @@ export class Modeer4Component implements OnInit {
 }
 
 
+
   private groupPermissions(data: any[]): SpendPermissionGroup[] {
   const groups: { [key: string]: SpendPermissionGroup } = {};
 
   data.forEach(p => {
-    const key = `${p.requestorName}|${p.requestDate}|${p.documentDate}|${p.destinationName}|${p.category}`;
+    const formatDate = (dateStr: string) => new Date(dateStr).toISOString().split('T')[0];
+
+const key = `${p.requestorName ?? ''}|${formatDate(p.requestDate)}|${formatDate(p.documentDate)}|${p.destinationName ?? ''}|${p.category ?? ''}`;
 
     if (!groups[key]) {
       groups[key] = {
@@ -73,7 +81,7 @@ export class Modeer4Component implements OnInit {
         destinationName: p.destinationName,
         category: p.category,
         items: [],
-        ManagerSignature: p.managerSignature ?? '' , // هنا نحط توقيع المدير
+        ManagerSignature: p.managerSignature ?? '' , 
         DocumentNumber: p.documentNumber  ?? ''
       };
     }

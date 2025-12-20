@@ -11,46 +11,48 @@
     </ul>
   </aside>
 
-  <form *ngIf="consumableForm" [formGroup]="consumableForm" (ngSubmit)="onSubmit()" class="m-auto">
-    <div class="form-container" dir="rtl">
+  <div class="forms-container m-auto">
+    <!-- Loop على كل فورم في القائمة -->
+    <form *ngFor="let form of consumableForms; let fIndex = index" [formGroup]="form" (ngSubmit)="onSubmitForm(form)"
+      class="form-container mb-5" dir="rtl">
 
+      <!-- رأس الفورم -->
       <header class="form-header">
         <h2 class="title">طلب و إذن صرف</h2>
         <h3 class="subtitle">مستديم | مستهلك</h3>
       </header>
 
+      <!-- البيانات المشتركة -->
       <div class="info-section">
         <div class="row">
           <div class="field mb-2">
             <label>اسم الجهة :</label>
-            <input type="text" formControlName="destinationName" class="input-line">
+            <input type="text" formControlName="destinationName" class="input-line" readonly>
           </div>
 
           <div class="field mb-2">
             <label>الفئة :</label>
-            <select formControlName="category" class="table-input" (change)="onGlobalCategoryChange($event)">
-              <option value="" disabled selected hidden>اختر الفئة</option>
-              <option *ngFor="let category of allCategories" [value]="category">{{ category }}</option>
-            </select>
+            <input type="text" formControlName="category" class="table-input" readonly>
           </div>
         </div>
 
         <div class="row">
           <div class="field mb-2 date-group">
             <label>تاريخ الطلب :</label>
-        <input formControlName="requestDateGroup" type="date">
+            <input formControlName="requestDateGroup" type="date" readonly>
           </div>
 
           <div class="field d-flex align-items-center mb-2 date-group">
             <label>التاريخ :</label>
-          <input formControlName="regularDateGroup" type="date">
+            <input formControlName="regularDateGroup" type="date">
           </div>
+        </div>
 
         <div class="row">
           <div class="field mb-2">
             <label>اسم الطالب ( المخزن / الإدارة / العامل ) :</label>
-            <input type="text" formControlName="requestorName" class="input-line">
-            <div *ngIf="consumableForm.get('requestorName')?.invalid && consumableForm.get('requestorName')?.touched"
+            <input type="text" formControlName="requestorName" class="input-line" readonly>
+            <div *ngIf="form.get('requestorName')?.invalid && form.get('requestorName')?.touched"
               class="text-danger mt-1 text-end small">
               يجب إدخال الاسم كاملاً (4 كلمات).
             </div>
@@ -68,6 +70,7 @@
         </div>
       </div>
 
+      <!-- الجدول -->
       <div class="table-section">
         <table>
           <thead>
@@ -84,25 +87,23 @@
             </tr>
           </thead>
           <tbody formArrayName="tableData">
-            <tr *ngFor="let rowGroup of tableData.controls; let i = index" [formGroupName]="i">
-
+            <tr *ngFor="let rowGroup of getTableData(form).controls; let i = index" [formGroupName]="i">
               <td>
-                <input type="text" formControlName="itemSearchText" class="table-input" placeholder="ابحث عن صنف..."
-                  [attr.list]="'list-' + i" (input)="filterItemOptions($event, i)" (blur)="syncItemName(i)">
-
-                <!-- تعديل جديد: الأصناف تجي من DB حسب الفئة والفلاتر -->
-                <datalist [id]="'list-' + i">
-                  <option *ngFor="let item of filteredItemsByRow[i]" [value]="item">{{ item }}</option>
-                </datalist>
-
+                <input type="text" formControlName="itemSearchText" class="table-input" readonly>
                 <input type="hidden" formControlName="itemName">
               </td>
 
-              <!-- تعديل جديد: الوحدة وسعر الوحدة ممتلئ تلقائياً من DB -->
-              <td><input type="text" formControlName="unit" class="table-input" readonly></td>
-              <td><input type="number" min="0" formControlName="quantityRequired" class="table-input"></td>
+              <td>
+                <input type="text" formControlName="unit" class="table-input">
+              </td>
+
+              <td>
+                <input type="number" min="0" formControlName="quantityRequired" class="table-input"
+                  (input)="updateValue(fIndex, i)">
+              </td>
               <td><input type="number" min="0" formControlName="quantityAuthorized" class="table-input"></td>
-              <td><input type="number" min="0" formControlName="quantityIssued" class="table-input"></td>
+              <td><input type="number" min="0" formControlName="quantityIssued" class="table-input"
+                  (input)="updateValue(fIndex, i)"></td>
 
               <td>
                 <select formControlName="storeType" class="table-input">
@@ -118,37 +119,45 @@
                 </select>
               </td>
 
-              <!-- تعديل جديد: سعر الوحدة ممتلئ تلقائياً من DB -->
-              <td><input type="number" min="0" formControlName="unitPrice" class="table-input"></td>
-              <td><input type="number" min="0" formControlName="value" class="table-input"></td>
+              <td>
+                <input type="number" min="0" formControlName="unitPrice" class="table-input"
+                  (input)="updateValue(fIndex, i)">
+              </td>
+
+              <td>
+                <input type="number" min="0" formControlName="value" class="table-input">
+              </td>
             </tr>
           </tbody>
         </table>
 
         <div class="row-controls">
-          <button type="button" class="remove-row-button" (click)="removeRow()">-</button>
-          <button type="button" class="add-row-button" (click)="addRow()">+</button>
+          <div class="row-controls">
+            <button type="button" class="remove-row-button" (click)="removeRowFromForm(form)">-</button>
+            <button type="button" class="add-row-button" (click)="addRowToForm(form)">+</button>
+          </div>
+
         </div>
       </div>
 
-<div class="signature-section">
-  <div class="sig-item">توقيع الطالب</div>
-  <div class="sig-item">كاتب الشطب</div>
+      <!-- التواقيع -->
+      <div class="signature-section">
+        <div class="sig-item">توقيع الطالب</div>
+        <div class="sig-item">كاتب الشطب</div>
 
-  <div class="sig-item approval-box">
-    <span>يصرح بالصرف مدير المخازن</span>
-    <input type="text" formControlName="managerSignature" class="signature-input">
-    <div *ngIf="consumableForm.get('managerSignature')?.invalid
-             && consumableForm.get('managerSignature')?.touched" class="error-text">
-      الاسم كاملاً مطلوب.
-    </div>
-  </div>
+        <div class="sig-item approval-box">
+          <span>يصرح بالصرف مدير المخازن</span>
+          <input type="text" formControlName="managerSignature" class="signature-input">
+          <div *ngIf="form.get('managerSignature')?.invalid && form.get('managerSignature')?.touched"
+            class="error-text">
+            الاسم كاملاً مطلوب.
+          </div>
+        </div>
 
-  <div class="sig-item">تم الصرف أمين المخازن</div>
-  <div class="sig-item">كاتب الشطب</div>
-  <div class="sig-item">توقيع المستلم</div>
-</div>
-
+        <div class="sig-item">تم الصرف أمين المخازن</div>
+        <div class="sig-item">كاتب الشطب</div>
+        <div class="sig-item">توقيع المستلم</div>
+      </div>
 
       <div class="footnotes">
         <p>(*) كشف العجز - سند خصم - أصناف تالفة أو تالفة - محضر بيع جلب تشغيل - إهداءات ليست للنشاط الرئيسي للجهة</p>
@@ -156,19 +165,14 @@
       </div>
 
       <div class="button-section">
-        <button type="submit" [disabled]="isSubmitting() || consumableForm.invalid"
-          class="submit-btn text-white fw-medium p-3 fs-5">
+        <button type="submit" [disabled]="isSubmitting()" class="submit-btn text-white fw-medium p-3 fs-5">
           <span *ngIf="isSubmitting()">جاري الحفظ...</span>
           <span *ngIf="!isSubmitting()">حفظ الاذن</span>
         </button>
       </div>
 
-    </div>
-
-    </div>
-  </form>
-
+    </form>
+  </div>
 </div>
-<app-footer>
 
-</app-footer>
+<app-footer></app-footer>
