@@ -29,6 +29,7 @@ import { EmployeeMa5azen5Component } from './pages/employee_ma5azen/employee-ma5
 import { Elda3mComponent } from './pages/elda3m/elda3m.component';
 
 
+
 export const routes: Routes = [
 
   { path: 'home', component: HomeComponent, title: 'home'},
@@ -57,7 +58,8 @@ export const routes: Routes = [
   { path: 'employee_ma5azen3', component: EmployeeMa5azen3Component, title: 'employee_ma5azen3'},
   { path: 'employee_ma5azen4', component:EmployeeMa5azen4Component , title:'employee_ma5azen4'},
   { path: 'employee_ma5azen5', component:EmployeeMa5azen5Component , title:'employee_ma5azen5'},
-  { path: 'elda3m' , component :Elda3mComponent , title:'elda3m'}
+  { path: 'elda3m' , component :Elda3mComponent , title:'elda3m'},
+ 
 
 
 

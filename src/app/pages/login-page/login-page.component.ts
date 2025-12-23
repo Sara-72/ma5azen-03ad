@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { Employee1Component } from '../employee/employee1/employee1.component';
 import { AuthService } from '../../services/auth.service';
+import { LoadingService } from '../../services/loading.service'; // Ensure this path is correct
 
 
 function passwordValidator(control: AbstractControl): ValidationErrors | null {
@@ -56,6 +57,9 @@ interface LoginForm {
   templateUrl: './login-page.component.html',
   styleUrl: './login-page.component.css'
 })
+
+
+
 export class LoginPageComponent {
   // Dependency injection
   private auth = inject(AuthService);
@@ -85,7 +89,8 @@ loginForm: FormGroup<LoginForm> = this.fb.group({
 }) as FormGroup<LoginForm>;
 
 
-constructor() {
+constructor(private loadingService: LoadingService) {
+
     // Effect to clear messages when user starts typing again
     effect(() => {
         const emailValue = this.loginForm.controls.email.value;
@@ -105,6 +110,7 @@ constructor() {
 
 
 onSubmit() {
+  this.loadingService.show();
   if (this.loginForm.invalid) return;
 
   this.isSubmitting.set(true);
@@ -119,7 +125,7 @@ console.log('API type:', typeof res.faculty);
 console.log('Form type:', typeof college);
 
       // ✅ التحقق من الكلية
-     const apiFaculty = (res.faculty || '').trim().toLowerCase();
+const apiFaculty = (res.faculty || '').trim().toLowerCase();
 const selectedFaculty = (college || '').trim().toLowerCase();
 
 if (apiFaculty !== selectedFaculty) {

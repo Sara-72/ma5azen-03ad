@@ -6,20 +6,17 @@
 }
 
 .home-page-container {
-
-
   width:100%;
   background-image: url('/assets/images/storage3.jpg');
-
-
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
   min-height: 100vh;
-
-
-
+  animation: slowZoom 20s infinite alternate linear;
+  -webkit-animation: slowZoom 20s infinite alternate linear;
 }
+
+
 
 .content{
   max-width: 1000px;
@@ -45,6 +42,7 @@
 
 .btn:hover{
   background-color: var(--secondary-color);
+  animation: pulseGlow 2s infinite;
 }
 
 .social-icons i{
@@ -63,4 +61,106 @@
   -o-transition: 0.5s;
 }
 
+/* The semi-transparent background that covers the whole screen */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5); /* Dim the background */
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center;     /* Center vertically */
+  z-index: 9999;           /* Ensure it is on top of everything */
+  backdrop-filter: blur(5px); /* Optional: blurs the background for a modern look */
+}
+
+
+
+
+/* Page Exit Animation (Optional: adds a fade effect to the background content) */
+.exit-active {
+  filter: grayscale(0.5) blur(2px);
+  transition: 0.5s;
+}
+/***********************************************/
+
+
+/* 1. Define the Keyframes */
+
+/* Smooth fade and move up */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Subtle scaling for the button */
+@keyframes popIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  80% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Slide icons from the right */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 2. Apply to your existing classes */
+
+.content p {
+  animation: fadeInUp 1s ease-out forwards;
+}
+
+.button {
+  animation: popIn 0.8s ease-out 0.5s backwards; /* 0.5s delay */
+}
+
+.social-icons a {
+  animation: slideInRight 0.8s ease-out;
+}
+
+/* Stagger the social icons delay */
+.social-icons a:nth-child(2) {
+  animation-delay: 0.2s;
+  animation-fill-mode: backwards;
+}
+
+/* Hover effect for the logo (Simple Pulse) */
+.u-logo:hover {
+  transform: scale(1.1);
+  transition: transform 0.3s ease;
+}
+
+@keyframes slowZoom {
+  from { background-size: 100%; }
+  to { background-size: 110%; }
+}
+
+
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+  70% { box-shadow: 0 0 0 15px rgba(255, 255, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+
+
+@keyframes pageExit {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(-100px); filter: blur(10px); }
+}
 
