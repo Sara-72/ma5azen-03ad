@@ -47,26 +47,14 @@
 
           <div class="field mb-2 date-group">
             <label>التاريخ :</label>
-<<<<<<< HEAD
             <input formControlName="regularDateGroup" type="date" readonly>
-=======
-            <input formControlName="regularDateGroup" type="date" class="input-line">
->>>>>>> backup-branch
           </div>
         </div>
 
         <div class="row">
           <div class="field mb-2 flex-grow-1">
             <label>اسم الطالب ( المخزن / الإدارة / العامل ) :</label>
-<<<<<<< HEAD
             <input type="text" formControlName="requestorName" class="input-line" readonly />
-=======
-            <input type="text" formControlName="requestorName" class="input-line w-100" readonly>
-            <div *ngIf="form.get('requestorName')?.invalid && form.get('requestorName')?.touched"
-                 class="text-danger mt-1 text-end small">
-              يجب إدخال الاسم كاملاً (4 كلمات).
-            </div>
->>>>>>> backup-branch
           </div>
         </div>
 
@@ -115,21 +103,16 @@
                        (input)="updateValue(fIndex, i)">
               </td>
               <td><input type="number" min="0" formControlName="quantityAuthorized" class="table-input"></td>
-<<<<<<< HEAD
               <td>
                 <input type="number" min="0" formControlName="quantityIssued" class="table-input"
                   (input)="updateValue(fIndex, i); checkIssuedQuantity(fIndex, i)" />
-              
+
                 <div *ngIf="rowGroup.get('quantityIssued')?.errors?.['exceedStock']" class="text-danger small mt-1">
                   الكمية المطلوبة أكبر من المتاح في المخزن
                   (المتاح: {{ rowGroup.get('quantityIssued')?.errors?.['exceedStock']?.available }})
                 </div>
               </td>
 
-=======
-              <td><input type="number" min="0" formControlName="quantityIssued" class="table-input"
-                       (input)="updateValue(fIndex, i)"></td>
->>>>>>> backup-branch
 
               <td>
                 <input type="text" formControlName="storeType" class="table-input" readonly />
@@ -163,15 +146,7 @@
 
         <div class="sig-item approval-box">
           <span>يصرح بالصرف مدير المخازن</span>
-<<<<<<< HEAD
           <input type="text" formControlName="managerSignature" class="signature-input" readonly />
-=======
-          <input type="text" formControlName="managerSignature" class="signature-input">
-          <div *ngIf="form.get('managerSignature')?.invalid && form.get('managerSignature')?.touched"
-               class="error-text text-danger">
-            الاسم كاملاً مطلوب.
-          </div>
->>>>>>> backup-branch
         </div>
 
 
