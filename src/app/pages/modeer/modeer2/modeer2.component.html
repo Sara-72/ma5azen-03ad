@@ -47,20 +47,17 @@
 
           <div class="field d-flex align-items-center mb-2 date-group">
             <label>التاريخ :</label>
-            <input formControlName="regularDateGroup" type="date">
+            <input formControlName="regularDateGroup" type="date" readonly>
           </div>
         </div>
 
         <div class="row">
           <div class="field mb-2">
             <label>اسم الطالب ( المخزن / الإدارة / العامل ) :</label>
-            <input type="text" formControlName="requestorName" class="input-line" readonly>
-            <div *ngIf="form.get('requestorName')?.invalid && form.get('requestorName')?.touched"
-              class="text-danger mt-1 text-end small">
-              يجب إدخال الاسم كاملاً (4 كلمات).
-            </div>
+            <input type="text" formControlName="requestorName" class="input-line" readonly />
           </div>
         </div>
+
 
         <div class="row">
           <div class="field">
@@ -97,7 +94,7 @@
               </td>
 
               <td>
-                <input type="text" formControlName="unit" class="table-input">
+                <input type="text" formControlName="unit" class="table-input" readonly>
               </td>
 
               <td>
@@ -105,14 +102,19 @@
                   (input)="updateValue(fIndex, i)">
               </td>
               <td><input type="number" min="0" formControlName="quantityAuthorized" class="table-input"></td>
-              <td><input type="number" min="0" formControlName="quantityIssued" class="table-input"
-                  (input)="updateValue(fIndex, i)"></td>
+              <td>
+                <input type="number" min="0" formControlName="quantityIssued" class="table-input"
+                  (input)="updateValue(fIndex, i); checkIssuedQuantity(fIndex, i)" />
+              
+                <div *ngIf="rowGroup.get('quantityIssued')?.errors?.['exceedStock']" class="text-danger small mt-1">
+                  الكمية المطلوبة أكبر من المتاح في المخزن
+                  (المتاح: {{ rowGroup.get('quantityIssued')?.errors?.['exceedStock']?.available }})
+                </div>
+              </td>
+
 
               <td>
-                <select formControlName="storeType" class="table-input">
-                  <option value="" disabled selected hidden>اختر النوع</option>
-                  <option *ngFor="let type of storeTypes" [value]="type">{{ type }}</option>
-                </select>
+                <input type="text" formControlName="storeType" class="table-input" readonly />
               </td>
 
               <td>
@@ -150,12 +152,9 @@
 
         <div class="sig-item approval-box">
           <span>يصرح بالصرف مدير المخازن</span>
-          <input type="text" formControlName="managerSignature" class="signature-input">
-          <div *ngIf="form.get('managerSignature')?.invalid && form.get('managerSignature')?.touched"
-            class="error-text">
-            الاسم كاملاً مطلوب.
-          </div>
+          <input type="text" formControlName="managerSignature" class="signature-input" readonly />
         </div>
+
 
         <div class="sig-item">تم الصرف أمين المخازن</div>
         <div class="sig-item">كاتب الشطب</div>

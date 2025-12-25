@@ -581,3 +581,22 @@ select{
         padding: 10px 20px;
     }
 }
+
+/* ===== FORCE RED BORDER EVEN ON FOCUS ===== */
+/* أي input أو select أو textarea */
+input.ng-invalid.ng-touched,
+select.ng-invalid.ng-touched,
+textarea.ng-invalid.ng-touched {
+    border: 2px solid #dc3545 !important;
+    outline: none !important;
+}
+
+/* Inputs الجدول */
+.table-input.ng-invalid.ng-touched {
+    border: 2px solid #dc3545 !important;
+}
+
+/* توقيع المدير */
+.signature-input.ng-invalid.ng-touched {
+    border-bottom: 2px solid #dc3545 !important;
+}

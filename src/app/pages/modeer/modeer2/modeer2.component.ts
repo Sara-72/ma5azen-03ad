@@ -35,7 +35,86 @@ export function fourStringsValidator(): ValidatorFn {
   styleUrl: './modeer2.component.css'
 })
 export class Modeer2Component implements OnInit {
+  private scrollToFirstInvalidControl(form: FormGroup) {
+  setTimeout(() => {
+    const firstInvalidControl = document.querySelector(
+      'input.ng-invalid, select.ng-invalid, textarea.ng-invalid'
+    ) as HTMLElement | null;
 
+    if (firstInvalidControl) {
+      firstInvalidControl.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+
+      firstInvalidControl.focus();
+
+      // تغيير لون البوردر الأساسي
+      firstInvalidControl.classList.add('error-border');
+
+      // رجوع اللون الطبيعي بعد 3 ثواني
+      setTimeout(() => {
+        firstInvalidControl.classList.remove('error-border');
+      }, 3000);
+    }
+  });
+}
+
+
+  private getAvailableQuantity(itemName: string, storeType: string): number {
+  const stockItem = this.storeKeeperStocks.find(
+    s => s.itemName === itemName && s.storeType === storeType
+  );
+
+  return stockItem?.quantity || 0;
+}
+
+checkIssuedQuantity(formIndex: number, rowIndex: number) {
+  const row = (this.consumableForms[formIndex].get('tableData') as FormArray).at(rowIndex);
+
+  const issued = Number(row.get('quantityIssued')?.value || 0);
+  const itemName = row.get('itemName')?.value;
+  const storeType = row.get('storeType')?.value;
+
+  const available = this.getAvailableQuantity(itemName, storeType);
+
+  if (issued > available) {
+    row.get('quantityIssued')?.setErrors({
+      exceedStock: { available }
+    });
+  } else {
+    const errors = row.get('quantityIssued')?.errors;
+    if (errors) {
+      delete errors['exceedStock'];
+      if (Object.keys(errors).length === 0) {
+        row.get('quantityIssued')?.setErrors(null);
+      }
+    }
+  }
+}
+
+  private getItemDefaults(itemName: string): { unit: string; storeType: string } {
+  if (!itemName) {
+    return { unit: '', storeType: '' };
+  }
+
+  const stockItem = this.storeKeeperStocks.find(
+    s => s.itemName === itemName
+  );
+
+  return {
+    unit: stockItem?.unit || '',
+    storeType: stockItem?.storeType || ''
+  };
+}
+
+  private getTodayDate(): string {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
   private fb = inject(FormBuilder);
   private http = inject(HttpClient);
   private modeerService = inject(ModeerSercive);
@@ -79,10 +158,13 @@ export class Modeer2Component implements OnInit {
       destinationName: ['', Validators.required],
       category: ['', Validators.required],
       requestDateGroup: ['', Validators.required],
-      regularDateGroup: ['', Validators.required],
+      regularDateGroup: [this.getTodayDate(), Validators.required],
       requestorName: ['', [Validators.required, fourStringsValidator()]],
       documentNumber: ['', Validators.required],
-      managerSignature: ['', [Validators.required, fourStringsValidator()]],
+       managerSignature: [
+      this.userName, 
+      [Validators.required, fourStringsValidator()]
+    ],
       tableData: this.fb.array([])
     });
   }
@@ -98,7 +180,10 @@ export class Modeer2Component implements OnInit {
       quantityAuthorized: [''],
       quantityIssued: [''],
       itemCondition: [''],
-      unitPrice: [''],
+      unitPrice: [
+      null,
+      [Validators.required, Validators.min(0.01)]
+    ],
       value: this.fb.control({ value: 0, disabled: true })
     });
   }
@@ -171,8 +256,8 @@ removeRowFromForm(form: FormGroup) {
           itemSearchText: note.itemName,
           category: note.category,
           quantityRequired: note.quantity,
-          unit: '',
-          storeType: '',
+          unit: this.getItemDefaults(note.itemName).unit,          
+          storeType: this.getItemDefaults(note.itemName).storeType,
           itemCondition: 'جديدة',
           quantityAuthorized: '',
           quantityIssued: '',
@@ -198,9 +283,11 @@ removeRowFromForm(form: FormGroup) {
   /** حفظ الفورم */
   onSubmitForm(form: FormGroup) {
   if (form.invalid) {
-    form.markAllAsTouched();
-    return;
-  }
+  form.markAllAsTouched();
+  this.scrollToFirstInvalidControl(form); 
+  return;
+}
+
 
   this.isSubmitting.set(true);
   const formVal = form.value;
