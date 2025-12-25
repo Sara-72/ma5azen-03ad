@@ -14,6 +14,10 @@
   </aside>
 
   <div class="big-container m-5">
+     <!-- لا يوجد أذونات -->
+    <div *ngIf="!hasPermissions()" class="alert alert-info text-center">
+      لا يوجد أذونات صرف
+    </div>
     <div *ngFor="let perm of groupedPermissions" class="form-container mb-5" dir="rtl">
       
       <header class="form-header">
@@ -118,7 +122,7 @@
 
       <div class="d-flex mb-4 justify-content-evenly">
         <button *ngIf="confirmingPerm !== perm" type="button" class="btn btn-success" (click)="openConfirmInline(perm)">
-          قبول الصرف
+           قبول اذن الصرف
         </button>
 
         <div *ngIf="confirmingPerm === perm" class="text-center">
