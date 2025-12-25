@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class ModeerSercive {
 
-  private api = 'http://newwinventoryapi.runasp.net/api';
+  private api = 'https://newwinventoryapi.runasp.net/api';
 
   constructor(private http: HttpClient) {}
 //Additions Service
@@ -16,7 +16,7 @@ export class ModeerSercive {
   }
   getStoreKeeperStocks() {
   return this.http.get<any[]>(
-    'http://newwinventoryapi.runasp.net/api/StoreKeeperStocks'
+    'https://newwinventoryapi.runasp.net/api/StoreKeeperStocks'
   );
 }
   //SpendPermission service

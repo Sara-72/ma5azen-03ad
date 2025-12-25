@@ -19,7 +19,7 @@ export interface LedgerEntry {
 })
 export class LedgerService {
 
-  private apiUrl = 'http://newwinventoryapi.runasp.net/api/LedgerEntries';
+  private apiUrl = 'https://newwinventoryapi.runasp.net/api/LedgerEntries';
 
   constructor(private http: HttpClient) {}
 

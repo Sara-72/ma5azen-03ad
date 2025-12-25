@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class SpendPermissionService {
 
-  private apiUrl = 'http://newwinventoryapi.runasp.net/api/SpendPermissions';
+  private apiUrl = 'https://newwinventoryapi.runasp.net/api/SpendPermissions';
 
   constructor(private http: HttpClient) {}
 

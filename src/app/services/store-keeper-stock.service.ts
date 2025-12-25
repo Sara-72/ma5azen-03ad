@@ -18,7 +18,7 @@ export interface StockResponse {
 })
 export class StoreKeeperStockService {
 
-  private apiUrl = 'http://newwinventoryapi.runasp.net/api/StoreKeeperStocks';
+  private apiUrl = 'https://newwinventoryapi.runasp.net/api/StoreKeeperStocks';
 
   constructor(private http: HttpClient) {}
 
