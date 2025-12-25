@@ -1,166 +1,230 @@
 :host {
-  display: block; /* Allows setting width/height */
-  min-height: 100vh; /* Ensures the component takes up full viewport height */
-  width: 100%;
-
-}
-
-.home-page-container {
-  width:100%;
-  background-image: url('/assets/images/storage3.jpg');
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
+  display: block;
   min-height: 100vh;
-  animation: slowZoom 20s infinite alternate linear;
-  -webkit-animation: slowZoom 20s infinite alternate linear;
+  width: 100%;
+}
+/* Ensure the parent is the anchor */
+.home-page-container {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    overflow: hidden; /* Important! */
+    z-index: 1;
+}
+
+.boxes-layer {
+    position: absolute;
+    inset: 0; /* Shortcut for top, left, right, bottom: 0 */
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0; /* Sits behind text (z-index 5) */
+    display: block !important; /* Force display */
+}
+
+.falling-box {
+    position: absolute;
+    display: inline-block;
+    opacity: 0.4; /* Increased opacity for testing */
+    z-index: 0;
+    /* 3D Glass Effect */
+    filter: drop-shadow(8px 12px 15px rgba(0,0,0,0.1));
+    will-change: transform;
+    pointer-events: none;
+}
+
+/* Color grouping logic (kept the same) */
+.b1, .b4, .b7, .b10 { color: var(--secondary-color); }
+.b2, .b5, .b8, .b11 { color: var(--third-color); }
+.b3, .b6, .b9, .b12 { color: var(--primary-color); }
+
+/* --- Individual Positions --- */
+
+/* Left Side Cluster */
+.b1 { top: 5%; left: 5%; font-size: 75px; animation: boxFloat 10s infinite ease-in-out; }
+.b2 { top: 60%; left: 8%; font-size: 45px; animation: boxFloat 14s infinite ease-in-out reverse; }
+.b5 { top: 35%; left: 12%; font-size: 35px; animation: boxFloat 9s infinite ease-in-out 2s; }
+.b7 { top: 85%; left: 20%; font-size: 60px; animation: boxFloat 11s infinite ease-in-out; }
+.b8 { top: 20%; left: 25%; font-size: 40px; animation: boxFloat 13s infinite ease-in-out 1s; }
+.b11 { top: 50%; left: 3%; font-size: 55px; animation: boxFloat 16s infinite ease-in-out; }
+
+/* Right Side Cluster */
+.b3 { top: 12%; right: 8%; font-size: 65px; animation: boxFloat 12s infinite ease-in-out 1s; }
+.b4 { top: 78%; right: 6%; font-size: 85px; animation: boxFloat 18s infinite ease-in-out; }
+.b6 { top: 45%; right: 15%; font-size: 50px; animation: boxFloat 15s infinite ease-in-out; }
+.b9 { top: 5%; right: 25%; font-size: 45px; animation: boxFloat 10s infinite ease-in-out reverse 3s; }
+.b10 { top: 65%; right: 22%; font-size: 38px; animation: boxFloat 14s infinite ease-in-out 2s; }
+.b12 { top: 30%; right: 3%; font-size: 55px; animation: boxFloat 9s infinite ease-in-out; }
+
+/* Performance optimization for many boxes */
+.falling-box {
+  will-change: transform;
+  pointer-events: none;
 }
 
 
+/* Color logic for the new bottom boxes */
+.b-bot-1, .b-bot-4 { color: var(--secondary-color); }
+.b-bot-2, .b-bot-5 { color: var(--third-color); }
+.b-bot-3, .b-bot-6 { color: color-mix(in srgb, var(--secondary-color), var(--third-color) 60%); }
 
-.content{
+/* --- Bottom Row Positions --- */
+
+/* Far Bottom Left */
+.b-bot-1 {
+  bottom: 5%; left: 15%; font-size: 110px;
+  filter: blur(2px) opacity(0.2); /* Blurred foreground look */
+  animation: boxFloat 12s infinite ease-in-out;
+}
+
+/* Bottom Center-Left */
+.b-bot-2 {
+  bottom: 10%; left: 35%; font-size: 60px;
+  animation: boxFloat 15s infinite ease-in-out reverse;
+}
+
+/* Bottom Center-Right */
+.b-bot-3 {
+  bottom: 2%; left: 55%; font-size: 90px;
+  filter: blur(1px) opacity(0.15);
+  animation: boxFloat 10s infinite ease-in-out 1s;
+}
+
+/* Far Bottom Right */
+.b-bot-4 {
+  bottom: 8%; right: 15%; font-size: 100px;
+  filter: blur(3px) opacity(0.2);
+  animation: boxFloat 14s infinite ease-in-out;
+}
+
+/* Tucked in corner */
+.b-bot-5 {
+  bottom: 15%; right: 35%; font-size: 50px;
+  animation: boxFloat 11s infinite ease-in-out reverse 2s;
+}
+
+/* Near the social icons */
+.b-bot-6 {
+  bottom: 20%; right: 5%; font-size: 40px;
+  animation: boxFloat 16s infinite ease-in-out;
+}
+
+/* Refined Float Animation for heavier bottom boxes */
+@keyframes boxFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(5deg); }
+}
+
+/* --- ORIGINAL STYLES --- */
+p { color: var(--primary-color); }
+
+.content {
   max-width: 1000px;
   width: 50%;
   margin: 0 auto;
-
+  position: relative;
+  z-index: 5;
 }
 
-.u-logo{
-  width:100px;
-  height:100px;
+
+
+
+/* Parent container needs perspective for the 3D effect to work */
+.text-3d-parent {
+  perspective: 1200px;
+  perspective-origin: center;
+  line-height: 1.4;
 }
 
-.btn{
+.flip-line {
+  display: inline-block; /* Required for transform to work */
+  opacity: 0;
+  transform-origin: 50% 0%; /* Rotates from the top edge */
+  transform: rotateX(-90deg);
+  animation: flipReveal 1.2s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
+  will-change: transform, opacity;
+}
+
+/* Stagger the timing for each line */
+.line-1 { animation-delay: 0.3s; }
+.line-2 { animation-delay: 0.6s; }
+.line-3 { animation-delay: 0.9s; }
+
+@keyframes flipReveal {
+  0% {
+    opacity: 0;
+    transform: rotateX(-90deg);
+  }
+  100% {
+    opacity: 1;
+    transform: rotateX(0deg);
+  }
+}
+
+/* Ensure the label keeps its specific color */
+.label {
+  color: var(--secondary-color);
+}
+
+.u-logo {
+  width: 100px;
+  height: 100px;
+  transition: transform 0.3s ease;
+  position: relative;
+  z-index: 5;
+}
+
+.u-logo:hover { transform: scale(1.1); }
+
+.btn {
   background-color: var(--primary-color);
-
-  transition: 0.5s;
-  -webkit-transition: 0.5s;
-  -moz-transition: 0.5s;
-  -ms-transition: 0.5s;
-  -o-transition: 0.5s;
-}
-
-.btn:hover{
-  background-color: var(--secondary-color);
   animation: pulseGlow 2s infinite;
+  transition: 0.5s;
 }
 
-.social-icons i{
-  font-size: 30px;
-}
+.btn:hover { background-color: var(--secondary-color); }
 
-.social-icons img{
-  filter: hue-rotate(0deg);
-  width:25px;
-  height:25px;
+.social-icons img {
+  width: 25px;
+  height: 25px;
   cursor: pointer;
   transition: 0.5s;
-  -webkit-transition: filter 0.5s ease;
-  -moz-transition: 0.5s;
-  -ms-transition: 0.5s;
-  -o-transition: 0.5s;
 }
 
-/* The semi-transparent background that covers the whole screen */
-.loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5); /* Dim the background */
-  display: flex;
-  justify-content: center; /* Center horizontally */
-  align-items: center;     /* Center vertically */
-  z-index: 9999;           /* Ensure it is on top of everything */
-  backdrop-filter: blur(5px); /* Optional: blurs the background for a modern look */
+.button {
+  animation: popIn 0.8s ease-out 0.5s backwards;
 }
 
-
-
-
-/* Page Exit Animation (Optional: adds a fade effect to the background content) */
-.exit-active {
-  filter: grayscale(0.5) blur(2px);
-  transition: 0.5s;
+.social-icons a {
+  animation: slideInRight 0.8s ease-out;
+  position: relative;
+  z-index: 5;
 }
-/***********************************************/
 
+/* --- KEYFRAMES --- */
+@keyframes slowZoom {
+  from { background-size: 100%; }
+  to { background-size: 110%; }
+}
 
-/* 1. Define the Keyframes */
-
-/* Smooth fade and move up */
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* Subtle scaling for the button */
 @keyframes popIn {
   0% { transform: scale(0.8); opacity: 0; }
   80% { transform: scale(1.05); }
   100% { transform: scale(1); opacity: 1; }
 }
 
-/* Slide icons from the right */
 @keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(50px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0; transform: translateX(50px); }
+  to { opacity: 1; transform: translateX(0); }
 }
-
-/* 2. Apply to your existing classes */
-
-.content p {
-  animation: fadeInUp 1s ease-out forwards;
-}
-
-.button {
-  animation: popIn 0.8s ease-out 0.5s backwards; /* 0.5s delay */
-}
-
-.social-icons a {
-  animation: slideInRight 0.8s ease-out;
-}
-
-/* Stagger the social icons delay */
-.social-icons a:nth-child(2) {
-  animation-delay: 0.2s;
-  animation-fill-mode: backwards;
-}
-
-/* Hover effect for the logo (Simple Pulse) */
-.u-logo:hover {
-  transform: scale(1.1);
-  transition: transform 0.3s ease;
-}
-
-@keyframes slowZoom {
-  from { background-size: 100%; }
-  to { background-size: 110%; }
-}
-
 
 @keyframes pulseGlow {
-  0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+  0% { box-shadow: 0 0 0 0 var(--secondary-color); }
   70% { box-shadow: 0 0 0 15px rgba(255, 255, 255, 0); }
   100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
 }
-
-
-@keyframes pageExit {
-  from { opacity: 1; transform: translateX(0); }
-  to { opacity: 0; transform: translateX(-100px); filter: blur(10px); }
-}
-

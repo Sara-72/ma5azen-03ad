@@ -1,34 +1,50 @@
 <div class="home-page-container p-4">
-  <img class="u-logo" src="assets/images/Hurghada-University.png">
 
+<div class="boxes-layer" [style.transform]="'translate(' + translateX + 'px, ' + translateY + 'px)'">
+    <div class="falling-box b1"><i class="ph-fill ph-package"></i></div>
+    <div class="falling-box b2"><i class="ph-fill ph-cube"></i></div>
+    <div class="falling-box b5"><i class="ph-fill ph-package"></i></div>
+    <div class="falling-box b7"><i class="ph-fill ph-archive"></i></div>
+    <div class="falling-box b8"><i class="ph-fill ph-warehouse"></i></div>
+    <div class="falling-box b11"><i class="ph-fill ph-trolley"></i></div>
+
+    <div class="falling-box b3"><i class="ph-fill ph-archive"></i></div>
+    <div class="falling-box b4"><i class="ph-fill ph-package"></i></div>
+    <div class="falling-box b6"><i class="ph-fill ph-cube"></i></div>
+    <div class="falling-box b9"><i class="ph-fill ph-warehouse"></i></div>
+    <div class="falling-box b10"><i class="ph-fill ph-trolley"></i></div>
+    <div class="falling-box b12"><i class="ph-fill ph-package"></i></div>
+    <div class="falling-box b-bot-1"><i class="ph-fill ph-package"></i></div>
+<div class="falling-box b-bot-2"><i class="ph-fill ph-cube"></i></div>
+<div class="falling-box b-bot-3"><i class="ph-fill ph-trolley"></i></div>
+<div class="falling-box b-bot-4"><i class="ph-fill ph-archive"></i></div>
+<div class="falling-box b-bot-5"><i class="ph-fill ph-package"></i></div>
+<div class="falling-box b-bot-6"><i class="ph-fill ph-cube"></i></div>
+  </div>
+
+  <img class="u-logo" src="assets/images/Hurghada-University.png" alt="University Logo">
 
   <div class="content d-flex flex-column mx-auto mt-5">
-    <p class="text-white fs-1 fw-semibold">
-      مرحبا بكم في<span class="label"> نظام المخازن و العهد</span><br>
-      جامعة الغردقة.
+    <p class="fs-1 fw-semibold text-3d-parent"
+       [style.textShadow]="shadowX + 'px ' + shadowY + 'px 15px rgba(0,0,0,0.15)'">
+      <span class="flip-line line-1">مرحبا بكم في </span>
+      <span class="flip-line line-2 label">نظام المخازن و العهد </span>
+      <span class="flip-line line-3">جامعة الغردقة.</span>
     </p>
 
-<div class="button mt-3">
+    <div class="button mt-3">
       <a (click)="goToLogin(); $event.preventDefault()"
          class="btn text-white fw-medium p-3 fs-5"
          role="button"
          href="/login5">
-         سجل الدخول
+        سجل الدخول
       </a>
     </div>
   </div>
 
-
-
-
-
-
-
   <div class="social-icons d-flex flex-column align-items-end mt-5">
-
-    <a href=""><img src="assets/images/logos_facebook.png"></a>
-    <a href=""><img class="mt-4" src="assets/images/logos_whatsapp-icon.png"></a>
-
+    <a href="#"><img src="assets/images/logos_facebook.png" alt="Facebook"></a>
+    <a href="#"><img class="mt-4" src="assets/images/logos_whatsapp-icon.png" alt="Whatsapp"></a>
   </div>
 
 </div>

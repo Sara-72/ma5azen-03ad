@@ -1,111 +1,184 @@
-
-nav{
-  background-color: var(--primary-color);
-  color :white;
-  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
-  width:100%;
+/* --- 3D Navbar Base --- */
+nav {
+  background: linear-gradient(145deg, var(--primary-color), var(--primary-color));
+  color: white;
+  width: 100%;
+  border-bottom: 4px solid rgba(0, 0, 0, 0.3);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.2),
+    0 10px 15px -3px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  z-index: 1000;
+  transform-style: preserve-3d;
+  transition: all 0.3s ease;
 }
 
+nav:hover {
+  box-shadow:
+    0 8px 12px -1px rgba(0, 0, 0, 0.3),
+    0 15px 20px -3px rgba(0, 0, 0, 0.4);
+}
+
+/* --- Nav Links 3D Styling --- */
 .navbar-nav .nav-link {
-  transition: color 0.3s ease;
+  position: relative;
+  transition: all 0.3s ease;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  padding: 8px 20px;
 }
 
 .navbar-nav .nav-link:hover {
-
-  color: var(--third-color)!important;
-
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-2px);
+  color: var(--third-color) !important;
 }
 
-
-.right-nav{
-  margin-right:20rem ;
+/* Underline Animation */
+.nav-item .nav-link::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -2px;
+  left: 50%;
+  background-color: var(--third-color);
+  transition: all 0.3s ease-in-out;
+  transform: translateX(-50%);
 }
 
-.left-container{
-
-  margin-right:15rem;
-
+.nav-item .nav-link:hover::after,
+.nav-item .nav-link.active::after {
+  width: 70%;
 }
 
-.left-container ul li {
-
-  list-style: none;
-
+/* --- Logout Wrapper & 3D Door Logic --- */
+.logout-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  perspective: 1000px; /* Vital for the 3D rotation */
 }
 
+.ph-sign-out {
+  display: inline-block;
+  /* Base state: Rotated 180 degrees */
+  transform: rotate(180deg) translateZ(0);
+  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.4));
+}
+
+.logout-wrapper:hover .ph-sign-out {
+  color: #ff4d4d !important;
+  /* Action: Rotates back to 0 and pulls forward in 3D space */
+  transform: rotate(0deg) translateZ(40px);
+  filter: drop-shadow(0 10px 15px rgba(220, 53, 69, 0.5));
+}
+
+.logout-wrapper:active .ph-sign-out {
+  transform: rotate(0deg) translateZ(100px) scale(0.5);
+  opacity: 0;
+}
+
+/* --- Tooltip Under the Door --- */
+.custom-tooltip {
+  position: absolute;
+  top: 50px;
+  background: var(--secondary-color);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  padding: 7px 15px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+
+  /* Hidden State */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  z-index: 100;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logout-wrapper:hover .custom-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.custom-tooltip::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent var(--secondary-color) transparent;
+}
+
+/* Cleanup your old margins to avoid conflicts */
+.right-nav {
+  margin: 0 !important;
+}
+
+/* Push Left Container to the absolute end */
+.left-container {
+
+
+  padding-left: 40px;
+}
 
 .u-logo {
   width: 60px;
   height: 60px;
+  margin-left: 20px;
 }
 
-button{
-  margin-right:15rem;
+.left-nav { display: flex; align-items: center; gap: 20px; }
+
+/* --- Entrance Animations --- */
+@keyframes navLinkFade {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
+.navbar-nav .nav-item {
+  animation: navLinkFade 0.5s ease forwards;
+  opacity: 0;
+}
+.navbar-nav .nav-item:nth-child(1) { animation-delay: 0.1s; }
+.navbar-nav .nav-item:nth-child(2) { animation-delay: 0.2s; }
+.navbar-nav .nav-item:nth-child(3) { animation-delay: 0.3s; }
 
-/* --- Responsive Adjustments (Applied on Smaller Screens) --- */
-
+/* --- Responsive Design --- */
 @media (max-width: 992px) {
-    /* Tablet and Mobile adjustments */
-
-    /* Ensure logo and toggler are aligned correctly */
-    .navbar {
-        padding: 10px 15px !important;
-        justify-content: space-between !important;
-    }
-
-    /* Remove large fixed margins and center the main menu */
-    .collapse.navbar-collapse {
-        order: 1; /* Ensure collapse menu appears below logo/toggler */
-    }
-
-    .right-nav {
-        /* Reset spacing for mobile menu, let Bootstrap handle alignment */
-        margin-right: 0;
-        margin-left: 0;
-        width: 100%;
-        padding-top: 10px;
-        padding-bottom: 10px;
-        border-top: 1px solid rgba(255, 255, 255, 0.1); /* Separator line */
-    }
-
-    /* Reset left container alignment and push elements to the far right of the dropdown menu */
-    .left-container {
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-        width: 100%;
-        justify-content: flex-start !important; /* Align content to the right */
-        padding-top: 10px;
-        border-top: 1px solid rgba(255, 255, 255, 0.1); /* Separator line */
-    }
-
-    /* Ensure user icon and sign-out link are aligned on a single line */
-    .left-container ul {
-        flex-direction: row;
-        justify-content: space-between;
-        width: 100%;
-        padding: 0;
-    }
-
-    /* Adjust spacing for icons in the left nav */
-    .left-nav .nav-item {
-        margin-left: 0 !important;
-        margin-right: 10px;
-    }
-
-    /* Reduce icon size margin for better mobile fit */
-    .left-nav .ph-user-circle {
-        margin-right: 0 !important;
-        margin-left: 10px;
-    }
-    .left-nav .ph-sign-out {
-        margin-right: 0 !important;
-        margin-left: 0;
-    }
-
-    /* Toggler button margin cleanup */
-    button {
-        margin-right: 0;
-    }
+  .navbar-nav.mx-auto {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .navbar-nav.mx-auto {
+    position: static;
+    transform: none;
+  }
+  .left-container {
+    margin-left: 0 !important;
+    justify-content: center;
+    width: 100%;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 15px;
+    margin-top: 10px;
+  }
+  .right-nav, .left-container, button { margin-right: 0 !important; }
+  .custom-tooltip { top: 0; right: 60px; }
+  .custom-tooltip::after { display: none; }
+  .navbar-collapse { background: var(--primary-color); padding: 20px; }
 }

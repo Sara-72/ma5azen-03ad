@@ -6,10 +6,20 @@
 
 
 .login-box{
-  width:650px;
-  height: 500px;
-
+  width:700px;
+  height: 570px;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+  padding:3% 2%;
+  border-radius:5px ;
+  -webkit-border-radius:5px ;
+  -moz-border-radius:5px ;
+  -ms-border-radius:5px ;
+  -o-border-radius:5px ;
 }
+
+
+
+
 
 .nav-tabs {
   --bs-nav-tabs-border-color: var(--secondary-color);
@@ -48,10 +58,253 @@ label{
   -moz-transition: 0.5s;
   -ms-transition: 0.5s;
   -o-transition: 0.5s;
- 
-    width:100%;
+
+  width: 100%;
 }
 
 .btn:hover{
   background-color: var(--secondary-color);
+}
+
+
+
+/* --- Keyframes --- */
+
+/* The box pops in slightly and fades in */
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Form rows slide in from the right (Arabic friendly) */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* The pulse for the button (to match your Home Page) */
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(0, 123, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0); }
+}
+
+/* --- Applying Animations --- */
+
+.login-box {
+  animation: zoomIn 0.8s ease-out forwards;
+}
+
+/* Staggered entrance for form fields */
+.nav-tabs, .mb-3, .form-check, .button {
+  animation: slideInRight 0.6s ease-out both;
+}
+
+/* Delaying each element for a "waterfall" effect */
+.nav-tabs { animation-delay: 0.2s; }
+.mb-3:nth-of-type(1) { animation-delay: 0.3s; }
+.mb-3:nth-of-type(2) { animation-delay: 0.4s; }
+#collegeGroup { animation-delay: 0.5s; }
+.button { animation-delay: 0.6s; }
+
+/* Continuous pulse on the login button */
+.btn:not(:disabled) {
+  animation: pulseGlow 2s infinite;
+}
+
+/* Subtle shake if the button is clicked while disabled (invalid form) */
+.btn:disabled:active {
+  animation: shake 0.2s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+
+
+.text-danger {
+  display: block;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+.u-logo {
+  animation: fadeInUp 1s ease-out;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+
+.nav-link {
+  position: relative; /* Needed for the absolute underline */
+  color: black;
+  overflow: hidden;
+  transition: color 0.3s ease;
+}
+
+/* Create the underline using a pseudo-element */
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 3px;
+  background-color: var(--secondary-color);
+  transition: all 0.3s ease-in-out;
+  transform: translateX(-50%);
+}
+
+/* Expand underline on hover */
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* Keep underline full for the active tab */
+.nav-link.active::after {
+  width: 100%;
+}
+
+/* Gentle lift and color change for the icon */
+.nav-link:hover i {
+  transform: translateY(-3px);
+  color: var(--secondary-color);
+  transition: transform 0.3s ease;
+}
+
+
+
+/* 1. Icon Animation */
+.btn i {
+  transition: transform 0.3s ease;
+  display: inline-block;
+}
+
+.btn:hover:not(:disabled) i {
+  transform: translateX(-5px); /* Arrow nudges left slightly on hover */
+}
+
+/* 2. Ripple Effect Logic */
+.ripple-btn {
+  position: relative;
+  overflow: hidden; /* Clips the ripple so it stays inside the button */
+}
+
+.ripple-btn::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5); /* Color of the ripple */
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%);
+  transform-origin: 50% 50%;
+}
+
+/* 3. The Click (Active) State */
+.ripple-btn:active::after {
+  animation: ripple 0.6s ease-out;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0, 0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(100, 100); /* Grows to cover the whole button */
+    opacity: 0;
+  }
+}
+
+/* Ensure the constant pulse you wanted is still there */
+.btn:not(:disabled) {
+  animation: pulseGlow 2s infinite;
+}
+
+
+
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.1);
+
+}
+
+/* Container must be relative */
+.input-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+/* The Lock (Right Side) */
+.input-icon {
+  position: absolute;
+  right: 15px; /* RTL position */
+  color: var(--primary-color);
+  z-index: 5;
+  pointer-events: none; /* User clicks through this to the input */
+}
+
+/* The Eye (Left Side Toggle) */
+.password-toggle-icon {
+  position: absolute;
+  left: 15px; /* Opposite side of the lock */
+  color: var(--primary-color);
+  cursor: pointer;
+  z-index: 10; /* Higher than input and lock */
+  /* FORCE DIMENSIONS */
+  display: inline-block !important;
+  width: 20px !important;
+  height: 20px !important;
+  line-height: 20px; /* Centers the icon vertically within the height */
+  text-align: center;
+  font-size: 18px;
+  transition: color 0.3s ease, transform 0.2s ease;
+  pointer-events: auto !important; /* Forces it to be clickable */
+}
+
+
+
+.password-toggle-icon:hover {
+  color: var(--primary-color);
+  transform: scale(1.1);
+}
+
+/* The Input Field */
+.icon-padding {
+  width: 100%;
+  height: 50px;
+  padding-right: 45px !important; /* Space for Lock icon */
+  padding-left: 45px !important;  /* Space for Eye icon */
+  z-index: 1; /* Keep behind icons */
+  position: relative;
 }

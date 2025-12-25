@@ -1,47 +1,123 @@
-<app-header>
+<app-header></app-header>
 
-</app-header>
-
-
-<section class="container">
-
-    <h2>مسؤول الدعم الفني للنظام بالجامعة</h2>
-    <p class="info-text">نحن هنا لمساعدتك في أي مشكلة أو استفسار يخص نظام مخازن الجامعة</p>
-
-    <div class="contact-info">
-        <p>يرجى التواصل معنا مباشرة:</p>
-        <p class="email">supportuniversity-warehouse.edu.eg</p>
-        <p class="phone">1234 <i class="fa-solid fa-phone"></i></p>
+<section class="support-container py-5">
+  <div class="container">
+    <div class="support-header reveal-top mb-5">
+      <h2 class="fw-bold">مسؤول الدعم الفني للنظام بالجامعة</h2>
+      <p class="info-text">
+        نحن هنا لمساعدتك في أي مشكلة أو استفسار يخص نظام مخازن الجامعة
+      </p>
     </div>
 
-    <div class="btn">إرسال طلب دعم</div>
-
-    <div class="form-box">
-
-        <div class="row">
-            <input type="text" placeholder="الاسم بالكامل">
-            <input type="email" placeholder="البريد الإلكتروني الجامعي">
+    <p class="mb-1 text-muted">يرجى التواصل معنا مباشرة:</p>
+    <div class="row contact-row justify-content-end mb-4">
+      <div class="col-md-4 contact-card reveal-right">
+        <div class="d-flex align-items-center justify-content-end mb-2">
+          <span class="email-text me-2"
+            >supportuniversity-warehouse.edu.eg</span
+          >
+          <i class="ph ph-envelope-simple fs-4 text-warning m-2"></i>
         </div>
-
-        <div class="row">
-            <select>
-                <option>الكلية / الجهة</option>
-            </select>
-
-            <select>
-                <option>نوع المشكلة</option>
-            </select>
+        <div class="d-flex align-items-center justify-content-end">
+          <span class="phone-text me-2">012349090</span>
+          <i class="ph ph-phone fs-4 text-warning m-2"></i>
         </div>
-
-        <textarea placeholder="وصف المشكلة"></textarea>
-
-        <button class="btn-main">إرسال طلب</button>
+      </div>
     </div>
 
+    <div class="form-wrapper reveal-scale">
+      <div class="form-title-bar">
+        <span>إرسال طلب دعم</span>
+      </div>
+
+      <div class="form-body p-4 p-md-5">
+        <div class="row g-4 mb-4">
+          <div class="col-md-6">
+            <label class="form-label">الاسم بالكامل</label>
+            <input
+              type="text"
+              class="form-control custom-input"
+              placeholder="أدخل اسمك الرباعي"
+            />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">البريد الإلكتروني الجامعي</label>
+            <input
+              type="email"
+              class="form-control custom-input"
+              placeholder="example@hu.edu.eg"
+            />
+          </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+          <div class="col-md-6">
+            <label class="form-label">الكلية / الجهة</label>
+            <select class="form-select custom-input">
+              <option selected disabled>اختر الكلية</option>
+              <option>كلية التربية</option>
+              <option>كلية الألسن</option>
+              <option>كلية الحاسبات والذكاء الاصطناعي</option>
+
+              <option>كلية السياحة و الفنادق</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">نوع المشكلة</label>
+            <select class="form-select custom-input">
+              <option selected disabled>اختر نوع المشكلة</option>
+              <option>مشكلة في تسجيل الدخول</option>
+              <option>طلب إضافة صنف</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label">وصف المشكلة</label>
+          <textarea
+            class="form-control custom-input"
+            rows="4"
+            placeholder="اكتب تفاصيل المشكلة هنا..."
+          ></textarea>
+        </div>
+<div class="mb-5">
+  <label class="form-label">إرفاق صور للمشكلة</label>
+
+  <div class="upload-area">
+    <input type="file" id="fileUpload" class="file-input" accept="image/*"
+          multiple (change)="onFileSelected($event)" #fileInput>
+
+    <label for="fileUpload" class="upload-dropzone">
+      <i class="ph ph-camera-plus fs-1"></i>
+      <span>اضغط لإضافة صور</span>
+    </label>
+
+    <div class="preview-grid mt-4">
+      @for (photo of attachments; track $index) {
+        <div class="preview-card">
+          <img [src]="photo.previewUrl" class="img-preview" alt="Preview">
+          <button type="button" class="btn-delete-overlay" (click)="removePhoto($index)">
+            <i class="ph ph-trash"></i>
+          </button>
+          <div class="file-info-overlay">
+            {{ photo.file.name }}
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+        <div class="d-flex justify-content-start">
+          <button class="btn-submit" (click)="submitForm()">
+            <span>إرسال طلب</span>
+            <i class="ph ph-paper-plane-tilt ms-2"></i>
+          </button>
+        </div>
+
+
+      </div>
+    </div>
+  </div>
 </section>
 
-
-
-<app-footer>
-
-</app-footer>
+<app-footer></app-footer>

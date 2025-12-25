@@ -1,7 +1,126 @@
-hr{
-  width:10%;
+/* Container Animation */
+.reveal-section {
+  direction: rtl;
 }
 
-h5{
-  color:var(--primary-color);
+.header-box {
+  animation: fadeInDown 0.8s ease-out forwards;
+}
+
+.title-hr {
+  width: 50px; /* More modern than 10% */
+  height: 4px;
+  background-color: var(--third-color); /* Matches your gold navbar accent */
+  border: none;
+  opacity: 1;
+  transition: width 0.5s ease;
+}
+
+/* Grid Layout */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+}
+/* 3D Feature Cards with Glow Effect */
+.feature-card {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  /* Soft base shadow */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeInUp 0.6s ease-out forwards;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden; /* For any internal glow effects */
+}
+
+/* The Glow Hover State */
+.feature-card:hover {
+  transform: translateY(-12px) scale(1.04);
+  /* Multi-layered glow using your primary color */
+  box-shadow:
+    0 15px 35px rgba(0, 0, 0, 0.1),
+    0 0 20px rgba(var(--primary-rgb), 0.3); /* Adjust --primary-rgb to your color's RGB values */
+  border-color: var(--primary-color);
+}
+
+/* Add a subtle shine sweep animation across the card on hover */
+.feature-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transform: skewX(-25deg);
+  transition: 0.5s;
+}
+
+.feature-card:hover::before {
+  left: 150%;
+}
+
+/* Icon rotation and color change on hover */
+.feature-card:hover .card-icon {
+  transform: rotateY(180deg);
+  color: var(--primary-color);
+  filter: drop-shadow(0 0 8px rgba(var(--primary-rgb), 0.5));
+}
+
+.card-icon {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  margin-bottom: 15px;
+  transition: transform 0.3s ease;
+}
+
+.feature-card:hover .card-icon {
+  transform: rotateY(180deg); /* 3D Icon Flip */
+}
+
+.feature-card p {
+  font-size: 1.1rem;
+  color: #555;
+  margin: 0;
+}
+
+/* Staggered Delay for Cards */
+.feature-card:nth-child(1) { animation-delay: 0.1s; }
+.feature-card:nth-child(2) { animation-delay: 0.2s; }
+.feature-card:nth-child(3) { animation-delay: 0.3s; }
+.feature-card:nth-child(4) { animation-delay: 0.4s; }
+.feature-card:nth-child(5) { animation-delay: 0.5s; }
+.feature-card:nth-child(6) { animation-delay: 0.6s; }
+.feature-card:nth-child(7) { animation-delay: 0.7s; }
+.feature-card:nth-child(8) { animation-delay: 0.8s; }
+.feature-card:nth-child(9) { animation-delay: 0.9s; }
+
+/* Animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile Fixes */
+@media (max-width: 768px) {
+  .features-grid { grid-template-columns: 1fr; }
 }

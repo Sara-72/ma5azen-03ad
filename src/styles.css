@@ -31,6 +31,9 @@ app-root {
   --black-color:#000000;
   --white-color:#FFFFFF;
 
+    --bg-light: #f4f7f6;
+
+
   /*fonts*/
   --font-arabic: "Tajawal", sans-serif;
 

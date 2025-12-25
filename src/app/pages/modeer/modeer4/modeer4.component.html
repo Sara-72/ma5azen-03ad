@@ -1,99 +1,92 @@
 <app-header></app-header>
 
-<div class="d-flex">
-    <aside class="sidebar">
-            <h5>
+<div class="page-container">
+  <aside class="sidebar">
+    <h5>
       مرحباً بك
       <span *ngIf="displayName">، {{ displayName }}</span>
     </h5>
 
-        <ul class="mt-5">
-            <li><a href="/modeer1">المخزن</a></li>
-            <li><a href="/modeer2">اذن الصرف</a></li>
-            <li><a href="/modeer3">مذكرات الصرف</a></li>
-            <li class="active"><a>اذونات الصرف</a></li>
-        </ul>
-    </aside>
+    <ul class="mt-5">
+      <li><a href="/modeer1">المخزن</a></li>
+      <li><a href="/modeer2">اذن الصرف</a></li>
+      <li><a href="/modeer3">مذكرات الصرف</a></li>
+      <li class="active"><a>اذونات الصرف</a></li>
+    </ul>
+  </aside>
 
-    <div class="big-container m-5">
-        <div *ngFor="let perm of groupedPermissions" class="form-container mb-5" dir="rtl">
-            <header class="form-header">
-                <h2 class="title">طلب و إذن صرف</h2>
-                <h3 class="subtitle">مستديم | مستهلك</h3>
-            </header>
+  <div class="big-container flex-grow-1 p-4">
+    <div *ngFor="let perm of groupedPermissions" class="form-container mb-5">
 
-            <div class="info-section">
-                <div class="row">
-                    <div class="field mb-2"><label>اسم الجهة :</label>
-                        <td>{{ perm.destinationName }}</td>
-                    </div>
-                    <div class="field mb-2"><label>الفئة :</label>
-                        <td>{{ perm.category }}</td>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="field mb-2"><label>تاريخ الطلب :</label>
-                        <td>{{ perm.requestDate | date:'MM/dd/yyyy' }}</td>
-                    </div>
-                    <div class="field mb-2"><label>التاريخ :</label>
-                        <td>{{ perm.documentDate | date:'MM/dd/yyyy' }}</td>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="field mb-2"><label>اسم الطالب :</label>
-                        <td>{{ perm.requestorName }}</td>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="field mb-2">
-                        <label>(*) سند الصرف :</label>
-                        <td>{{ perm.DocumentNumber }}</td>
-                    </div>
-                </div>
-            </div>
+      <header class="form-header">
+        <h2 class="title">طلب و إذن صرف</h2>
+        <h3 class="subtitle">مستديم | مستهلك</h3>
+      </header>
 
-            <div class="table-section">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>اسم الصنف</th>
-                            <th>الوحدة</th>
-                            <th>الكمية المطلوبة</th>
-                            <th>الكمية المصرح بها</th>
-                            <th>الكمية المنصرفة</th>
-                            <th>المخزن</th>
-                            <th>حالة الصنف</th>
-                            <th>سعر الوحدة</th>
-                            <th>القيمة</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let item of perm.items">
-                            <td>{{ item.itemName }}</td>
-                            <td>{{ item.unit }}</td>
-                            <td>{{ item.requestedQuantity }}</td>
-                            <td>{{ item.approvedQuantity }}</td>
-                            <td>{{ item.issuedQuantity }}</td>
-                            <td>{{ item.storeHouse }}</td>
-                            <td>{{ item.stockStatus }}</td>
-                            <td>{{ item.unitPrice }}</td>
-                            <td>{{ item.totalValue }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="signature-section mt-3">
-                <div>توقيع الطالب</div>
-                <div>كاتب الشطب</div>
-                <div>يصرح بالصرف مدير المخازن: <td>{{ perm.ManagerSignature }}</td>
-                </div>
-                <div>تم الصرف أمين المخازن</div>
-                <div>كاتب الشطب</div>
-                <div>توقيع المستلم</div>
-            </div>
+      <div class="info-section">
+        <div class="row">
+          <div class="field"><label>اسم الجهة :</label><span>{{ perm.destinationName }}</span></div>
+          <div class="field"><label>الفئة :</label><span>{{ perm.category }}</span></div>
         </div>
+
+        <div class="row">
+          <div class="field"><label>تاريخ الطلب :</label><span>{{ perm.requestDate | date:'MM/dd/yyyy' }}</span></div>
+          <div class="field"><label>التاريخ :</label><span>{{ perm.documentDate | date:'MM/dd/yyyy' }}</span></div>
+        </div>
+
+        <div class="row">
+          <div class="field"><label>اسم الطالب :</label><span>{{ perm.requestorName }}</span></div>
+        </div>
+
+        <div class="row">
+          <div class="field"><label>(*) سند الصرف :</label><span>{{ perm.DocumentNumber }}</span></div>
+        </div>
+      </div>
+
+      <div class="table-section">
+        <table>
+          <thead>
+            <tr>
+              <th>اسم الصنف</th>
+              <th>الوحدة</th>
+              <th>الكمية المطلوبة</th>
+              <th>الكمية المصرح بها</th>
+              <th>الكمية المنصرفة</th>
+              <th>المخزن</th>
+              <th>حالة الصنف</th>
+              <th>سعر الوحدة</th>
+              <th>القيمة</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of perm.items">
+              <td>{{ item.itemName }}</td>
+              <td>{{ item.unit }}</td>
+              <td>{{ item.requestedQuantity }}</td>
+              <td>{{ item.approvedQuantity }}</td>
+              <td>{{ item.issuedQuantity }}</td>
+              <td>{{ item.storeHouse }}</td>
+              <td>{{ item.stockStatus }}</td>
+              <td>{{ item.unitPrice }}</td>
+              <td>{{ item.totalValue }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="signature-section">
+        <div>توقيع الطالب</div>
+        <div>كاتب الشطب</div>
+        <div>
+            يصرح بالصرف مدير المخازن:
+            <span class="d-block mt-2 border-bottom border-dark pb-1">{{ perm.ManagerSignature }}</span>
+        </div>
+        <div>تم الصرف أمين المخازن</div>
+        <div>كاتب الشطب</div>
+        <div>توقيع المستلم</div>
+      </div>
     </div>
+  </div>
 </div>
 
 <app-footer></app-footer>

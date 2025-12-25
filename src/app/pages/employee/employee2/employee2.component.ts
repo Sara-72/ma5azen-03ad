@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component ,HostListener} from '@angular/core';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '../../../components/header/header.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
@@ -16,7 +16,7 @@ import { CommonModule } from '@angular/common';
   styleUrl: './employee2.component.css'
 })
 export class Employee2Component {
-  
+
  userName: string = '';
  displayName: string = '';
 
@@ -34,4 +34,17 @@ getFirstTwoNames(fullName: string): string {
     .slice(0, 2)
     .join(' ');
 }
-}
+
+
+
+@HostListener('mousemove', ['$event'])
+onMouseMove(event: MouseEvent) {
+  const rows = document.querySelectorAll('tbody tr');
+  rows.forEach((row: any) => {
+    const rect = row.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    row.style.setProperty('--mouse-x', `${x}px`);
+    row.style.setProperty('--mouse-y', `${y}px`);
+  });
+}}

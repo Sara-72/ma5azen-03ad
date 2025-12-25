@@ -62,3 +62,91 @@
     width: 100%;
     margin-right: 0;
 }
+
+
+
+/* --- Animation Keyframes --- */
+
+/* Form groups sliding in from the left */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Card appearing with a subtle scale up */
+@keyframes cardEntry {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* --- Applying Animations to Elements --- */
+
+.auth-card {
+  animation: cardEntry 0.6s ease-out forwards;
+}
+
+/* Apply staggered animation to each form group */
+.mb-4, .mb-3, hr {
+  animation: slideInLeft 0.5s ease-out both;
+}
+
+/* Delay each group so they appear one after another */
+.mb-4:nth-child(1) { animation-delay: 0.1s; } /* Name */
+.mb-4:nth-child(2) { animation-delay: 0.2s; } /* Email */
+.mb-4:nth-child(3) { animation-delay: 0.3s; } /* Password */
+.mb-3 { animation-delay: 0.4s; }              /* Role Selection */
+hr { animation-delay: 0.5s; }                 /* Divider */
+.mb-4:nth-child(6) { animation-delay: 0.6s; } /* College Selection (if visible) */
+.submit-button { animation-delay: 0.7s; }     /* Save Button */
+
+/* --- Interactive Hover & Focus Effects --- */
+
+/* Glow effect when user clicks an input */
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 10px rgba(0, 77, 153, 0.2);
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+/* Pulse for the "Save" button like the other pages */
+.submit-button {
+  animation: pulseGlow 2s infinite;
+}
+
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 0 0 rgba(0, 77, 153, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(0, 77, 153, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 77, 153, 0); }
+}
+
+/* Radio buttons "pop" when selected */
+.form-check-input:checked {
+  transform: scale(1.2);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+
+/* Change icon color when the neighboring input is focused */
+.input-group:focus-within .input-group-text {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+  transition: all 0.3s ease;
+}
+
+.input-group-text {
+  transition: all 0.3s ease;
+}
