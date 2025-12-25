@@ -1,209 +1,358 @@
-
-
-.container {
-    width: 80%;
-    margin: auto;
-    text-align: center;
-    padding: 40px 0;
-
-
-}
-
-.btn {
-    background: var(--secondary-color);
-    color: white;
-    padding: 6px 20px;
-    width: fit-content;
-    border: none;
-    border-radius: 6px;
-    margin-top: 15px;
-    cursor: default;
-    font-size: 15px;
-    display:block;
-
-}
-
-
-
-.container h2 {
-    font-size: 24px;
-    text-align: center;
-}
-
-.info-text {
-    color: #555;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.contact-info .email,
-.contact-info .phone {
-    font-weight: bold;
-    margin-top: 5px;
-    margin-bottom: 20px;
-}
-
-.contact-info {
-  text-align: right;
-
-}
-
-
-.form-box {
-    background: white;
-    width: 70%;
-    margin-top: 20px;
-    padding: 50px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    margin-left: auto;
-}
-
-.row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    gap: 15px;
-}
-
-input, select {
-    width: 48%;
-    padding: 12px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    margin-bottom: 12px;
+/* --- 1. CORE LAYOUT & BACKGROUND --- */
+.support-container {
     direction: rtl;
+    background-color: #f8f9fa;
+    min-height: 80vh;
 }
 
-textarea {
-    width: 100%;
-    height: 150px;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    resize: none;
+.support-header h2 {
+    color: var(--primary-color);
+    position: relative;
+    display: inline-block;
+    padding-bottom: 10px;
 }
 
-.btn-main {
+.support-header h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 60px;
+    height: 4px;
+    background: var(--third-color);
+    border-radius: 2px;
+}
+
+/* --- 2. 3D FORM WRAPPER --- */
+.form-wrapper {
+    background: white;
+    border-radius: 12px;
+    box-shadow:
+        0 10px 30px rgba(0,0,0,0.08),
+        0 1px 3px rgba(0,0,0,0.05);
+    overflow: hidden;
+    border-bottom: 5px solid rgba(0,0,0,0.1); /* The 3D edge */
+}
+
+.form-title-bar {
     background: var(--primary-color);
     color: white;
-    padding: 12px 20px;
+    padding: 12px 25px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-align: right;
+}
+
+/* --- 3. INPUTS & FORM CONTROLS --- */
+.custom-input {
+    border: 1px solid #e0e0e0;
+    padding: 12px 30px;
+    border-radius: 8px;
+    background-color: #fdfdfd;
+    transition: all 0.3s ease;
+    text-align: right;
+}
+
+.custom-input:focus {
+    background-color: #fff;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(0, 51, 102, 0.1); /* Replace with your primary RGB */
+    transform: translateY(-2px);
+    outline: none;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #444;
+    text-align: right;
+}
+
+/* --- 4. UPLOAD AREA & PREVIEW GRID --- */
+.upload-dropzone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    background: #fafafa;
+    border: 2px dashed var(--primary-color);
+    border-radius: 12px;
+    cursor: pointer;
+    color: var(--primary-color);
+    transition: all 0.3s ease;
+    gap: 10px;
+}
+
+.upload-dropzone:hover {
+    background: #f0f7ff;
+    transform: translateY(-2px);
+}
+
+.file-input {
+    display: none;
+}
+
+.preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 15px;
+    width: 100%;
+}
+
+.preview-card {
+    position: relative;
+    height: 130px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    border: 2px solid white;
+    transition: transform 0.3s ease;
+}
+
+.preview-card:hover {
+    transform: scale(1.05);
+}
+
+.img-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Delete Overlay Button */
+.btn-delete-overlay {
+    position: absolute;
+    top: 5px;
+    left: 5px; /* RTL logic */
+    background: rgba(220, 53, 69, 0.9);
+    color: white;
     border: none;
     border-radius: 6px;
-    margin-top: 15px;
-    cursor: pointer;
-    font-size: 15px;
+    width: 30px;
+    height: 30px;
     display: flex;
-    justify-content: flex-end;
-    margin-left: auto;
-    transition:0.3s;
-    -webkit-transition:0.3s;
-    -moz-transition:0.3s;
-    -ms-transition:0.3s;
-    -o-transition:0.3s;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 10;
 }
 
-.btn-main:hover{
-  background: var(--secondary-color);
-
-
-
-
+.preview-card:hover .btn-delete-overlay {
+    opacity: 1;
 }
 
-
-
-
-
-
-/* --- CORE LAYOUT ADJUSTMENTS --- */
-
-.container {
-    max-width: 1100px; /* Cap maximum width for large monitors */
-    width: 90%; /* Increase from 80% for slightly better desktop use */
-    margin: auto;
+.file-info-overlay {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    font-size: 11px;
+    padding: 5px;
     text-align: center;
-    padding: 40px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.form-box {
-    max-width: 800px; /* Cap maximum form width */
-    width: 90%; /* Increase width for better desktop use */
-    margin-top: 20px;
-    padding: 50px;
+/* --- 5. SUBMIT BUTTON --- */
+.btn-submit {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 12px 40px;
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    margin-left: auto; /* Keeps it right-aligned */
-    margin-right: auto; /* Add auto to center it within the container */
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-/* Ensure the initial button styles are clean */
-.btn {
-    margin-right: auto; /* Center the button */
-    margin-left: auto;
+.btn-submit:hover {
+    background: var(--secondary-color);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+}
+
+.btn-submit i {
+    transition: transform 0.3s ease;
+}
+
+.btn-submit:hover i {
+    transform: translate(-5px, -5px) rotate(-10deg);
+}
+
+/* --- 6. ANIMATIONS --- */
+.reveal-top { animation: fadeInDown 0.8s ease forwards; }
+.reveal-right { animation: fadeInRight 0.8s ease forwards; opacity: 0; }
+.reveal-scale { animation: scaleIn 0.6s ease-out forwards; opacity: 0; }
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInRight {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
 }
 
 
 
+/* --- SUCCESS MODAL STYLES --- */
+/* --- FULL PAGE MODAL OVERLAY --- */
+.modal-overlay {
+    position: fixed; /* Stays in place even if user scrolls */
+    top: 0;
+    left: 0;
+    width: 100vw; /* Full Viewport Width */
+    height: 100vh; /* Full Viewport Height */
+    background: rgba(0, 14, 31, 0.85); /* Deep dark blue tint for better contrast */
+    backdrop-filter: blur(8px); /* Blur the background site (Header, Content, Footer) */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Higher than Navbar (usually 1000) and Footer */
+    padding: 20px;
+    animation: fadeIn 0.4s ease forwards;
+}
 
-/* --- RESPONSIVE ADJUSTMENTS (MEDIA QUERIES) --- */
+/* Ensure the body doesn't scroll when modal is open (Optional logic) */
+.modal-open {
+    overflow: hidden;
+}
 
+.success-card {
+    background: #ffffff;
+    padding: 50px 30px;
+    border-radius: 24px;
+    text-align: center;
+    max-width: 450px;
+    width: 100%;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: modalBounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* --- REFINED ANIMATIONS --- */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes modalBounce {
+    0% { transform: scale(0.7) translateY(100px); opacity: 0; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.success-card h3 {
+    color: var(--primary-color);
+    margin: 20px 0 10px;
+    font-weight: 700;
+}
+
+.success-card p {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.btn-confirm {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 40px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-confirm:hover {
+    background: var(--secondary-color);
+    transform: scale(1.05);
+}
+
+/* --- CHECKMARK ANIMATION --- */
+.checkmark-wrapper {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+}
+
+.checkmark {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: block;
+    stroke-width: 2;
+    stroke: #28a745;
+    stroke-miterlimit: 10;
+    box-shadow: inset 0px 0px 0px #28a745;
+    animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+}
+
+.checkmark-circle {
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    stroke-width: 2;
+    stroke-miterlimit: 10;
+    stroke: #28a745;
+    fill: none;
+    animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.checkmark-check {
+    transform-origin: 50% 50%;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+}
+
+@keyframes stroke { 100% { stroke-dashoffset: 0; } }
+@keyframes fill { 100% { box-shadow: inset 0px 0px 0px 40px #f0fff4; } }
+
+/* --- MODAL KEYFRAMES --- */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scaleUp {
+    from { opacity: 0; transform: scale(0.8) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+
+
+/************************************************************/
+
+
+
+/* --- 7. RESPONSIVE DESIGN --- */
 @media (max-width: 768px) {
-    /* Tablet and Mobile adjustments */
-
-    /* 1. Main Container */
-    .container {
-        width: 100%; /* Take full screen width */
-        padding: 20px 10px; /* Reduce vertical and horizontal padding */
+    .form-box, .form-wrapper {
+        padding: 20px 15px;
+        width: 100%;
     }
 
-    /* 2. Form Layout Stacking */
-    .form-box {
-        width: 100%; /* Form takes full container width */
-        padding: 30px 15px; /* Reduce padding inside the form box */
-    }
-
-    /* 3. Input Field Stacking (CRITICAL) */
     .row {
-        flex-direction: column; /* Stack input fields vertically */
-        margin-bottom: 0; /* Remove gap between rows as fields now handle their own margin */
+        flex-direction: column;
         gap: 0;
     }
 
-    input, select {
-        width: 100%; /* Inputs take full width when stacked */
-        margin-bottom: 15px; /* Add margin back after stacking */
-    }
-
-    /* 4. Button Alignment Fix */
-    .btn-main {
-        display: block; /* Make the button full width */
+    .col-md-6 {
         width: 100%;
-        text-align: center;
-        margin: 15px auto 0 auto; /* Center the button */
-        justify-content: center;
+        margin-bottom: 15px;
     }
 
-    /* 5. Contact Info Alignment Fix */
-    .contact-info {
-        text-align: center; /* Center the contact information */
-        padding-bottom: 10px;
-    }
-}
-
-@media (max-width: 480px) {
-    /* Extra Small Mobile adjustments */
-
-    .container h2 {
-        font-size: 20px; /* Reduce heading size */
-    }
-
-    .form-box {
-        padding: 20px 10px; /* Minimize form padding */
-    }
-
-    /* Ensure text areas still look good */
-    textarea {
-        height: 100px;
+    .preview-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     }
 }

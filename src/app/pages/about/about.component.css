@@ -1,5 +1,92 @@
-.content p{
+/* 1. Main Container Logic */
+.about-section {
+  overflow-x: hidden; /* Prevents scrollbars during slide-in animations */
+  direction: rtl;
+}
 
-  width:60%;
+.content p {
+  width: 65%;
+  line-height: 1.8;
+  color: black;
+}
 
+/* 2. Floating Animation for the Title */
+.main-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  text-shadow: 2px 4px 10px rgba(0, 0, 0, 0.3);
+  color: var(--primary-color);
+  animation: floating 3s ease-in-out infinite;
+}
+
+@keyframes floating {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* 3. Entrance Animations (Reveal from Top/Right) */
+.reveal-top {
+  animation: revealTop 0.8s ease-out forwards;
+}
+
+.reveal-right {
+  opacity: 0;
+  animation: revealRight 0.8s ease-out forwards;
+  animation-delay: 0.3s;
+}
+
+@keyframes revealTop {
+  from { opacity: 0; transform: translateY(-30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes revealRight {
+  from { opacity: 0; transform: translateX(50px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* 4. Staggered List Items (The Waterfall Effect) */
+.stagger-item {
+  opacity: 0;
+  transform: translateX(30px);
+  animation: revealRight 0.5s ease-out forwards;
+  margin-bottom: 12px;
+  list-style: none;
+  position: relative;
+}
+
+/* Custom Bullet Point Animation */
+.stagger-item::before {
+  content: "←";
+  color: var(--third-color);
+  margin-left: 10px;
+  font-weight: bold;
+}
+
+/* Set delays for each item so they appear one by one */
+.stagger-item:nth-child(1) { animation-delay: 0.5s; }
+.stagger-item:nth-child(2) { animation-delay: 0.6s; }
+.stagger-item:nth-child(3) { animation-delay: 0.7s; }
+.stagger-item:nth-child(4) { animation-delay: 0.8s; }
+.stagger-item:nth-child(5) { animation-delay: 0.9s; }
+.stagger-item:nth-child(6) { animation-delay: 1.0s; }
+
+/* Sub-list animations */
+.sub-stagger {
+  opacity: 0;
+  animation: revealRight 0.5s ease-out forwards;
+  animation-delay: 1.2s;
+}
+
+/* 5. Hover Effect on Tasks */
+.stagger-item:hover {
+  color: var(--primary-color);
+  transform: translateX(-5px) scale(1.02);
+  transition: all 0.3s ease;
+  cursor: default;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+  .content p { width: 100%; }
 }

@@ -88,7 +88,7 @@ export class AdminComponent implements OnInit, OnDestroy{
   ) {
     this.adminForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
+      password: ['', Validators.required,Validators.minLength(8)],
       role: ['', Validators.required],
       college: [''],
 
@@ -151,7 +151,7 @@ export class AdminComponent implements OnInit, OnDestroy{
     this.adminForm.reset();
   }, err => {
     console.error(err);
-    alert('حصل خطأ أثناء التحقق من الإيميل');
+    alert('حدث خطأ أثناء التحقق من الإيميل');
   });
 }
 

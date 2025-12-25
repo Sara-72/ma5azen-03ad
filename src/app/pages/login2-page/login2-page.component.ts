@@ -32,7 +32,7 @@ function passwordValidator(control: AbstractControl): ValidationErrors | null {
   if (!passwordPattern.test(value)) {
     return {
       invalidPassword: {
-        message: 'Must be at least 8 chars, including 1 uppercase letter and 1 number.',
+        message:  'يجب أن يتكون من 8 أحرف على الأقل , بما في ذلك حرف كبير واحد و رقم واحد.',
       },
     };
   }
@@ -56,6 +56,13 @@ interface LoginForm {
   styleUrl: './login2-page.component.css'
 })
 export class Login2PageComponent {
+
+    showPassword = false; // Initial state: hidden
+
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
+
 
   isSubmitting = signal(false);
   message = signal<{ text: string; type: 'success' | 'error' } | null>(null);
@@ -98,7 +105,7 @@ export class Login2PageComponent {
   }
 
   onSubmit() {
-    this.auth.employeeLogin({
+  this.auth.employeeLogin({
   email: this.loginForm.value.email,
   password: this.loginForm.value.password
 }).subscribe({

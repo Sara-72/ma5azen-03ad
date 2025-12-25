@@ -14,7 +14,7 @@
       <ul class="nav nav-tabs mt-4">
 
               <li class="nav-item">
-                <a class="nav-link" aria-current="page" href="/login5"><i class="fa-solid fa-user"></i> مسئول </a>
+                <a class="nav-link" aria-current="page" href="/login5"><i class="fa-solid fa-computer"></i>مسئول الIT </a>
               </li>
 
 
@@ -39,10 +39,15 @@
 
       <div class="mb-3">
           <label for="email" class="form-label"> الحساب الالكتروني</label>
-          <input type="email" class="form-control" id="email" name="email" formControlName="email" placeholder="أدخل الحساب الالكتروني" required
+          <div class="input-icon-wrapper">
+          <i class="fa-solid fa-envelope input-icon"></i>
+          <input type="email" class="form-control icon-padding" id="email" name="email" formControlName="email" placeholder="أدخل الحساب الالكتروني" required
               [class.border-red-500]="isInvalid('email')"
               [class.border-gray-300]="!isInvalid('email')">
 
+
+
+              </div>
 
 
             @if (isInvalid('email')) {
@@ -58,12 +63,25 @@
 
       <div class="mb-3">
           <label for="password" class="form-label">كلمة السر</label>
-          <input type="password" id="password" formControlName="password"  class="form-control" name="password" placeholder="أدخل كلمة السر" aria-describedby="passwordHelpBlock" required minlength="8"
+          <div class="input-icon-wrapper">
+          <i class="fa-solid fa-lock input-icon"></i>
+          <input [type]="showPassword ? 'text' : 'password'" id="password" formControlName="password"  class="form-control icon-padding" name="password" placeholder="أدخل كلمة السر" aria-describedby="passwordHelpBlock" required minlength="8"
               [class.border-red-500]="isInvalid('password')"
               [class.border-gray-300]="!isInvalid('password')">
 
 
 
+
+            <i
+      class="fa-solid password-toggle-icon"
+      [ngClass]="showPassword ? 'bi-eye' : 'bi-eye-slash'"
+      (click)="togglePasswordVisibility()"
+      class="password-toggle-icon">
+    </i>
+
+
+
+  </div>
             @if (isInvalid('password')) {
               <div class="mt-1 text-xs text-red-600 font-medium">
                 @if (loginForm.get('password')?.getError('required')) {
@@ -104,11 +122,15 @@
 
 
 
-            @if (isSubmitting()) {
-              Processing...
-            } @else {
-              سجل الدخول
-            }
+
+@if (isSubmitting()) {
+      <span class="spinner-border spinner-border-sm me-2"></span> جاري التسجيل...
+    } @else {
+      <div class="d-flex justify-content-center align-items-center">
+      <span>سجل الدخول</span>
+      <i class="fa-solid fa-right-to-bracket me-2"></i>
+      </div>
+    }
 
 
 

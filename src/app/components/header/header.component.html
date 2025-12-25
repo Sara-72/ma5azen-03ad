@@ -1,45 +1,32 @@
-<nav class="navbar navbar-expand-lg p-3 justify-content-center align-items-center">
+<nav class="navbar navbar-expand-lg p-3">
+  <div class="container-fluid"> <img src="assets/images/Hurghada-University.png" alt="University Logo" class="u-logo">
 
+    <button class="navbar-toggler bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-  <img src="assets/images/Hurghada-University.png" alt="University Logo" class="u-logo">
+    <div class="collapse navbar-collapse" id="navbarNav">
 
-  <button
-    class="navbar-toggler bg-white"
-    type="button"
-    data-bs-toggle="collapse"
-    data-bs-target="#navbarNav"
-    aria-controls="navbarNav"
-    aria-expanded="false"
-    aria-label="Toggle navigation"
-  >
-    <span class="navbar-toggler-icon"></span>
-  </button>
-
-  <div class="collapse navbar-collapse" id="navbarNav">
-    <ul class="right-nav navbar-nav justify-content-center align-items-center mb-2 mb-lg-0">
-      <li class="nav-item">
-        <a class="nav-link text-white mx-4 fw-medium" href="/about" routerLinkActive="active">عن النظام</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link text-white mx-4 fw-medium" href="/features" routerLinkActive="active">مميزات النظام</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link text-white mx-4 fw-medium" href="/elda3m" routerLinkActive="active">الدعم الفني</a>
-      </li>
-
-    </ul>
-
-    <div class="left-container d-flex flex-row justify-content-center align-items-center ms-auto">
-      <ul class="left-nav navbar-nav justify-content-center align-items-center mb-2 mb-lg-0">
-      <li class="nav-item">
-        <i class="ph ph-user-circle fs-1 text-white-50 me-5"></i>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link me-5" href="/home" routerLinkActive="active"><i class="ph ph-sign-out fs-3 text-danger"></i></a>
-      </li>
+      <ul class="navbar-nav mx-auto mb-2 mb-lg-0 d-flex justify-content-between">
+        <li class="nav-item">
+          <a class="nav-link text-white mx-2 fw-medium" href="/about" routerLinkActive="active">عن النظام</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white mx-2 fw-medium" href="/features" routerLinkActive="active">مميزات النظام</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white mx-2 fw-medium" href="/elda3m" routerLinkActive="active">الدعم الفني</a>
+        </li>
       </ul>
+
+      <div class="left-container d-flex align-items-center">
+
+        <a class="nav-link logout-wrapper" href="/home">
+          <i class="ph ph-sign-out fs-3 text-danger"></i>
+          <span class="custom-tooltip">هل تريد تسجيل الخروج؟</span>
+        </a>
+      </div>
+
     </div>
-
   </div>
-
 </nav>

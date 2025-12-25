@@ -26,7 +26,7 @@
                 </div>
 
 
-                @if (adminForm.get('name')?.invalid && adminForm.get('name')?.touched) {
+        @if (adminForm.get('name')?.invalid && adminForm.get('name')?.touched) {
         <div class="text-danger mt-1 text-end small">
             @if (adminForm.get('name')?.hasError('required')) {
               من فضلك أدخل الاسم.
@@ -47,6 +47,10 @@
                         <i class="fas fa-envelope"></i>
                     </span>
                 </div>
+
+
+
+                
             </div>
 
             <div class="mb-4">

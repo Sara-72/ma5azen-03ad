@@ -15,15 +15,15 @@
     </ul>
   </aside>
 
-  <div class="d-flex align-items-center big-container my-3">
+  <div class="d-flex align-items-center big-container my-3 ">
     <form [formGroup]="memoContainerForm" (ngSubmit)="onSubmit()" dir="rtl" class="mt-5 mx-5">
       <div formArrayName="requests">
 
-        <div *ngFor="let memoGroup of requests.controls; let $index = index" [formGroupName]="$index" class="paper">
+        <div *ngFor="let memoGroup of requests.controls; let $index = index" [formGroupName]="$index" class="paper mt-3">
 
           <div class="d-flex justify-content-center align-items-center">
             <img src="assets/images/Hurghada-University.png" class="paper-logo" alt="logo">
-            <h2 class="title m-auto">مكتب أمين الكلية (طلب #{{ $index + 1 }})</h2>
+            <h2 class="title m-auto">مكتب أمين الكلية (طلب {{ $index + 1 }})</h2>
           </div>
 
           <div class="paper-box">
@@ -34,12 +34,16 @@
             <div class="row">
               <div class="field">
                 <label>الفئة :</label>
-                <select
+<select
   formControlName="category"
-  class="table-input form-select"
+  class="table-input form-select placeholder-style"
   (change)="updateFilteredItems(getCategoryValue($event), $index)">
-  <option value="" disabled hidden>اختر الفئة</option>
-  <option *ngFor="let category of categoriesFromStock" [value]="category">{{ category }}</option>
+
+  <option value="" disabled selected hidden>اختر الفئة</option>
+
+  <option *ngFor="let category of categoriesFromStock" [value]="category">
+    {{ category }}
+  </option>
 </select>
 
               </div>
@@ -48,7 +52,7 @@
             <div *ngIf="memoGroup.get('category')?.value" formArrayName="itemLines" class="item-lines-container">
               <div *ngFor="let itemLine of getItemLines($index).controls; let i = index" [formGroupName]="i" class="row item-line">
                 <div class="field">
-                  <label>الصنف #{{ i + 1 }}:</label>
+                  <label>الصنف {{ i + 1 }}:</label>
                   <select formControlName="itemName" class="table-input form-select">
                     <option value="" disabled hidden>اختر الصنف</option>
                     <option *ngFor="let item of getAvailableItems($index, i)" [value]="item">

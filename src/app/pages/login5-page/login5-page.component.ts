@@ -32,7 +32,7 @@ function passwordValidator(control: AbstractControl): ValidationErrors | null {
   if (!passwordPattern.test(value)) {
     return {
       invalidPassword: {
-        message: 'Must be at least 8 chars, including 1 uppercase letter and 1 number.',
+        message: 'يجب أن يتكون من 8 أحرف على الأقل , بما في ذلك حرف كبير واحد و رقم واحد.',
       },
     };
   }
@@ -63,7 +63,13 @@ interface LoginForm {
 })
 export class Login5PageComponent {
 
-  
+  showPassword = false; // Initial state: hidden
+
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
+
+
 
   isSubmitting = signal(false);
   message = signal<{ text: string; type: 'success' | 'error' } | null>(null);
@@ -105,7 +111,7 @@ export class Login5PageComponent {
     const control = this.loginForm.get(controlName);
     return !!control && control.invalid && (control.dirty || control.touched);
   }
- onSubmit() {
+onSubmit() {
   this.message.set(null);
 
   if (this.loginForm.invalid) {
@@ -124,7 +130,7 @@ export class Login5PageComponent {
       localStorage.setItem('role', 'ADMIN');
       localStorage.setItem('name', res.name);
 
-        
+
       this.router.navigate(['/admin']);
     },
     error: () => {

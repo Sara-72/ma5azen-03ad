@@ -6,7 +6,7 @@ import { Injectable } from "@angular/core";
 })
 export class AuthService {
 
-  private api = 'http://newwinventoryapi.runasp.net/api';
+  private api = 'https://newwinventoryapi.runasp.net/api';
 
   constructor(private http: HttpClient) {}
 

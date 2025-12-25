@@ -1,24 +1,81 @@
-footer{
-  height:80px;
+/* --- NAV-MIRROR FOOTER --- */
+.sticky-footer {
+    position: sticky;
+    top: 100vh;
+    width: 100%;
+    z-index: 1000;
+    /* Use the same background as your Nav Bar */
+    background-color: var(--primary-color);
 
-
-  width:100%;
-  /* margin-top:10%; */
-  background-color: var(--primary-color);
-
+    /* 3D "Thick" Border - Mirrors the bottom border of a Nav Bar */
+    border-top: 5px solid rgba(0, 0, 0, 0.15);
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
 }
 
+.footer-bar {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+    /* Subtle gloss effect often used in Nav Bars */
+    background: linear-gradient(rgba(255,255,255,0.05) 0%, transparent 100%);
+}
 
-/* --- Responsive Adjustments (Applied on Smaller Screens) --- */
+.footer-text {
+    color: #ffffff;
+    margin: 0;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 
-@media (max-width: 768px) {
-    /* Reduce font size on mobile screens */
-    footer p {
-        font-size: 0.85em;
+/* --- NAV-STYLE LINK --- */
+.nav-style-link {
+    color: #ffc107; /* Or your nav's accent color */
+    text-decoration: none;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.nav-style-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+/* --- CONSISTENT REVEAL ANIMATION --- */
+.reveal-footer {
+    opacity: 0;
+    animation: navSlideUp 0.8s ease-out forwards;
+}
+
+@keyframes navSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(100%); /* Slides up from outside the screen */
     }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
-    /* Reduce padding slightly on very small screens */
-    footer {
-        padding: 1rem 0.5rem;
+/* --- RESPONSIVE FIXES --- */
+@media (max-width: 768px) {
+    .footer-bar {
+        height: auto;
+        padding: 20px;
+    }
+    .footer-text {
+        flex-direction: column;
+        font-size: 0.9rem;
+        text-align: center;
     }
 }
