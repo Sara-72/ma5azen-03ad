@@ -1,6 +1,6 @@
 <app-header></app-header>
 
-<div class="d-flex">
+<div class="page-container">
   <aside class="sidebar">
     <h5>
       مرحباً بك
@@ -14,18 +14,18 @@
     </ul>
   </aside>
 
-  <div class="forms-container m-auto">
-    <!-- Loop على كل فورم في القائمة -->
-    <form *ngFor="let form of consumableForms; let fIndex = index" [formGroup]="form" (ngSubmit)="onSubmitForm(form)"
-      class="form-container mb-5" dir="rtl">
+  <main class="forms-container m-auto">
+    <form *ngFor="let form of consumableForms; let fIndex = index"
+          [formGroup]="form"
+          (ngSubmit)="onSubmitForm(form)"
+          class="form-container mb-5"
+          dir="rtl">
 
-      <!-- رأس الفورم -->
-      <header class="form-header">
+      <header class="form-header text-center">
         <h2 class="title">طلب و إذن صرف</h2>
         <h3 class="subtitle">مستديم | مستهلك</h3>
       </header>
 
-      <!-- البيانات المشتركة -->
       <div class="info-section">
         <div class="row">
           <div class="field mb-2">
@@ -35,28 +35,28 @@
 
           <div class="field mb-2">
             <label>الفئة :</label>
-            <input type="text" formControlName="category" class="table-input" readonly>
+            <input type="text" formControlName="category" class="input-line" readonly>
           </div>
         </div>
 
         <div class="row">
           <div class="field mb-2 date-group">
             <label>تاريخ الطلب :</label>
-            <input formControlName="requestDateGroup" type="date" readonly>
+            <input formControlName="requestDateGroup" type="date" class="input-line" readonly>
           </div>
 
-          <div class="field d-flex align-items-center mb-2 date-group">
+          <div class="field mb-2 date-group">
             <label>التاريخ :</label>
-            <input formControlName="regularDateGroup" type="date">
+            <input formControlName="regularDateGroup" type="date" class="input-line">
           </div>
         </div>
 
         <div class="row">
-          <div class="field mb-2">
+          <div class="field mb-2 flex-grow-1">
             <label>اسم الطالب ( المخزن / الإدارة / العامل ) :</label>
-            <input type="text" formControlName="requestorName" class="input-line" readonly>
+            <input type="text" formControlName="requestorName" class="input-line w-100" readonly>
             <div *ngIf="form.get('requestorName')?.invalid && form.get('requestorName')?.touched"
-              class="text-danger mt-1 text-end small">
+                 class="text-danger mt-1 text-end small">
               يجب إدخال الاسم كاملاً (4 كلمات).
             </div>
           </div>
@@ -65,7 +65,7 @@
         <div class="row">
           <div class="field">
             <label>(*) سند الصرف :</label>
-            <select formControlName="documentNumber" class="table-input">
+            <select formControlName="documentNumber" class="input-line">
               <option value="" disabled selected hidden>اختر السند</option>
               <option *ngFor="let condition of documentNumbers" [value]="condition">{{ condition }}</option>
             </select>
@@ -73,8 +73,7 @@
         </div>
       </div>
 
-      <!-- الجدول -->
-      <div class="table-section">
+      <div class="table-section mt-4">
         <table>
           <thead>
             <tr>
@@ -90,7 +89,9 @@
             </tr>
           </thead>
           <tbody formArrayName="tableData">
-            <tr *ngFor="let rowGroup of getTableData(form).controls; let i = index" [formGroupName]="i">
+            <tr *ngFor="let rowGroup of getTableData(form).controls; let i = index"
+                [formGroupName]="i"
+                [style.animation-delay]="(i * 0.1) + 's'">
               <td>
                 <input type="text" formControlName="itemSearchText" class="table-input" readonly>
                 <input type="hidden" formControlName="itemName">
@@ -102,11 +103,11 @@
 
               <td>
                 <input type="number" min="0" formControlName="quantityRequired" class="table-input"
-                  (input)="updateValue(fIndex, i)">
+                       (input)="updateValue(fIndex, i)">
               </td>
               <td><input type="number" min="0" formControlName="quantityAuthorized" class="table-input"></td>
               <td><input type="number" min="0" formControlName="quantityIssued" class="table-input"
-                  (input)="updateValue(fIndex, i)"></td>
+                       (input)="updateValue(fIndex, i)"></td>
 
               <td>
                 <select formControlName="storeType" class="table-input">
@@ -124,26 +125,19 @@
 
               <td>
                 <input type="number" min="0" formControlName="unitPrice" class="table-input"
-                  (input)="updateValue(fIndex, i)">
+                       (input)="updateValue(fIndex, i)">
               </td>
 
               <td>
-                <input type="number" min="0" formControlName="value" class="table-input">
+                <input type="number" min="0" formControlName="value" class="table-input" readonly>
               </td>
             </tr>
           </tbody>
         </table>
 
-        <div class="row-controls">
-          <div class="row-controls">
-            <button type="button" class="remove-row-button" (click)="removeRowFromForm(form)">-</button>
-            <button type="button" class="add-row-button" (click)="addRowToForm(form)">+</button>
-          </div>
 
-        </div>
       </div>
 
-      <!-- التواقيع -->
       <div class="signature-section">
         <div class="sig-item">توقيع الطالب</div>
         <div class="sig-item">كاتب الشطب</div>
@@ -152,7 +146,7 @@
           <span>يصرح بالصرف مدير المخازن</span>
           <input type="text" formControlName="managerSignature" class="signature-input">
           <div *ngIf="form.get('managerSignature')?.invalid && form.get('managerSignature')?.touched"
-            class="error-text">
+               class="error-text text-danger">
             الاسم كاملاً مطلوب.
           </div>
         </div>
@@ -173,9 +167,8 @@
           <span *ngIf="!isSubmitting()">حفظ الاذن</span>
         </button>
       </div>
-
     </form>
-  </div>
+  </main>
 </div>
 
 <app-footer></app-footer>

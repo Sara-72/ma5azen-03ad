@@ -93,7 +93,7 @@ export class Modeer2Component implements OnInit {
       itemName: [''],
       itemSearchText: [''],
       category: [''],
-      unit: [''], 
+      unit: [''],
       quantityRequired: [''],
       quantityAuthorized: [''],
       quantityIssued: [''],
@@ -104,7 +104,7 @@ export class Modeer2Component implements OnInit {
   }
 
   private loadSpendNotes() {
-    this.http.get<any[]>('http://newwinventoryapi.runasp.net/api/SpendNotes')
+    this.http.get<any[]>('https://newwinventoryapi.runasp.net/api/SpendNotes')
       .subscribe({
         next: (notes) => {
           // فلترة المذكرات الغير مؤكدين والمقبولين
@@ -220,7 +220,7 @@ removeRowFromForm(form: FormGroup) {
 
   // حفظ كل صفوف الفورم الحالي
   const saveRequests = tableData.map((row: any) => {
-    return this.http.post('http://newwinventoryapi.runasp.net/api/SpendPermissions', {
+    return this.http.post('https://newwinventoryapi.runasp.net/api/SpendPermissions', {
       ...basePayload,
       itemName: row.itemName,
       unit: row.unit,
@@ -236,7 +236,7 @@ removeRowFromForm(form: FormGroup) {
   });
 
   Promise.all(saveRequests)
-    .then(() => this.http.get<any[]>('http://newwinventoryapi.runasp.net/api/SpendNotes').toPromise())
+    .then(() => this.http.get<any[]>('https://newwinventoryapi.runasp.net/api/SpendNotes').toPromise())
     .then(notes => {
       if (!notes) return;
 
@@ -251,7 +251,7 @@ removeRowFromForm(form: FormGroup) {
 
       // تحديث الحالة فقط لهذه المذكرات
       const updateRequests = notesToUpdate.map(note =>
-        this.http.put(`http://newwinventoryapi.runasp.net/api/SpendNotes/${note.id}`, {
+        this.http.put(`https://newwinventoryapi.runasp.net/api/SpendNotes/${note.id}`, {
           ...note,
           confirmationStatus: 'مؤكد'
         }).toPromise()

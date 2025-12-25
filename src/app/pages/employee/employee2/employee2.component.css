@@ -1,188 +1,186 @@
-
-a{
+/* --- GLOBAL --- */
+a {
   text-decoration: none;
-  color:var(--black-color);
+  color: var(--black-color);
   transition: 0.3s;
-  -webkit-transition: 0.3s;
-  -moz-transition: 0.3s;
-  -ms-transition: 0.3s;
-  -o-transition: 0.3s;
 }
 
-/* PAGE LAYOUT */
 .page-container {
-    display: flex;
+  display: flex;
+  background-color: #f4f7f6;
+  perspective: 2000px;
+  padding: 20px;
+  gap: 30px;
+  min-height: 100vh;
 }
 
-/* SIDEBAR */
+/* --- SIDEBAR --- */
+
+/* SIDEBAR - 3D Floating Slab Effect */
 .sidebar {
-    width: 20%;
-    min-height: 100vh;
-    padding: 20px;
-    background: white;
-    border-left: 1px solid #ddd;
-    box-shadow: rgb(204, 219, 232) 3px 3px 6px 0px inset, rgba(255, 255, 255, 0.5) -3px -3px 6px 1px inset;
+    width: 25%;
+    min-height: calc(100vh - 40px); /* Leave space at top/bottom */
+    margin: 20px;
+    background: #ffffff;
+    padding: 30px 20px;
+    border-radius: 15px;
+
+    /* 3D Shadows: One for depth (dark), one for highlight (light) */
+    box-shadow:
+        20px 20px 60px #d9d9d9,
+        -5px -5px 20px #ffffff,
+        inset 0 0 0 1px rgba(0,0,0,0.05);
+
+    /* Slight tilt for 3D perspective */
+    transform: perspective(1000px) rotateY(5deg);
+    transition: transform 0.5s ease, box-shadow 0.5s ease;
+    z-index: 10;
 }
 
+/* Make it straighten up when you interact with it */
+.sidebar:hover {
+    transform: perspective(1000px) rotateY(0deg);
+    box-shadow:
+        30px 30px 70px #cecece,
+        -5px -5px 25px #ffffff;
+}
+
+/* SIDEBAR LIST ITEMS */
 .sidebar ul {
     padding: 0;
     list-style: none;
+    perspective: 500px; /* Depth for children */
 }
 
 .sidebar li {
-    padding: 12px 5px;
-    border-bottom: 1px solid #ddd;
+    padding: 15px 20px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    border: none; /* Removed the old flat border */
+    background: transparent;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-style: preserve-3d;
 }
 
-.sidebar li.active {
-    color: #0a3a63;
-    font-weight: bold;
-    border-left: 4px solid #0a3a63;
-    cursor:default;
-    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+/* 3D Hover Effect for Links */
+.sidebar li:hover {
+    background: #f8f9fa;
+    color:var(--secondary-color);
+    transform: translateZ(20px) translateX(-5px); /* Pops out toward the user */
+    box-shadow: 10px 10px 20px rgba(0,0,0,0.05);
 }
-
-.sidebar li  a:hover {
+.sidebar li:hover a{
   color:var(--secondary-color);
 }
 
-/* CONTENT */
-.content {
-    flex: 1;
-    padding: 40px;
+.sidebar li a {
+    display: block;
+    width: 100%;
+
+}
+
+/* ACTIVE STATE - Looks "Pressed In" or "Carved" */
+.sidebar li.active {
+    background: #f0f4f8;
+    color: var(--primary-color);
+    font-weight: bold;
+    border-left: none; /* Removed flat border */
+
+    /* Inner shadow creates a "carved into the wood" look */
+    box-shadow:
+        inset 6px 6px 12px #d1d9e6,
+        inset -6px -6px 12px #ffffff;
+    transform: translateZ(-5px); /* Sinks slightly into the sidebar */
 }
 
 
+.sidebar li.active::before {
+    content: "";
+    position: absolute;
+    right: -10px; /* Positions it on the edge */
+    top: 20%;
+    height: 60%;
+    width: 4px;
+    background: var(--secondary-color);
+    border-radius: 10px;
+    box-shadow: 0 0 10px var(--secondary-color);
+}
 
+/* --- CONTENT AREA --- */
+.content {
+  flex: 1;
+  padding: 40px;
+  perspective: 1500px;
+}
 
 .table-container {
-
   width: 100%;
-  max-width: 600px; /* Adjust as needed */
+  max-width: 800px;
   margin: 20px auto;
-
+  background: white;
+  border-radius: 12px;
+  position: relative;
+  transform: rotateY(-2deg) rotateX(1deg);
+  box-shadow: -15px 20px 40px rgba(0, 0, 0, 0.1),
+              0 0 30px rgba(0, 123, 255, 0.12);
+  transition: all 0.6s ease;
+  animation: tableEntrance 0.8s ease-out;
 }
 
+.table-container:hover {
+  transform: rotateY(0deg) rotateX(0deg) translateZ(15px);
+  box-shadow: -25px 35px 60px rgba(0, 0, 0, 0.15),
+              0 0 50px rgba(0, 123, 255, 0.25);
+}
 
-table {
-  /* Set the table to take full width of its container */
+/* --- THE TABLE FIX --- */
+.custom-3d-table {
   width: 100%;
-  border-collapse: collapse; /* Essential for clean borders */
-  border: 1px solid #dee2e6 ; /* Main outer border */
-  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+  table-layout: fixed; /* MANDATORY: Forces columns to respect width */
+  border-collapse: collapse; /* Cleaner than separate for removing phantom gaps */
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #dee2e6;
 }
 
-th, td {
-  /* Style for all header and data cells */
-  border: 2px solid #dee2e6 ;
-  padding: 30px;
-  text-align: center; /* Center text alignment */
-  height: 85px;
-  vertical-align: top; /* Start content at the top of the large cells */
-  box-sizing: border-box;
+.custom-3d-table th,
+.custom-3d-table td {
+  width: 33.333%; /* Explicitly divide into 3 parts */
+  padding: 20px;
+  text-align: center;
+  border: 1px solid #eee; /* Light borders for clean look */
+  vertical-align: middle;
 }
 
-th {
-  /* Style specifically for table headers */
-  background-color: #f8f8f8;
+.custom-3d-table th {
+  background-color: #f8f9fa;
+  color: #0a3a63;
   font-weight: bold;
-  font-size: 1.1em;
-  color: #333;
+  border-bottom: 2px solid #dee2e6;
 }
 
-
-
-/* --- RESPONSIVE ADJUSTMENTS (MEDIA QUERIES) --- */
-
-@media (max-width: 992px) {
-    /* Tablet/Small Desktop Layout */
-
-    .sidebar {
-        width: 25%; /* Give a little more space to the content */
-    }
-
-    .content {
-        padding: 20px; /* Reduce main content padding */
-    }
-
-    /* Table adjustments for slightly smaller screens */
-    .table-container {
-        max-width: 95%; /* Allow table to grow closer to full width */
-        margin: 15px auto;
-    }
-
-    th, td {
-        padding: 15px; /* Reduce padding significantly */
-        font-size: 0.9em;
-        height: auto; /* Allow height to collapse */
-    }
+.custom-3d-table tbody tr {
+  transition: all 0.3s ease;
+  animation: rowFadeIn 0.5s ease-out backwards;
 }
 
-@media (max-width: 768px) {
-    /* Mobile/Tablet Layout Stacking */
-
-    .page-container {
-        flex-direction: column; /* Stack sidebar and content vertically */
-        flex-grow: 1;
-    }
-
-    .sidebar {
-        width: 100%; /* Sidebar takes full width */
-        min-height: auto;
-        border-left: none;
-        border-bottom: 1px solid #ddd;
-    }
-
-    /* Ensure sidebar content aligns correctly when horizontal */
-    .sidebar ul {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        margin-top: 10px;
-    }
-
-    .sidebar h5 {
-        text-align: center;
-    }
-
-    .sidebar li {
-        border-bottom: none;
-        border-right: 1px solid #ddd; /* Add separator between menu items */
-        padding: 8px 15px;
-        flex: 1 1 auto;
-        text-align: center;
-    }
-
-    .sidebar li.active {
-        border-left: none;
-        border-bottom: 3px solid #0a3a63; /* Use bottom border for active item */
-    }
-
-    .content {
-        padding: 10px;
-        flex-grow: 1;
-    }
-
-    /* Table Layout on Mobile */
-    .table-container {
-        overflow-x: auto; /* Enable horizontal scrolling for the table */
-        max-width: 100%;
-        width: 100%;
-        margin: 10px 0;
-    }
-
-    .styled-table {
-        /* Prevent table from shrinking smaller than its content requires */
-        min-width: 400px;
-    }
-
-    th, td {
-        padding: 10px;
-        font-size: 0.85em;
-        white-space: nowrap; /* Prevent text wrapping in cells to enforce scrolling */
-    }
-
-    th {
-        font-size: 0.9em;
-    }
+.custom-3d-table tbody tr:hover {
+  background-color: rgba(0, 123, 255, 0.05);
+  transform: scale(1.01);
 }
+
+/* --- ANIMATIONS --- */
+@keyframes tableEntrance {
+  from { opacity: 0; transform: translateY(30px) rotateY(-10deg); }
+  to { opacity: 1; transform: translateY(0) rotateY(-2deg); }
+}
+
+@keyframes rowFadeIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Ensure row entrance delays */
+tbody tr:nth-child(1) { animation-delay: 0.1s; }
+tbody tr:nth-child(2) { animation-delay: 0.2s; }
+tbody tr:nth-child(3) { animation-delay: 0.3s; }

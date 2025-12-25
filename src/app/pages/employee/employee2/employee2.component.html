@@ -1,77 +1,48 @@
+<app-header></app-header>
 
-
-
-<app-header>
-
-</app-header>
-
-
-
-
-
-    <div class="page-container">
-
-
-        <aside class="sidebar">
-           <h5>
+<div class="page-container">
+  <aside class="sidebar">
+    <h5>
       مرحباً بك
       <span *ngIf="displayName">، {{ displayName }}</span>
     </h5>
-            <ul>
-                <li><a href="/employee1">مذكرة الصرف</a></li>
-                <li class="active">العهد</li>
-                <li><a href="/employee3">استعلم عن مذكراتك</a></li>
-            </ul>
-        </aside>
+    <ul>
+      <li><a href="/employee1">مذكرة الصرف</a></li>
+      <li class="active">العهد</li>
+      <li><a href="/employee3">استعلم عن مذكراتك</a></li>
+    </ul>
+  </aside>
 
-
-        <main class="content">
-
-            <div class="table-container">
-
-                <table class="table table-bordered table-striped table-hover text-center">
-                    <thead>
-                        <tr>
-                            <th>الصنف</th>
-                            <th>تاريخ الاستلام</th>
-
-                            <th>الكمية</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-
-                        <tr>
-                            <td>دباسة</td>
-                            <td>2/11/2025</td>
-
-                            <td>2</td>
-                        </tr>
-
-                        <tr>
-                        <td>أوراق تصوير</td>
-                        <td>3/11/2025</td>
-
-                        <td>10</td>
-                        </tr>
-
-                        <!-- صف جديد -->
-                        <tr>
-                          <td>أقلام</td>
-                          <td>5/11/2025</td>
-
-                          <td>20</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-            </div>
-
-        </main>
-
+  <main class="content">
+    <div class="table-container">
+      <table class="custom-3d-table">
+        <thead>
+          <tr>
+            <th>الصنف</th>
+            <th>تاريخ الاستلام</th>
+            <th>الكمية</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>دباسة</td>
+            <td>2/11/2025</td>
+            <td>2</td>
+          </tr>
+          <tr>
+            <td>أوراق تصوير</td>
+            <td>3/11/2025</td>
+            <td>10</td>
+          </tr>
+          <tr>
+            <td>أقلام</td>
+            <td>5/11/2025</td>
+            <td>20</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
+  </main>
+</div>
 
-
-<app-footer>
-
-</app-footer>
+<app-footer></app-footer>
