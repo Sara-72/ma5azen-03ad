@@ -43,7 +43,7 @@ function passwordValidator(control: AbstractControl): ValidationErrors | null {
 interface LoginForm {
   email: FormControl<string>;
   password: FormControl<string>;
-  college: FormControl<string | null>;
+  
 }
 
 
@@ -88,9 +88,7 @@ loginForm: FormGroup<LoginForm> = this.fb.group({
     passwordValidator, // Our custom validator
   ]),
 
-  college: this.fb.control<string | null>(null, [
-      Validators.required
-  ]),
+ 
 
 
 }) as FormGroup<LoginForm>;
@@ -117,40 +115,24 @@ constructor(private loadingService: LoadingService) {
 
 
 onSubmit() {
-  this.loadingService.show();
   if (this.loginForm.invalid) return;
 
+  this.loadingService.show();
   this.isSubmitting.set(true);
 
-  const { email, password, college } = this.loginForm.value;
+  const { email, password } = this.loginForm.value;
 
   this.auth.userLogin({ email, password }).subscribe({
     next: (res: any) => {
-console.log('faculty from API:', res.faculty);
-console.log('selected college:', college);
-console.log('API type:', typeof res.faculty);
-console.log('Form type:', typeof college);
 
-      // ✅ التحقق من الكلية
-const apiFaculty = (res.faculty || '').trim().toLowerCase();
-const selectedFaculty = (college || '').trim().toLowerCase();
-
-if (apiFaculty !== selectedFaculty) {
-  this.isSubmitting.set(false);
-  this.message.set({
-    text: 'الكلية التي اخترتها غير صحيحة',
-    type: 'error'
-  });
-  return;
-}
-
-
-      // ✅ كل شيء صحيح
+      // تخزين البيانات
       localStorage.setItem('token', res.token ?? '');
       localStorage.setItem('role', res.role ?? 'USER');
-      localStorage.setItem('college', res.faculty);
-      localStorage.setItem('name', res.name);
+      localStorage.setItem('name', res.name ?? '');
+      localStorage.setItem('college', res.faculty ?? '');
 
+
+      // تحويل المستخدم لصفحة الموظف
       this.router.navigate(['/employee1']);
     },
 

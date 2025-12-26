@@ -7,23 +7,12 @@ import { FooterComponent } from '../../../components/footer/footer.component';
 import { SpendNotesService } from '../../../services/spend-notes.service';
 import { StoreKeeperStockService } from '../../../services/store-keeper-stock.service';
 
-
-
-
 export function fourStringsValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const value = control.value;
-
-    if (!value) {
-      return null; // Let Validators.required handle the empty state
-    }
-
-    // Trim whitespace and split by one or more spaces, filtering out empty strings.
+    if (!value) return null;
     const words = String(value).trim().split(/\s+/).filter(Boolean);
-
     const isValid = words.length === 4;
-
-    // Return the validation error object if the count is not 4
     return isValid ? null : {
         fourStrings: {
             requiredCount: 4,
@@ -46,6 +35,10 @@ export function fourStringsValidator(): ValidatorFn {
 })
 export class Employee1Component implements OnInit {
  private stockService = inject(StoreKeeperStockService);
+ userCollege: string = '';
+ collegeAdmin: string = '';
+ todayDate: string = '';
+ availableQuantityMap: { [key: string]: number } = {};
 
  collegeOptions: string[] = [
   'كلية الحاسبات والذكاء الاصطناعي',
@@ -54,7 +47,6 @@ export class Employee1Component implements OnInit {
   'كلية السياحة والفنادق',
 ];
 
-// أسماء أمين الكلية الجديدة حسب طلبك
 collegeAdminMap: { [key: string]: string } = {
   'كلية الحاسبات والذكاء الاصطناعي': 'محمود محمد محمد',
   'كلية التربية': 'شوري جعفر',
@@ -64,8 +56,6 @@ collegeAdminMap: { [key: string]: string } = {
 allStocks: any[] = [];
 categoriesFromStock: string[] = [];
 itemDataFromStock: { [key: string]: string[] } = {};
-
-
 availableItemOptions: string[] = [
   'أقلام جاف',
   'أوراق A4',
@@ -74,44 +64,32 @@ availableItemOptions: string[] = [
   'طابعة ليزر',
   'مواد تنظيف'
 ];
-
 categories: string[] = ['أثاث ومفروشات', 'أجهزة إلكترونية', 'مستهلكات مكتبية', 'مواد تنظيف'];
-
 itemData: { [key: string]: string[] } = {
     'أثاث ومفروشات': ['مكاتب', 'كراسي', 'خزائن ملفات', 'أرائك'],
     'أجهزة إلكترونية': ['شاشات عرض', 'طابعات', 'أجهزة كمبيوتر', 'ماوس وكيبورد'],
     'مستهلكات مكتبية': ['أقلام', 'ورق A4', 'دبابيس', 'ملفات بلاستيكية'],
     'مواد تنظيف': ['مطهرات', 'مناديل ورقية', 'مماسح', 'صابون سائل']
 };
-
 filteredItemNamesMap: { [key: number]: string[] } = {};
+selectedCategory: string = '';
+memoContainerForm!: FormGroup;
+isSubmitting = signal(false);
+statusMessage: string | null = null;
+statusType: 'success' | 'error' | null = null;
 
+private fb = inject(FormBuilder);
 
+constructor(private spendNotesService: SpendNotesService) {
+  this.memoContainerForm = this.fb.group({
+    requests: this.fb.array([])
+  });
+}
 
-// 🚨 NEW PROPERTY: To hold the currently selected category for the new dropdown
-selectedCategory: string = ''
-
- // 🚨 New name for the top-level form group
-  memoContainerForm!: FormGroup;
-  isSubmitting = signal(false);
-
-  private fb = inject(FormBuilder);
-
-  constructor(
-  private spendNotesService: SpendNotesService) {
-    this.memoContainerForm = this.fb.group({
-
-      // 🚨 New FormArray: requests is an array of complete memos (papers)
-      requests: this.fb.array([]) // نبدأ الفارغ، سنضيف أول مذكرة بعد ngOnInit
-
-    });
-  }
-
- userName: string = '';
- displayName: string = '';
+userName: string = '';
+displayName: string = '';
 private setEmployeeSignatureIfValid(memoGroup: FormGroup): void {
   const words = this.userName.trim().split(/\s+/).filter(Boolean);
-
   if (words.length === 4) {
     memoGroup.get('employeeSignature')?.setValue(this.userName);
   }
@@ -120,252 +98,249 @@ private setEmployeeSignatureIfValid(memoGroup: FormGroup): void {
 ngOnInit(): void {
   this.userName = localStorage.getItem('name') || '';
   this.displayName = this.getFirstTwoNames(this.userName);
+  this.userCollege = localStorage.getItem('college') || '';
+  this.collegeAdmin = this.collegeAdminMap[this.userCollege] || '';
+  this.todayDate = new Date().toISOString().substring(0, 10);
 
-  // جلب المخزون من الخدمة
   this.stockService.getAllStocks().subscribe(stocks => {
     this.allStocks = stocks;
-
-    // استخراج الفئات
+    this.availableQuantityMap = {};
+    stocks.forEach(stock => {
+      const key = `${stock.category}|${stock.itemName}`;
+      this.availableQuantityMap[key] = stock.quantity;
+    });
     this.categoriesFromStock = [...new Set(stocks.map(s => s.category))];
-
-    // بناء خريطة الفئة -> الأصناف
     this.itemDataFromStock = {};
     this.categoriesFromStock.forEach(cat => {
       this.itemDataFromStock[cat] = [
         ...new Set(stocks.filter(s => s.category === cat).map(s => s.itemName))
       ];
     });
-
-    // إضافة أول مذكرة بعد معرفة userName
     const firstMemo = this.createRequestMemoGroup();
+    this.fillFixedData(firstMemo);
     this.requests.push(firstMemo);
   });
 }
 
-
+private fillFixedData(memoGroup: FormGroup): void {
+  memoGroup.patchValue({
+    employeeSignature: this.userName,
+    collegeName: this.userCollege,
+    collegeAdminName: this.collegeAdmin,
+    requestDate: this.todayDate
+  });
+  memoGroup.get('collegeName')?.disable();
+  memoGroup.get('requestDate')?.disable();
+  memoGroup.get('employeeSignature')?.disable();
+}
 
 getFirstTwoNames(fullName: string): string {
   if (!fullName) return '';
-
-  return fullName
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .join(' ');
+  return fullName.trim().split(/\s+/).slice(0, 2).join(' ');
 }
 
+get requests(): FormArray {
+  return this.memoContainerForm.get('requests') as FormArray;
+}
 
-  // 🚨 Getter for the FormArray holding all the papers
-  get requests(): FormArray {
-    return this.memoContainerForm.get('requests') as FormArray;
-  }
-
-  // Helper function to create the form group for ONE entire request memo (ONE Paper)
 private createRequestMemoGroup(): FormGroup {
   return this.fb.group({
     collegeAdminName: [''],
     collegeName: [''],
-    category: [null], // 👈 مهم
-    itemLines: this.fb.array([]), // 👈 نبدأ فاضي
+    category: [null],
+    itemLines: this.fb.array([]),
     requestDate: [''],
-    employeeSignature: [
-      this.userName || '',
-      [Validators.required, fourStringsValidator()]
-    ]
+    employeeSignature: ['', [Validators.required, fourStringsValidator()]]
   });
 }
 
-
-
-
-
-
-// --- Employee1Component.ts ---
-
-// ... existing methods ...
-
-/**
- * Helper function to safely extract the value from a change event on a select element.
- * @param event The native DOM event object.
- */
 getCategoryValue(event: Event): string {
-    // We are sure the target is a select element, so we cast it here in TypeScript
-    return (event.target as HTMLSelectElement).value;
+  return (event.target as HTMLSelectElement).value;
 }
 
-// 🚨 MISSING METHOD FIX: addItemLine
-// --- تعديل addItemLine لإضافة صنف جديد بشكل صحيح ---
 addItemLine(memoIndex: number): void {
-  const memoGroup = this.requests.at(memoIndex) as FormGroup;
-  const category = memoGroup.get('category')?.value;
-  
-
-  this.getItemLines(memoIndex).push(this.fb.group({
-  itemName: [null, Validators.required], // ✅ user يختار
-  count: [1, [Validators.required, Validators.min(1)]]
-}));
-
+  const itemGroup = this.fb.group({
+    itemName: [null, Validators.required],
+    count: [1, [Validators.required, Validators.min(1)]]
+  });
+  const countControl = itemGroup.get('count');
+  countControl?.valueChanges.subscribe(countValue => {
+    const memoGroup = this.requests.at(memoIndex) as FormGroup;
+    const category = memoGroup.get('category')?.value;
+    const itemName = itemGroup.get('itemName')?.value;
+    if (!category || !itemName || countValue == null) return;
+    const key = `${category}|${itemName}`;
+    const available = this.availableQuantityMap[key] ?? 0;
+    if (countValue > available) {
+      countControl.setErrors({ ...countControl.errors, exceedStock: true });
+    } else {
+      if (countControl.hasError('exceedStock')) {
+        const errors = { ...countControl.errors };
+        delete errors['exceedStock'];
+        countControl.setErrors(Object.keys(errors).length ? errors : null);
+      }
+    }
+  });
+  this.getItemLines(memoIndex).push(itemGroup);
 }
 
-
-
-
-// Helper function to create the form group for ONE item line (Item Name + Count)
 private createItemLineGroup(): FormGroup {
-    return this.fb.group({
-        itemName: ['', Validators.required], // الصنف
-        count: [1, [Validators.required, Validators.min(1)]], // العدد
-    });
+  return this.fb.group({
+    itemName: ['', Validators.required],
+    count: [1, [Validators.required, Validators.min(1)]],
+  });
 }
 
-// 🚨 Modify the updateFilteredItems function to accept the raw event (Optional, but cleaner)
-// If you want to keep updateFilteredItems accepting just the string, that is also fine.
-// I will keep your existing function signature, and call the helper function from the template.
-
-
-
-// 🚨 UPDATE SIGNATURE: Now accepts the index of the memo that triggered the change
-// --- Employee1Component.ts ---
-
-// --- تحديث الدالة updateFilteredItems ---
 updateFilteredItems(category: string, memoIndex: number): void {
   if (!category) return;
-
   const availableItems = this.itemDataFromStock[category] || [];
-
   const itemLinesArray = this.getItemLines(memoIndex);
   itemLinesArray.clear();
-
   const firstItemName = availableItems.length > 0 ? availableItems[0] : '';
   itemLinesArray.push(this.fb.group({
     itemName: [null, Validators.required],
     count: [1, [Validators.required, Validators.min(1)]]
   }));
 }
-   
+closeStatusMessage(): void {
+  this.statusMessage = null;
+  this.statusType = null;
+}
 
 getAvailableItems(memoIndex: number, itemLineIndex: number): string[] {
   const memoGroup = this.requests.at(memoIndex) as FormGroup;
   const category = memoGroup.get('category')?.value;
-
   if (!category) return [];
-
   const allItems = this.itemDataFromStock[category] || [];
-
   const itemLines = this.getItemLines(memoIndex).controls;
   const selectedItems = itemLines
     .map((ctrl, idx) => idx !== itemLineIndex ? ctrl.get('itemName')?.value : null)
     .filter(Boolean);
-
   return allItems.filter(item => !selectedItems.includes(item));
 }
 
-
-
-
-
-
-// --- Employee1Component.ts ---
-
-// Getter to easily access the item lines FormArray for a specific memo (by index)
-// New definition: Accepts the index (number)
-
-
-// --- Employee1Component.ts ---
-
-// 1. Helper to access the nested FormArray
-// Helper function to access the nested itemLines FormArray for a specific memo (by index)
-// 1. Helper function to access the nested itemLines FormArray
 getItemLines(memoIndex: number): FormArray {
-    // 1. Get the specific memo group using the outer index
-    const memoGroup = this.requests.at(memoIndex);
-
-    // Safety check
-    if (!memoGroup) {
-        // Returns an empty FormArray if the memo group isn't found, preventing crashes
-        return this.fb.array([]);
-    }
-
-    // 2. Return the nested FormArray 'itemLines'
-    return memoGroup.get('itemLines') as FormArray;
+  const memoGroup = this.requests.at(memoIndex);
+  if (!memoGroup) return this.fb.array([]);
+  return memoGroup.get('itemLines') as FormArray;
 }
-// 2. Function to remove a specific item line
-// --- Employee1Component.ts ---
-
-// Function to remove a specific item line
-// --- Employee1Component.ts ---
 
 removeItemLine(memoIndex: number, itemLineIndex: number): void {
-
-    const itemLinesArray = this.getItemLines(memoIndex);
-
-    // 🚨 Action: Since the button only appears when length > 1,
-    // we can remove the item directly using its index.
-    itemLinesArray.removeAt(itemLineIndex);
-
-    console.log(`Removed item index ${itemLineIndex} from memo index ${memoIndex}`);
+  const itemLinesArray = this.getItemLines(memoIndex);
+  itemLinesArray.removeAt(itemLineIndex);
 }
 
 onCollegeChange(collegeName: string, memoIndex: number): void {
   if (!collegeName) return;
-
   const adminName = this.collegeAdminMap[collegeName] || '';
-
   const memoGroup = this.requests.at(memoIndex) as FormGroup;
-
   memoGroup.get('collegeAdminName')?.setValue(adminName);
 }
 
-
-
-
-
-  // ➕ Method to add a new paper (New Request Memo)
-  addRow(): void {
+addRow(): void {
   const newMemo = this.createRequestMemoGroup();
-this.requests.push(newMemo);
-
+  this.fillFixedData(newMemo);
+  this.requests.push(newMemo);
 }
 
-
-
-  // ➖ Method to remove the last paper
-  removeRow(): void {
-    if (this.requests.length > 1) {
-      this.requests.removeAt(this.requests.length - 1);
-    } else if (this.requests.length === 1) {
-      // Option: Clear the fields of the last paper instead of removing the whole thing
-      this.requests.at(0).reset();
-    }
+removeRow(): void {
+  if (this.requests.length > 1) {
+    this.requests.removeAt(this.requests.length - 1);
+  } else if (this.requests.length === 1) {
+    this.requests.at(0).reset();
   }
+}
 
-  // --- SUBMIT LOGIC (Updated to use memoContainerForm) ---
-// --- إرسال الطلب مع جميع الأصناف ---
+private hasInvalidQuantity(): boolean {
+  let hasError = false;
+  this.requests.controls.forEach((memoCtrl) => {
+    const memo = memoCtrl as FormGroup;
+    const category = memo.get('category')?.value;
+    const itemLines = memo.get('itemLines') as FormArray;
+    itemLines.controls.forEach((itemCtrl) => {
+      const itemGroup = itemCtrl as FormGroup;
+      const itemName = itemGroup.get('itemName')?.value;
+      const count = itemGroup.get('count')?.value;
+      if (!category || !itemName) return;
+      const key = `${category}|${itemName}`;
+      const available = this.availableQuantityMap[key] ?? 0;
+      const control = itemGroup.get('count');
+      if (count > available) {
+        control?.setErrors({ ...control.errors, exceedStock: true });
+        control?.markAsTouched();
+        control?.markAsDirty();
+        hasError = true;
+      } else {
+        if (control?.hasError('exceedStock')) {
+          const errors = { ...control.errors };
+          delete errors['exceedStock'];
+          control.setErrors(Object.keys(errors).length ? errors : null);
+        }
+      }
+    });
+  });
+  return hasError;
+}
+
 onSubmit(): void {
-  if (this.memoContainerForm.invalid) {
-    this.memoContainerForm.markAllAsTouched();
+  this.statusMessage = null;
+  this.statusType = null;
+
+  // 1️⃣ نعلم كل الحقول بأنها تم لمسها
+  this.memoContainerForm.markAllAsTouched();
+
+  // 2️⃣ تحقق من كمية المخزن لكل الأصناف
+  if (this.hasInvalidQuantity()) {
+    
+    this.statusType = 'error';
     return;
   }
 
-  this.isSubmitting.set(true);
+  // 3️⃣ تحقق من صحة الفورم ككل
+  let invalidCategory = false;
+  let invalidItem = false;
 
+  this.requests.controls.forEach((memoCtrl, memoIndex) => {
+    const memo = memoCtrl as FormGroup;
+
+    // تحقق من الفئة
+    if (!memo.get('category')?.value) {
+      invalidCategory = true;
+      memo.get('category')?.setErrors({ required: true });
+    }
+
+    // تحقق من الأصناف
+    const itemLines = memo.get('itemLines') as FormArray;
+    itemLines.controls.forEach((itemCtrl: AbstractControl, itemIndex) => {
+      const itemGroup = itemCtrl as FormGroup;
+      if (!itemGroup.get('itemName')?.value) {
+        invalidItem = true;
+        itemGroup.get('itemName')?.setErrors({ required: true });
+      }
+    });
+  });
+
+  
+
+  if (this.memoContainerForm.invalid) {
+    return;
+  }
+
+  // 4️⃣ إرسال البيانات
+  this.isSubmitting.set(true);
   let requestsToSend = 0;
   let successCount = 0;
   let hasError = false;
 
-  this.requests.controls.forEach((memoCtrl, memoIndex) => {
+  this.requests.controls.forEach((memoCtrl) => {
     const memo = memoCtrl as FormGroup;
     const itemLines = memo.get('itemLines')?.value || [];
-
     itemLines.forEach((item: any) => {
       requestsToSend++;
-
       const payload = {
-        itemName: item.itemName,        // ✅ صنف واحد
-        quantity: item.count,           // ✅ كميته فقط
-        requestDate: new Date(
-          memo.get('requestDate')?.value
-        ).toISOString(),
+        itemName: item.itemName,
+        quantity: item.count,
+        requestDate: new Date(memo.get('requestDate')?.value).toISOString(),
         userSignature: memo.get('employeeSignature')?.value,
         college: memo.get('collegeName')?.value,
         category: memo.get('category')?.value,
@@ -374,32 +349,24 @@ onSubmit(): void {
         employeeId: 1
       };
 
-      console.log('🚀 Sending item:', payload);
-
       this.spendNotesService.createSpendNote(payload).subscribe({
         next: () => {
           successCount++;
-
           if (successCount === requestsToSend && !hasError) {
-            alert('تم إرسال جميع الأصناف بنجاح ✅');
-
-            const employeeSig =
-              this.requests.at(0)?.get('employeeSignature')?.value || '';
-
+            this.statusMessage = 'تم إرسال جميع الأصناف بنجاح ✅';
+            this.statusType = 'success';
             this.memoContainerForm.reset();
             this.requests.clear();
-
             const newMemo = this.createRequestMemoGroup();
-            newMemo.get('employeeSignature')?.setValue(employeeSig);
+            this.fillFixedData(newMemo);
             this.requests.push(newMemo);
-
             this.isSubmitting.set(false);
           }
         },
-        error: err => {
+        error: () => {
           hasError = true;
-          console.error('❌ فشل حفظ الصنف', err);
-          alert('حدث خطأ أثناء حفظ أحد الأصناف ❌');
+          this.statusMessage = 'حدث خطأ أثناء حفظ أحد الأصناف ❌';
+          this.statusType = 'error';
           this.isSubmitting.set(false);
         }
       });
