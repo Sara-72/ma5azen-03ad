@@ -1,59 +1,62 @@
-<app-header> </app-header>
+<app-header></app-header>
 
-<div class="d-flex flex-row">
+<div class="page-container">
   <aside class="sidebar">
     <h5>
-  مرحباً بك
-  <span *ngIf="displayName">، {{ displayName }}</span>
-</h5>
+      مرحباً بك
+      <span *ngIf="displayName">، {{ displayName }}</span>
+    </h5>
     <ul class="mt-5">
       <li><a href="/employee_ma5azen1">دفتر المالية</a></li>
       <li><a href="/employee_ma5azen2">كاتب الشطب</a></li>
       <li><a href="/employee_ma5azen3">المخزن</a></li>
-      <li class="active"><a>مخزن الأمين</a></li>
-      <li><a href="/employee_ma5azen5">عرض مخزنك </a></li>
+      <li class="active"><a href="/employee_ma5azen4">مخزن الأمين</a></li>
+      <li><a href="/employee_ma5azen5">عرض مخزنك</a></li>
     </ul>
   </aside>
 
-  <div class="container mt-5">
-      <!-- <div class="mb-3">
-      <label for="categorySelect" class="form-label">اختر الفئة:</label>
-      <select id="categorySelect" class="form-select" [(ngModel)]="selectedCategory" (change)="filterByCategory()">
-        <option value="">الكل</option>
-        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
-      </select>
-    </div> -->
-    <div class="table-responsive-rtl">
-      <table
-        class="table table-bordered table-striped table-hover text-center"
-        dir="rtl"
-      >
-        <thead>
-          <tr>
-            <th>الفئة</th>
-            <th>الصنف</th>
-            <th>حالة الصنف</th>
-            <th>الوحدة</th>
-            <th>العدد</th>
-          </tr>
-        </thead>
+  <main class="flex-grow-1">
+    <div class="table-container text-center" dir="rtl">
+      <h2>عرض مخزن الأمين</h2>
 
-        <tbody>
-          <tr >
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-
-          <tr>
-            <td colspan="4">لا توجد بيانات</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="table-responsive">
+        <table class="custom-3d-table">
+          <thead>
+            <tr>
+              <th>الفئة</th>
+              <th>الصنف</th>
+              <th>حالة الصنف</th>
+              <th>الوحدة</th>
+              <th>العدد المتوفر</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>أجهزة إلكترونية</td>
+              <td>لابتوب Dell</td>
+              <td>مستديم</td>
+              <td>قطعة</td>
+              <td>5</td>
+            </tr>
+            <tr>
+              <td>أدوات مكتبية</td>
+              <td>ورق A4</td>
+              <td>مستهلك</td>
+              <td>بكت</td>
+              <td>50</td>
+            </tr>
+            <tr>
+              <td>أثاث</td>
+              <td>مكتب خشبي</td>
+              <td>مستديم</td>
+              <td>قطعة</td>
+              <td>2</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
+  </main>
 </div>
 
-<app-footer> </app-footer>
+<app-footer></app-footer>

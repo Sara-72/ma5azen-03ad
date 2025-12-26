@@ -1,15 +1,11 @@
-<app-header>
+<app-header></app-header>
 
-</app-header>
-
-
-
-<div class="d-flex flex-row">
+<div class="page-container">
   <aside class="sidebar">
-     <h5>
-  مرحباً بك
-  <span *ngIf="displayName">، {{ displayName }}</span>
-</h5>
+    <h5>
+      مرحباً بك
+      <span *ngIf="displayName">، {{ displayName }}</span>
+    </h5>
     <ul class="mt-5">
       <li><a href="/employee_ma5azen1">دفتر المالية</a></li>
       <li><a href="/employee_ma5azen2">كاتب الشطب</a></li>
@@ -18,41 +14,45 @@
       <li class="active"><a>عرض مخزنك </a></li>
     </ul>
   </aside>
-  <div class="container mt-5">
-    <div class="table-responsive-rtl">
-      <table
-        class="table table-bordered table-striped table-hover text-center"
-        dir="rtl"
-      >
-        <thead>
-          <tr>
-            <th>الفئة</th>
-            <th>الصنف</th>
-            <th>حالة الصنف</th>
-            <th>الوحدة</th>
-            <th>العدد</th>
-          </tr>
-        </thead>
 
-        <tbody>
-          <tr >
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
+  <main class="flex-grow-1">
+    <div class="table-container-3d text-center" dir="rtl">
+      <h2>عرض المخزن الخاص بك</h2>
 
-          <tr>
-            <td colspan="4">لا توجد بيانات</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="table-responsive">
+        <table class="custom-table text-center">
+          <thead>
+            <tr>
+              <th>الفئة</th>
+              <th>الصنف</th>
+              <th>حالة الصنف</th>
+              <th>الوحدة</th>
+              <th>العدد</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>أجهزة تقنية</td>
+              <td>شاشة 24 بوصة</td>
+              <td>مستديم</td>
+              <td>عدد</td>
+              <td>2</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+              <td colspan="5" class="py-4 text-muted">لا توجد بيانات إضافية حالياً</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
-
-
+  </main>
 </div>
-<app-footer>
 
-</app-footer>
+<app-footer></app-footer>

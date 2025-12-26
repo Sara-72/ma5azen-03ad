@@ -20,22 +20,24 @@ a{
 /* SIDEBAR - 3D Floating Slab Effect */
 .sidebar {
     width: 25%;
-    min-height: calc(100vh - 40px); /* Leave space at top/bottom */
+    min-height: calc(100vh - 40px);
     margin: 20px;
     background: #ffffff;
     padding: 30px 20px;
     border-radius: 15px;
-
-    /* 3D Shadows: One for depth (dark), one for highlight (light) */
-    box-shadow:
-        20px 20px 60px #d9d9d9,
-        -5px -5px 20px #ffffff,
-        inset 0 0 0 1px rgba(0,0,0,0.05);
-
-    /* Slight tilt for 3D perspective */
-    transform: perspective(1000px) rotateY(5deg);
+    /*3DShadows:;
+    Onefordepth(dark),oneforhighlight(light)*/box-shadow:        20px 20px 60px #d9d9d9,        -5px -5px 20px #ffffff,        inset 0 0 0 1px rgba(0,0,0,0.05);
+    /*Slighttiltfor3Dperspective*/transform: perspective(1000px) rotateY(5deg);
     transition: transform 0.5s ease, box-shadow 0.5s ease;
     z-index: 10;
+    -webkit-transform: perspective(1000px) rotateY(0deg);
+    -moz-transform: perspective(1000px) rotateY(0deg);
+    -ms-transform: perspective(1000px) rotateY(0deg);
+    -o-transform: perspective(1000px) rotateY(0deg);
+    -webkit-transition: transform 0.5s ease, box-shadow 0.5s ease;
+    -moz-transition: transform 0.5s ease, box-shadow 0.5s ease;
+    -ms-transition: transform 0.5s ease, box-shadow 0.5s ease;
+    -o-transition: transform 0.5s ease, box-shadow 0.5s ease;
 }
 
 /* Make it straighten up when you interact with it */

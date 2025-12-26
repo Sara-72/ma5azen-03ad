@@ -1,205 +1,202 @@
-a{
-  text-decoration: none;
-  color:var(--black-color);
-  transition: 0.3s;
-  -webkit-transition: 0.3s;
-  -moz-transition: 0.3s;
-  -ms-transition: 0.3s;
-  -o-transition: 0.3s;
-}
 
-/*  PAGE LAYOUT */
 .page-container {
-    display: flex;
+  display: flex;
+  background-color: var(--bg-light);
+  min-height: 100vh;
+  perspective: 2000px; /* Essential for the 3D stage */
+  padding: 20px;
+  gap: 20px;
 }
 
-/* SIDEBAR  */
+/* --- SIDEBAR - 3D Neumorphic Slab --- */
+/* --- GLOBAL --- */
+a {
+  text-decoration: none;
+  color: var(--black-color);
+  transition: 0.3s;
+}
+
+.page-container {
+  display: flex;
+  background-color: #f4f7f6;
+  perspective: 2000px;
+  padding: 20px;
+  gap: 30px;
+  min-height: 100vh;
+}
+
+/* --- SIDEBAR --- */
+
+/* SIDEBAR - 3D Floating Slab Effect */
 .sidebar {
-    width: 20%;
-    min-height: 100vh;
-    background: #fff;
-    padding: 20px;
-    border-left: 1px solid #ddd;
-    box-shadow: rgb(204, 219, 232) 3px 3px 6px 0px inset, rgba(255, 255, 255, 0.5) -3px -3px 6px 1px inset;
+    width: 25%;
+    min-height: calc(100vh - 40px);
+    /*Leavespaceattop/bottom*/margin: 20px;
+    background: #ffffff;
+    padding: 30px 20px;
+    border-radius: 15px;
+    /*3DShadows:;
+    Onefordepth(dark),oneforhighlight(light)*/box-shadow:        20px 20px 60px #d9d9d9,        -5px -5px 20px #ffffff,        inset 0 0 0 1px rgba(0,0,0,0.05);
+    /*Slighttiltfor3Dperspective*/transform: perspective(1000px) rotateY(0deg);
+    transition: transform 0.5s ease, box-shadow 0.5s ease;
+    z-index: 10;
+    -webkit-transform: perspective(1000px) rotateY(0deg);
+    -moz-transform: perspective(1000px) rotateY(0deg);
+    -ms-transform: perspective(1000px) rotateY(0deg);
+    -o-transform: perspective(1000px) rotateY(0deg);
+    -webkit-transition: transform 0.5s ease, box-shadow 0.5s ease;
+    -moz-transition: transform 0.5s ease, box-shadow 0.5s ease;
+    -ms-transition: transform 0.5s ease, box-shadow 0.5s ease;
+    -o-transition: transform 0.5s ease, box-shadow 0.5s ease;
 }
 
-.sidebar h3 {
-    margin-bottom: 25px;
+/* Make it straighten up when you interact with it */
+.sidebar:hover {
+    transform: perspective(1000px) rotateY(0deg);
+    box-shadow:
+        30px 30px 70px #cecece,
+        -5px -5px 25px #ffffff;
 }
 
+/* SIDEBAR LIST ITEMS */
 .sidebar ul {
     padding: 0;
     list-style: none;
+    perspective: 500px; /* Depth for children */
 }
 
 .sidebar li {
-    padding: 10px 5px;
-    border-bottom: 1px solid #ddd;
-    cursor: default;
+    padding: 15px 20px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    border: none; /* Removed the old flat border */
+    background: transparent;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-style: preserve-3d;
 }
 
-.sidebar li  a:hover {
+/* 3D Hover Effect for Links */
+.sidebar li:hover {
+    background: #f8f9fa;
+    color:var(--secondary-color);
+    transform: translateZ(20px) translateX(-5px); /* Pops out toward the user */
+    box-shadow: 10px 10px 20px rgba(0,0,0,0.05);
+}
+.sidebar li:hover a{
   color:var(--secondary-color);
 }
 
-.sidebar li.active {
-    color: #0a3a63;
-    font-weight: bold;
-    border-left: 4px solid #0a3a63;
-    cursor:default;
-    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
-
-}
-
-/******************************************************/
-
-
-
-.table-container {
-
-  width: 100%;
-  max-width: 600px; /* Adjust as needed */
-  margin: 20px auto;
-}
-
-table {
-  /* Set the table to take full width of its container */
-  width: 100%;
-  border-collapse: collapse; /* Essential for clean borders */
-  border: 1px solid #dee2e6 ; /* Main outer border */
-  box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
-}
-
-th, td {
-  /* Style for all header and data cells */
-  border: 2px solid #dee2e6 ;
-  padding: 30px;
-  text-align: center; /* Center text alignment */
-  height: 85px;
-  vertical-align: top; /* Start content at the top of the large cells */
-  box-sizing: border-box;
-}
-
-th {
-  /* Style specifically for table headers */
-  background-color: #f8f8f8;
-  font-weight: bold;
-  font-size: 1.1em;
-  color: #333;
-}
-
-
-
-/* --- CORE LAYOUT FIX (CRITICAL for Sticky Footer and Layout) --- */
-
-/* Target the main content wrapper (d-flex flex-row) */
-.d-flex.flex-row {
-    flex-grow: 1; /* Pushes the footer down (Inherits from app-root) */
+.sidebar li a {
+    display: block;
     width: 100%;
-    /* Keep display: flex and flex-direction: row for desktop */
+
 }
 
-/* Ensure the container holding the table takes the remaining space on desktop */
-.d-flex.flex-row > .container {
-    flex-grow: 1;
-    padding: 0 15px; /* Add padding to the sides */
-}
+/* ACTIVE STATE - Looks "Pressed In" or "Carved" */
+.sidebar li.active {
+    background: #f0f4f8;
+    color: var(--primary-color);
+    font-weight: bold;
+    border-left: none; /* Removed flat border */
 
-/* Ensure the sidebar does not grow */
-.sidebar {
-    /* ... existing styles ... */
-    flex-shrink: 0;
-}
-
-/* Reduce overly large cell padding globally */
-th, td {
-    padding: 15px; /* Reduced from 30px for better initial display */
-    height: auto; /* Remove fixed height */
+    /* Inner shadow creates a "carved into the wood" look */
+    box-shadow:
+        inset 6px 6px 12px #d1d9e6,
+        inset -6px -6px 12px #ffffff;
+    transform: translateZ(-5px); /* Sinks slightly into the sidebar */
 }
 
 
-
-/* --- RESPONSIVE ADJUSTMENTS (MEDIA QUERIES) --- */
-
-@media (max-width: 992px) {
-    /* Tablet/Small Desktop Adjustments */
-
-    .sidebar {
-        width: 25%; /* Give more room to the table */
-        padding: 15px;
-    }
-
-    /* Reduce table cell padding further on tablets */
-    th, td {
-        padding: 10px;
-        font-size: 0.9em;
-    }
+.sidebar li.active::before {
+    content: "";
+    position: absolute;
+    right: -10px; /* Positions it on the edge */
+    top: 20%;
+    height: 60%;
+    width: 4px;
+    background: var(--secondary-color);
+    border-radius: 10px;
+    box-shadow: 0 0 10px var(--secondary-color);
 }
 
-@media (max-width: 768px) {
-    /* Mobile Layout Stacking & Sticky Footer Fix */
 
-    /* 1. LAYOUT STACKING FIX (Overriding d-flex flex-row) */
-    .d-flex.flex-row {
-        flex-direction: column !important; /* Force stacking */
-        flex-grow: 1; /* Retain flex-grow for footer */
-        display: block !important; /* Force block flow temporarily */
-    }
-
-    /* 2. SIDEBAR COLLAPSE */
-    .sidebar {
-        width: 100% !important; /* Sidebar takes full width */
-        min-height: auto;
-        border-left: none;
-        border-bottom: 1px solid #ddd;
-        order: -1; /* Ensure sidebar appears BEFORE the main content */
-    }
-
-    /* Reorganize sidebar links for horizontal display on mobile */
-    .sidebar ul {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-around;
-        margin-top: 10px !important;
-    }
-
-    .sidebar h5 {
-        text-align: center;
-    }
-
-    .sidebar li {
-        border-bottom: none;
-        padding: 8px 10px;
-        flex: 1 1 auto;
-        text-align: center;
-        border-right: 1px solid #ddd; /* Separator */
-    }
-    .sidebar li.active {
-        border-left: none;
-        border-bottom: 3px solid var(--primary-color);
-    }
-
-    /* 3. TABLE SCROLLING */
-    .d-flex.flex-row > .container {
-        width: 100% !important;
-        max-width: 100%;
-        padding: 10px 5px; /* Minimal padding */
-        margin: 0 !important; /* Clear Bootstrap margins */
-    }
-
-    .table-responsive-rtl {
-        overflow-x: auto; /* Enable horizontal scrolling */
-        width: 100%;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .table {
-        min-width: 450px; /* Min width for 4 columns */
-        width: auto;
-    }
-
-    th, td {
-        font-size: 0.8em;
-        padding: 6px 4px; /* Tight padding */
-    }
+/* --- THE TABLE CONTAINER (The Floating Board) --- */
+.table-container {
+  flex: 1;
+  width: 100%;
+  max-width: 900px;
+  margin: 40px auto;
+  background: white;
+  border-radius: 15px;
+  position: relative;
+  /* Initial 3D Tilt */
+  transform: rotateY(-2deg) rotateX(0deg);
+  box-shadow: -15px 20px 40px rgba(0, 0, 0, 0.1), 0 0 30px rgba(10, 58, 99, 0.1);
+  transition: all 0.6s ease;
+  animation: tableEntrance 0.8s ease-out;
+  padding: 30px;
 }
+
+.table-container:hover {
+  transform: rotateY(0deg) rotateX(0deg) translateZ(15px);
+  box-shadow: -25px 35px 60px rgba(0, 0, 0, 0.15), 0 0 50px rgba(10, 58, 99, 0.2);
+}
+
+.table-container h2 {
+  color: var(--primary-color);
+  font-weight: 800;
+  margin-bottom: 25px;
+  border-bottom: 2px double #eee;
+  padding-bottom: 10px;
+}
+
+/* --- THE CUSTOM 3D TABLE --- */
+.custom-3d-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #dee2e6;
+}
+
+.custom-3d-table th {
+  background-color: #f8f9fa;
+  color: var(--primary-color);
+  padding: 20px;
+  font-weight: bold;
+  border: 1px solid #eee;
+}
+
+.custom-3d-table td {
+  padding: 18px;
+  text-align: center;
+  border: 1px solid #eee;
+  vertical-align: middle;
+}
+
+.custom-3d-table tbody tr {
+  transition: all 0.3s ease;
+  animation: rowFadeIn 0.5s ease-out backwards;
+}
+
+.custom-3d-table tbody tr:hover {
+  background-color: rgba(0, 123, 255, 0.05);
+  transform: scale(1.01);
+}
+
+/* --- ANIMATIONS --- */
+@keyframes tableEntrance {
+  from { opacity: 0; transform: translateY(30px) rotateY(-10deg); }
+  to { opacity: 1; transform: translateY(0) rotateY(-2deg); }
+}
+
+@keyframes rowFadeIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Staggered Row Entry */
+tbody tr:nth-child(1) { animation-delay: 0.1s; }
+tbody tr:nth-child(2) { animation-delay: 0.2s; }
+tbody tr:nth-child(3) { animation-delay: 0.3s; }
+tbody tr:nth-child(4) { animation-delay: 0.4s; }

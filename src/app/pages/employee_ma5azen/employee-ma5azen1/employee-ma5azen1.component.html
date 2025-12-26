@@ -1,113 +1,81 @@
-<app-header>
-
-</app-header>
-
+<app-header></app-header>
 
 <div class="content d-flex flex-row">
+  <aside class="sidebar">
+    <h5>
+      مرحباً بك
+      <span *ngIf="displayName">، {{ displayName }}</span>
+    </h5>
 
-      <aside class="sidebar">
-            <h5>
-  مرحباً بك
-  <span *ngIf="displayName">، {{ displayName }}</span>
-</h5>
+    <ul class="mt-5">
+      <li class="active"><a>دفتر المالية</a></li>
+      <li><a href="/employee_ma5azen2">كاتب الشطب</a></li>
+      <li><a href="employee_ma5azen3">المخزن</a></li>
+      <li><a href="/employee_ma5azen4">مخزن الأمين</a></li>
+      <li><a href="/employee_ma5azen5">عرض مخزنك </a></li>
+    </ul>
+  </aside>
 
-            <ul class="mt-5">
+  <main class="flex-grow-1">
+    <form [formGroup]="inventoryLogForm" (ngSubmit)="onSubmit()" dir="rtl" class="my-5 mx-4">
 
-                <li class="active"><a>دفتر المالية</a></li>
-                <li><a href="/employee_ma5azen2">كاتب الشطب</a></li>
-                <li><a href="employee_ma5azen3">المخزن</a></li>
-                <li><a href="/employee_ma5azen4">مخزن الأمين</a></li>
-                <li><a href="/employee_ma5azen5">عرض مخزنك </a></li>
+      <div class="table-section">
+        <h2 class="text-center">دفتر المالية</h2>
 
-            </ul>
-        </aside>
+        <div class="table-responsive">
+          <table class="table table-bordered text-center">
+            <thead>
+              <tr>
+                <th>رقم الإضافة</th>
+                <th>اسم الصنف</th>
+                <th>الوحدة</th>
+                <th>الكمية</th>
+                <th>سعر الوحدة</th>
+                <th>القيمة</th>
+                <th>حالة الصنف</th>
+              </tr>
+            </thead>
 
-      <form [formGroup]="inventoryLogForm" (ngSubmit)="onSubmit()" dir="rtl" class="my-5 mx-4">
-
-        <div class="table-section p-4">
-          <h2 class="text-center mb-5"> <br>دفتر المالية</h2>
-            <table class="table table-bordered text-center">
-
-                <thead>
-                    <tr>
-                        <th>رقم الإضافة</th>
-                        <th>اسم الصنف</th>
-                        <th>الوحدة</th>
-                        <th>الكمية</th>
-                        <th>سعر الوحدة</th>
-                        <th>القيمة</th>
-                        <th>حالة الصنف</th>
-                    </tr>
-                </thead>
-
-                <tbody formArrayName="tableData">
-                    @for (rowGroup of tableData.controls; track $index) {
-                        <tr [formGroupName]="$index">
-
-                            <td>
-                                <input type="number" formControlName="additionNumber" class="form-control text-center" min="0">
-                            </td>
-
-                          <td>
-                                  <select formControlName="itemName" class="form-select text-center">
-                                        <option value="" disabled selected>--- اختر ---</option>
-
-                                  @for (item of ma5azenItemOptions; track item) {
-                                        <option [value]="item">{{ item }}</option>
-                                      }
-                                  </select>
-                          </td>
-
-                            <td>
-                                <input type="text" formControlName="unit" class="form-control text-center">
-                            </td>
-
-                            <td>
-                                <input type="number" formControlName="quantity" class="form-control text-center" min="1">
-                            </td>
-
-                            <td>
-                                <input type="number" formControlName="unitPrice" class="form-control text-center" min="0">
-                            </td>
-
-                            <td>
-                                <input type="number" formControlName="value" class="form-control text-center" min="0">
-                            </td>
-
-                            <td>
-                                <select formControlName="itemCondition" class="form-select text-center">
-                                    <option value="" disabled selected>اختر</option>
-                                    <option value="مستهلك">مستهلك</option>
-                                    <option value="مستديم">مستديم</option>
-                                </select>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-
-            <div class="row-controls">
-                <button type="button" class="remove-row-button" (click)="removeRow()">-</button>
-                <button type="button" class="add-row-button" (click)="addRow()">+</button>
-            </div>
-        </div> <div class="button-section">
-            <button
-                type="submit"
-                [disabled]="isSubmitting() || inventoryLogForm.invalid"
-                class="submit-btn mt-5">
-                @if (isSubmitting()) {
-                    جاري الحفظ...
-                } @else {
-                    حفظ البيانات
-                }
-            </button>
+            <tbody formArrayName="tableData">
+              @for (rowGroup of tableData.controls; track $index) {
+                <tr [formGroupName]="$index">
+                  <td><input type="number" formControlName="additionNumber" class="form-control text-center"></td>
+                  <td>
+                    <select formControlName="itemName" class="form-select text-center">
+                      <option value="" disabled selected>--- اختر ---</option>
+                      @for (item of ma5azenItemOptions; track item) {
+                        <option [value]="item">{{ item }}</option>
+                      }
+                    </select>
+                  </td>
+                  <td><input type="text" formControlName="unit" class="form-control text-center"></td>
+                  <td><input type="number" formControlName="quantity" class="form-control text-center"></td>
+                  <td><input type="number" formControlName="unitPrice" class="form-control text-center"></td>
+                  <td><input type="number" formControlName="value" class="form-control text-center"></td>
+                  <td>
+                    <select formControlName="itemCondition" class="form-select text-center">
+                      <option value="" disabled selected>اختر</option>
+                      <option value="مستهلك">مستهلك</option>
+                      <option value="مستديم">مستديم</option>
+                    </select>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
 
+        <button type="button" class="remove-row-button" (click)="removeRow()">-</button>
+        <button type="button" class="add-row-button" (click)="addRow()">+</button>
+      </div>
+
+      <div class="button-section">
+        <button type="submit" [disabled]="isSubmitting() || inventoryLogForm.invalid" class="submit-btn mt-5">
+          @if (isSubmitting()) { جاري الحفظ... } @else { حفظ البيانات }
+        </button>
+      </div>
     </form>
+  </main>
+</div>
 
-
-    </div>
-
-<app-footer>
-
-</app-footer>
+<app-footer></app-footer>

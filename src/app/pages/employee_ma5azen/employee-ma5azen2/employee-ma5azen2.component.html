@@ -1,36 +1,26 @@
-<app-header>
+<app-header></app-header>
 
-</app-header>
-
-
-<div class="content d-flex flex-row">
-
-
-
+<div class="page-container">
   <aside class="sidebar">
-             <h5>
-  مرحباً بك
-  <span *ngIf="displayName">، {{ displayName }}</span>
-</h5>
-            <ul class="mt-5">
+    <h5>
+      مرحباً بك
+      <span *ngIf="displayName">، {{ displayName }}</span>
+    </h5>
+    <ul class="mt-5">
+      <li><a href="/employee_ma5azen1">دفتر المالية</a></li>
+      <li class="active"><a>كاتب الشطب</a></li>
+      <li><a href="/employee_ma5azen3">المخزن</a></li>
+      <li><a href="/employee_ma5azen4">مخزن الأمين</a></li>
+      <li><a href="/employee_ma5azen5">عرض مخزنك </a></li>
+    </ul>
+  </aside>
 
-                <li><a href="/employee_ma5azen1">دفتر المالية</a></li>
-                <li class="active"><a>كاتب الشطب</a></li>
-                <li><a href="/employee_ma5azen3" >المخزن</a></li>
-                <li><a href="/employee_ma5azen4">مخزن الأمين</a></li>
-                <li><a href="/employee_ma5azen5">عرض مخزنك </a></li>
-
-            </ul>
-        </aside>
-<div class="container my-5">
-    <div class="table-responsive-rtl">
-      <table
-        class="table table-bordered table-striped table-hover text-center"
-        dir="rtl"
-      >
+  <main class="content">
+    <div class="table-container">
+      <table class="custom-3d-table" dir="rtl">
         <thead>
           <tr>
-            <th>رقم الاضافة</th>
+            <th>رقم الإضافة</th>
             <th>اسم الصنف</th>
             <th>الوحدة</th>
             <th>الكمية</th>
@@ -39,25 +29,32 @@
             <th>حالة الصنف</th>
           </tr>
         </thead>
-
         <tbody>
           <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td>101</td>
+            <td>أحبار طابعة</td>
+            <td>عدد</td>
+            <td>5</td>
+            <td>250</td>
+            <td>1250</td>
+            <td>مستهلك</td>
           </tr>
-
-
+          <tr>
+            <td>102</td>
+            <td>ورق تصوير A4</td>
+            <td>رزمة</td>
+            <td>10</td>
+            <td>180</td>
+            <td>1800</td>
+            <td>مستهلك</td>
+          </tr>
+          <tr>
+            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+          </tr>
         </tbody>
       </table>
     </div>
-  </div>
+  </main>
 </div>
 
-<app-footer>
-
-</app-footer>
+<app-footer></app-footer>
