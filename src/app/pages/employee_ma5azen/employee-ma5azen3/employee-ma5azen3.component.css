@@ -25,10 +25,9 @@ a {
 }
 
 /* --- SIDEBAR - 3D Neumorphic Slab --- */
-
 /* SIDEBAR - 3D Floating Slab Effect */
 .sidebar {
-    width: 30%;
+    width: 25%;
     min-height: calc(100vh - 40px);
     /*Leavespaceattop/bottom*/margin: 20px;
     background: #ffffff;
@@ -89,6 +88,7 @@ a {
     display: block;
     width: 100%;
 
+
 }
 
 /* ACTIVE STATE - Looks "Pressed In" or "Carved" */
@@ -113,10 +113,11 @@ a {
     top: 20%;
     height: 60%;
     width: 4px;
-    background: var(--secondary-color);
+    background: var(--primary-color);
     border-radius: 10px;
-    box-shadow: 0 0 10px var(--secondary-color);
+    box-shadow: 0 0 10px var(--primary-color);
 }
+
 
 
 

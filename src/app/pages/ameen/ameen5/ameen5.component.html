@@ -1,14 +1,11 @@
-<app-header>
+<app-header></app-header>
 
-</app-header>
-
-<div class="d-flex">
-
+<div class="page-container">
   <aside class="sidebar">
-        <h5>
-  مرحباً بك
-  <span *ngIf="displayName">، {{ displayName }}</span>
-</h5>
+    <h5>
+      مرحباً بك
+      <span *ngIf="displayName">، {{ displayName }}</span>
+    </h5>
     <ul class="mt-5">
       <li><a href="/ameen1">المخزن</a></li>
       <li><a href="/ameen2">دفتر اليومية</a></li>
@@ -18,13 +15,11 @@
     </ul>
   </aside>
 
+  <main class="content">
+    <div class="table-container" dir="rtl">
+      <h2 class="mb-4 fw-bold text-center" style="color: var(--primary-color);">عرض مخزنك</h2>
 
-    <div class="container mt-5">
-    <div class="table-responsive-rtl">
-      <table
-        class="table table-bordered table-striped table-hover text-center"
-        dir="rtl"
-      >
+      <table class="custom-3d-table text-center">
         <thead>
           <tr>
             <th>الفئة</th>
@@ -35,33 +30,27 @@
           </tr>
         </thead>
 
-       <tbody>
-  @if (stocks.length === 0) {
-    <tr>
-      <td colspan="5">لا توجد بيانات</td>
-    </tr>
-  }
-  @else {
-    @for (stock of stocks; track stock.id) {
-      <tr>
-        <td>{{ stock.category }}</td>
-        <td>{{ stock.itemName }}</td>
-        <td>{{ stock.storeType }}</td>
-        <td>{{ stock.unit }}</td>
-        <td>{{ stock.quantity }}</td>
-      </tr>
-    }
-  }
-</tbody>
-
+        <tbody>
+          @if (stocks.length === 0) {
+            <tr>
+              <td colspan="5">لا توجد بيانات متوفرة</td>
+            </tr>
+          }
+          @else {
+            @for (stock of stocks; track stock.id) {
+              <tr>
+                <td>{{ stock.category }}</td>
+                <td>{{ stock.itemName }}</td>
+                <td>{{ stock.storeType }}</td>
+                <td>{{ stock.unit }}</td>
+                <td>{{ stock.quantity }}</td>
+              </tr>
+            }
+          }
+        </tbody>
       </table>
     </div>
-  </div>
+  </main>
+</div>
 
-
-  </div>
-
-
-<app-footer>
-
-</app-footer>
+<app-footer></app-footer>

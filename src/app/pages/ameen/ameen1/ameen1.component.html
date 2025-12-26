@@ -1,112 +1,79 @@
-<app-header>
-
-</app-header>
-
-
-
+<app-header></app-header>
 
 <div class="content d-flex flex-row">
+  <aside class="sidebar">
+    <h5>
+      مرحباً بك
+      <span *ngIf="displayName">، {{ displayName }}</span>
+    </h5>
+    <ul class="mt-5">
+      <li class="active"><a>المخزن</a></li>
+      <li><a href="/ameen2">دفتر اليومية</a></li>
+      <li><a href="/ameen3">أذونات الصرف</a></li>
+      <li><a href="/ameen4">دفاتر اليومية</a></li>
+      <li><a href="/ameen5">مخزنك</a></li>
+    </ul>
+  </aside>
 
-<aside class="sidebar">
-            <h5>
-  مرحباً بك
-  <span *ngIf="displayName">، {{ displayName }}</span>
-</h5>
+  <form [formGroup]="simpleForm" (ngSubmit)="onSubmit()" dir="rtl" class="mt-5 form-part m-auto flex-grow-1 d-flex flex-column align-items-center">
 
-            <ul class="mt-5">
-                <li class="active"><a>المخزن</a></li>
-                <li><a href="/ameen2">دفتر اليومية</a></li>
-                <li><a href="/ameen3">أذونات الصرف</a></li>
-                <li><a href="/ameen4">دفاتر اليومية</a></li>
-                <li><a href="/ameen5">مخزنك</a></li>
+    <div class="table-section">
+      <h2 class="text-center">المخزن</h2>
 
-            </ul>
-        </aside>
-
-
-
-  <form
-    [formGroup]="simpleForm"
-    (ngSubmit)="onSubmit()"
-    dir="rtl"
-    class="mt-5 form-part m-auto"
-  >
-    <div class="table-section px-5 py-4">
-      <h2 class="text-center m-4"> المخزن</h2>
-      <table class="table table-bordered text-center">
-        <thead>
-          <tr>
-            <th>الفئة</th>
-            <th>الصنف</th>
-            <th>حالة الصنف</th>
-            <th>الوحدة</th>
-            <th>العدد</th>
-          </tr>
-        </thead>
-
-        <tbody formArrayName="tableData">
-          @for (rowGroup of tableData.controls; track $index) {
-          <tr [formGroupName]="$index">
-            <td>
-              <select formControlName="category" class="form-control">
-                <option value="" disabled selected hidden>اختر فئة</option>
-                @for (category of categories; track category) {
-                <option [value]="category">{{ category }}</option>
-                }
-              </select>
-            </td>
-
-            <td>
-              <select formControlName="item" class="form-control">
-                <option [ngValue]="null" disabled selected hidden>
-                  اختر صنف
-                </option>
-                @for (item of availableItemsByRow[$index]; track item) {
-                <option [value]="item">{{ item }}</option>
-                }
-              </select>
-            </td>
-
-                <td>
-                            <select formControlName="itemType" class="form-control">
-                                <option value="" disabled selected hidden>اختر نوع</option>
-                                @for (type of itemTypes; track type) {
-                                    <option [value]="type">{{ type }}</option>
-                                }
-                            </select>
-                        </td>
-<td>
-<input min="0" formControlName="unit" class="form-control"/>
-</td>
-            <td>
-              <input type="number" min="0" formControlName="count" class="form-control"/>
-            </td>
-          </tr>
-          }
-        </tbody>
-      </table>
-
-      <div class="row-controls">
-        <button type="button" class="remove-row-button" (click)="removeRow()">
-          -
-        </button>
-        <button type="button" class="add-row-button" (click)="addRow()">
-          +
-        </button>
+      <div class="table-responsive">
+        <table class="table table-bordered text-center">
+          <thead>
+            <tr>
+              <th>الفئة</th>
+              <th>الصنف</th>
+              <th>حالة الصنف</th>
+              <th>الوحدة</th>
+              <th>العدد</th>
+            </tr>
+          </thead>
+          <tbody formArrayName="tableData">
+            @for (rowGroup of tableData.controls; track $index) {
+            <tr [formGroupName]="$index">
+              <td>
+                <select formControlName="category" class="form-control">
+                  <option value="" disabled selected hidden>اختر فئة</option>
+                  @for (category of categories; track category) {
+                  <option [value]="category">{{ category }}</option>
+                  }
+                </select>
+              </td>
+              <td>
+                <select formControlName="item" class="form-control">
+                  <option [ngValue]="null" disabled selected hidden>اختر صنف</option>
+                  @for (item of availableItemsByRow[$index]; track item) {
+                  <option [value]="item">{{ item }}</option>
+                  }
+                </select>
+              </td>
+              <td>
+                <select formControlName="itemType" class="form-control">
+                  <option value="" disabled selected hidden>اختر نوع</option>
+                  @for (type of itemTypes; track type) {
+                  <option [value]="type">{{ type }}</option>
+                  }
+                </select>
+              </td>
+              <td><input formControlName="unit" class="form-control" /></td>
+              <td><input type="number" formControlName="count" class="form-control" /></td>
+            </tr>
+            }
+          </tbody>
+        </table>
       </div>
+
+      <button type="button" class="remove-row-button" (click)="removeRow()">-</button>
+      <button type="button" class="add-row-button" (click)="addRow()">+</button>
     </div>
 
-    <button
-      type="submit"
-      [disabled]="isSubmitting() || simpleForm.invalid"
-      class="submit-btn mt-4"
-    >
+    <button type="submit" [disabled]="isSubmitting() || simpleForm.invalid" class="submit-btn mt-5">
       @if (isSubmitting()) { جاري الحفظ... } @else { حفظ البيانات }
     </button>
   </form>
 </div>
 
-<app-footer>
-</app-footer>
-
-
+<app-footer></app-footer>

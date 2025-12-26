@@ -1,12 +1,11 @@
 <app-header></app-header>
 
-<div class="d-flex">
-
+<div class="page-container">
   <aside class="sidebar">
-       <h5>
-  مرحباً بك
-  <span *ngIf="displayName">، {{ displayName }}</span>
-</h5>
+    <h5>
+      مرحباً بك
+      <span *ngIf="displayName">، {{ displayName }}</span>
+    </h5>
     <ul class="mt-5">
       <li><a href="/ameen1">المخزن</a></li>
       <li><a href="/ameen2">دفتر اليومية</a></li>
@@ -16,16 +15,14 @@
     </ul>
   </aside>
 
-  <form dir="rtl">
+  <form dir="rtl" class="m-auto">
 
-    <!-- جدول المستهلك -->
     <div class="log-container">
       <header class="log-header text-center">
-        <h2 class="text-center">يومية المخزن</h2>
+        <h2>يومية المخزن</h2>
       </header>
 
-      <!-- نوع المخزن -->
-      <div class="storehouse-field">
+      <div class="storehouse-field text-end">
         <label>المخزن: </label>
         <span>مستهلك</span>
       </div>
@@ -34,10 +31,10 @@
         <table>
           <thead>
             <tr>
-              <th>التاريخ</th>
-              <th>وارد من / منصرف إلى</th>
-              <th>قيمة الأصناف المضافة</th>
-              <th>قيمة الأصناف المنصرفة</th>
+              <th style="width: 20%;">التاريخ</th>
+              <th style="width: 40%;">وارد من / منصرف إلى</th>
+              <th style="width: 20%;">قيمة الأصناف المضافة</th>
+              <th style="width: 20%;">قيمة الأصناف المنصرفة</th>
             </tr>
           </thead>
           <tbody>
@@ -52,14 +49,12 @@
       </div>
     </div>
 
-    <!-- جدول المستديم -->
     <div class="log-container">
       <header class="log-header text-center">
-        <h2 class="text-center">يومية المخزن</h2>
+        <h2>يومية المخزن</h2>
       </header>
 
-      <!-- نوع المخزن -->
-      <div class="storehouse-field">
+      <div class="storehouse-field text-end">
         <label>المخزن: </label>
         <span>مستديم</span>
       </div>
@@ -68,10 +63,10 @@
         <table>
           <thead>
             <tr>
-              <th>التاريخ</th>
-              <th>وارد من / منصرف إلى</th>
-              <th>قيمة الأصناف المضافة</th>
-              <th>قيمة الأصناف المنصرفة</th>
+              <th style="width: 20%;">التاريخ</th>
+              <th style="width: 40%;">وارد من / منصرف إلى</th>
+              <th style="width: 20%;">قيمة الأصناف المضافة</th>
+              <th style="width: 20%;">قيمة الأصناف المنصرفة</th>
             </tr>
           </thead>
           <tbody>
@@ -87,7 +82,6 @@
     </div>
 
   </form>
-
 </div>
 
 <app-footer></app-footer>

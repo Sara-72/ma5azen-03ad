@@ -1,98 +1,69 @@
-<app-header>
+<app-header></app-header>
 
-</app-header>
+<div class="page-container">
+  <aside class="sidebar">
+    <h5>
+      مرحباً بك
+      <span *ngIf="displayName">، {{ displayName }}</span>
+    </h5>
+    <ul class="mt-5">
+      <li><a href="/ameen1">المخزن</a></li>
+      <li class="active"><a>دفتر اليومية</a></li>
+      <li><a href="/ameen3">أذونات الصرف</a></li>
+      <li><a href="/ameen4">دفاتر اليومية</a></li>
+      <li><a href="/ameen5">مخزنك</a></li>
+    </ul>
+  </aside>
 
+  <form [formGroup]="inventoryLogForm" (ngSubmit)="onSubmit()" dir="rtl" class="flex-grow-1 d-flex flex-column align-items-center">
 
+    <div class="table-container-3d">
+      <header class="log-header text-center">
+        <h2>يومية المخزن</h2>
+      </header>
 
-<div class="d-flex">
-<aside class="sidebar">
-                <h5>
-  مرحباً بك
-  <span *ngIf="displayName">، {{ displayName }}</span>
-</h5>
-            <ul class="mt-5">
-                <li><a href="/ameen1">المخزن</a></li>
-                <li class="active"><a >دفتر اليومية</a></li>
-                <li><a href="/ameen3">أذونات الصرف</a></li>
-                <li><a href="/ameen4">دفاتر اليومية</a></li>
-                <li><a href="/ameen5">مخزنك</a></li>
+      <div class="mb-4 text-end px-3">
+        <label for="assetTypeSelect" class="form-label fw-bold">المخزن</label>
+        <select id="assetTypeSelect" formControlName="assetType" class="form-select custom-select">
+          <option value="" disabled selected>اختر نوع المخزن</option>
+          <option *ngFor="let type of assetTypes" [value]="type">{{ type }}</option>
+        </select>
+      </div>
 
-            </ul>
-        </aside>
+      <div class="table-responsive">
+        <table class="custom-table text-center">
+          <thead>
+            <tr>
+              <th>التاريخ</th>
+              <th>وارد من / منصرف إلى</th>
+              <th>قيمة الأصناف المضافة</th>
+              <th>قيمة الأصناف المنصرفة</th>
+            </tr>
+          </thead>
 
+          <tbody formArrayName="tableData">
+            @for (rowGroup of tableData.controls; track $index) {
+            <tr [formGroupName]="$index">
+              <td><input type="date" formControlName="date" class="form-control table-input"></td>
+              <td><input type="text" formControlName="sourceOrDestination" class="form-control table-input"></td>
+              <td><input type="text" formControlName="addedValue" class="form-control table-input"></td>
+              <td><input type="text" formControlName="issuedValue" class="form-control table-input"></td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
 
-
-<form [formGroup]="inventoryLogForm" (ngSubmit)="onSubmit()" dir="rtl" class="my-3 mx-2">
-
-    <div class="log-container">
-
-        <header class="log-header text-center">
-            <h2 class="text-center">يومية المخزن</h2>
-
-        </header>
-<div class="mb-4">
-    <label for="assetTypeSelect" class="form-label d-block text-end">مخزن</label>
-    <select id="assetTypeSelect" formControlName="assetType" class="form-select text-end">
-        <option value="" disabled selected>اختر نوع المخزن</option>
-
-<option *ngFor="let type of assetTypes" [value]="type">{{ type }}</option>
-
-    </select>
-</div>
-
-        <div class="table-section">
-            <table class="table table-bordered text-center">
-                <thead>
-                    <tr>
-                        <th>التاريخ</th>
-
-
-                        <th>وارد من / منصرف إلى</th>
-                        <th>قيمة الأصناف المضافة</th>
-                        <th>قيمة الأصناف المنصرفة</th>
-
-                    </tr>
-                </thead>
-
-                <tbody formArrayName="tableData">
-                    @for (rowGroup of tableData.controls; track $index) {
-                        <tr [formGroupName]="$index">
-
-                            <td><input type="date" formControlName="date" class="form-control"></td>
-
-                            <td><input type="text" formControlName="sourceOrDestination" class="form-control wide-col"></td>
-                            <td><input type="text" formControlName="addedValue" class="form-control"></td>
-                            <td><input type="text" formControlName="issuedValue" class="form-control"></td>
-
-                        </tr>
-                    }
-                </tbody>
-            </table>
-
-            <div class="row-controls">
-                <button type="button" class="remove-row-button" (click)="removeRow()">-</button>
-                <button type="button" class="add-row-button" (click)="addRow()">+</button>
-            </div>
-        </div>
-
-        <div class="button-section">
-            <button type="submit" [disabled]="isSubmitting() || inventoryLogForm.invalid" class="submit-btn mt-5">
-                @if (isSubmitting()) {
-                    جاري الحفظ...
-                } @else {
-                    حفظ البيانات
-                }
-            </button>
-        </div>
+      <button type="button" class="remove-row-button" (click)="removeRow()">-</button>
+      <button type="button" class="add-row-button" (click)="addRow()">+</button>
     </div>
-</form>
 
-
+    <div class="button-section">
+      <button type="submit" [disabled]="isSubmitting() || inventoryLogForm.invalid" class="submit-btn mt-4">
+        @if (isSubmitting()) { جاري الحفظ... } @else { حفظ البيانات }
+      </button>
+    </div>
+  </form>
 </div>
 
-
-
-<app-footer>
-</app-footer>
-
-
+<app-footer></app-footer>

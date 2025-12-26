@@ -15,7 +15,6 @@ a {
 }
 
 /* --- SIDEBAR --- */
-
 /* SIDEBAR - 3D Floating Slab Effect */
 .sidebar {
     width: 25%;
@@ -79,12 +78,13 @@ a {
     display: block;
     width: 100%;
 
+
 }
 
 /* ACTIVE STATE - Looks "Pressed In" or "Carved" */
 .sidebar li.active {
     background: #f0f4f8;
-    color: var(--secondary-color);
+    color: var(--primary-color);
     font-weight: bold;
     border-left: none; /* Removed flat border */
 
@@ -103,10 +103,11 @@ a {
     top: 20%;
     height: 60%;
     width: 4px;
-    background: var(--secondary-color);
+    background: var(--primary-color);
     border-radius: 10px;
-    box-shadow: 0 0 10px var(--secondary-color);
+    box-shadow: 0 0 10px var(--primary-color);
 }
+
 
 /* --- CONTENT AREA --- */
 .content {
@@ -176,7 +177,7 @@ a {
 
 /* --- ANIMATIONS --- */
 @keyframes tableEntrance {
-  from { opacity: 0; transform: translateY(30px) rotateY(-10deg); }
+  from { opacity: 0; transform: translateY(30px) rotateY(-10deg); -webkit-transform: translateY(30px) rotateY(-10deg); -moz-transform: translateY(30px) rotateY(-10deg); -ms-transform: translateY(30px) rotateY(-10deg); -o-transform: translateY(30px) rotateY(-10deg); }
   to { opacity: 1; transform: translateY(0) rotateY(-2deg); }
 }
 
