@@ -1,7 +1,14 @@
 <app-header></app-header>
 
-<div class="page-container">
+<!-- 🚨 رسالة الحالة فوق كل حاجة -->
+<div *ngIf="statusMessage" class="status-overlay">
+  <div class="status-box" [ngClass]="statusType">
+    {{ statusMessage }}
+    <button class="close-btn" (click)="closeStatusMessage()">موافق</button>
+  </div>
+</div>
 
+<div class="page-container">
   <aside class="sidebar">
     <h5>
       مرحباً بك
@@ -18,7 +25,6 @@
   <div class="d-flex align-items-center big-container my-3 ">
     <form [formGroup]="memoContainerForm" (ngSubmit)="onSubmit()" dir="rtl" class="mt-5 mx-5">
       <div formArrayName="requests">
-
         <div *ngFor="let memoGroup of requests.controls; let $index = index" [formGroupName]="$index" class="paper mt-3">
 
           <div class="d-flex justify-content-center align-items-center">
@@ -31,40 +37,53 @@
             <p>تحية طيبة وبعد،،،</p>
             <p class="mt">الرجاء من سيادتكم بالموافقة على صرف عدد</p>
 
+            <!-- الفئة -->
             <div class="row">
               <div class="field">
                 <label>الفئة :</label>
-<select
-  formControlName="category"
-  class="table-input form-select placeholder-style"
-  (change)="updateFilteredItems(getCategoryValue($event), $index)">
-
-  <option value="" disabled selected hidden>اختر الفئة</option>
-
-  <option *ngFor="let category of categoriesFromStock" [value]="category">
-    {{ category }}
-  </option>
-</select>
-
+                <select
+                  formControlName="category"
+                  class="table-input form-select placeholder-style"
+                  (change)="updateFilteredItems(getCategoryValue($event), $index)">
+                  <option value="" disabled selected hidden>اختر الفئة</option>
+                  <option *ngFor="let category of categoriesFromStock" [value]="category">
+                    {{ category }}
+                  </option>
+                </select>
+                <div *ngIf="memoGroup.get('category')?.touched && memoGroup.get('category')?.hasError('required')" class="text-danger small mt-1">
+                  الرجاء اختيار الفئة
+                </div>
               </div>
             </div>
 
+            <!-- الأصناف -->
             <div *ngIf="memoGroup.get('category')?.value" formArrayName="itemLines" class="item-lines-container">
               <div *ngFor="let itemLine of getItemLines($index).controls; let i = index" [formGroupName]="i" class="row item-line">
+
+                <!-- اسم الصنف -->
                 <div class="field">
                   <label>الصنف {{ i + 1 }}:</label>
                   <select formControlName="itemName" class="table-input form-select">
                     <option value="" disabled hidden>اختر الصنف</option>
                     <option *ngFor="let item of getAvailableItems($index, i)" [value]="item">
-{{ item }}</option>
+                      {{ item }}
+                    </option>
                   </select>
+                  <div *ngIf="itemLine.get('itemName')?.touched && itemLine.get('itemName')?.hasError('required')" class="text-danger small mt-1">
+                    الرجاء اختيار الصنف
+                  </div>
                 </div>
 
+                <!-- الكمية -->
                 <div class="field count-input">
                   <label>العدد:</label>
                   <input type="number" formControlName="count" min="1" class="table-input">
+                  <div *ngIf="itemLine.get('count')?.hasError('exceedStock') && (itemLine.get('count')?.touched || itemLine.get('count')?.dirty)" class="text-danger small mt-1">
+                    الكمية المطلوبة غير متاحه فى المخزن
+                  </div>
                 </div>
 
+                <!-- زر الحذف -->
                 <div class="remove-btn-container" *ngIf="getItemLines($index).length > 1">
                   <button type="button" class="remove-item-btn d-flex mt-3" (click)="removeItemLine($index, i)">
                     ❌ <p>أحذف الصنف </p>
@@ -73,11 +92,7 @@
 
               </div>
 
-              <button
-                type="button"
-                class="add-item-btn"
-                (click)="addItemLine($index)"
-                [disabled]="!memoGroup.get('category')?.value">
+              <button type="button" class="add-item-btn" (click)="addItemLine($index)" [disabled]="!memoGroup.get('category')?.value">
                 + أضف صنف آخر
               </button>
             </div>
@@ -85,9 +100,9 @@
             <br>
             <p>وتفضلوا سيادتكم بقبول فائق التقدير و الاحترام،،،</p>
 
+            <!-- التواقيع والمعلومات الثابتة -->
             <div class="d-flex align-items-center">
               <div class="signatures">
-
                 <div class="ms-3">
                   <strong>توقيع الموظف</strong><br>
                   <input type="text" formControlName="employeeSignature" placeholder="أدخل الاسم الرباعي" />
@@ -99,13 +114,7 @@
 
                 <div class="ms-3">
                   <strong>الكلية</strong><br>
-                  <select
-                    formControlName="collegeName"
-                    class="form-select"
-                    (change)="onCollegeChange($any($event.target).value, $index)">
-                    <option value="" disabled>--- اختر الكلية ---</option>
-                    <option *ngFor="let college of collegeOptions" [value]="college">{{ college }}</option>
-                  </select>
+                  <input type="text" class="form-control" [value]="memoGroup.get('collegeName')?.value" disabled>
                 </div>
 
                 <div class="ms-3">
@@ -118,17 +127,15 @@
                   {{ memoGroup.get('collegeAdminName')?.value || '—' }}
                   <input type="hidden" formControlName="collegeAdminName">
                 </div>
-
               </div>
             </div>
 
           </div>
         </div>
-
       </div>
 
       <div class="button-section">
-        <button type="submit" [disabled]="isSubmitting() || memoContainerForm.invalid" class="submit-btn mt-5">
+        <button type="submit" [disabled]="isSubmitting()" class="submit-btn">
           {{ isSubmitting() ? 'جاري الارسال...' : 'ارسال الطلب' }}
         </button>
       </div>

@@ -701,3 +701,62 @@ input[type="text"] {
         justify-content: flex-end;
     }
 }
+/* الطبقة الشفافة للخلفية */
+.status-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center; /* أفقياً */
+  align-items: center;     /* عمودياً */
+  background-color: rgba(0,0,0,0.2); /* شفافية للخلفية */
+  z-index: 9999;
+}
+
+/* صندوق الرسالة */
+.status-box {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px 35px;
+  min-width: 300px;
+  text-align: center;
+  font-weight: 600;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+  animation: fadeInMsg 0.3s ease-in-out;
+}
+
+.status-box.success {
+  color: #0d6efd;
+  border: 2px solid #0d6efd;
+}
+
+.status-box.error {
+  color: #dc3545;
+  border: 2px solid #dc3545;
+}
+
+@keyframes fadeInMsg {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.status-box .close-btn {
+  margin-top: 15px;
+  padding: 6px 15px;
+  border: none;
+  background-color: var(--primary-color);
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.status-box .close-btn:hover {
+  background-color: var(--secondary-color);
+}
+.error {
+  color: red;
+  font-size: 13px;
+  margin-top: 2px;
+}
