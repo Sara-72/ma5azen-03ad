@@ -37,6 +37,7 @@ export class Ameen3Component implements OnInit {
   }
 
   /* ================= Helpers ================= */
+
   normalize(val: string) {
     return val?.trim().toLowerCase();
   }
@@ -60,6 +61,7 @@ export class Ameen3Component implements OnInit {
   }
 
   /* ================= تحميل الأذونات ================= */
+
   loadNewPermissions() {
     this.spendPermissionService.getAll().subscribe(res => {
       const newOnes = res.filter(p => p.permissionStatus === 'جديد');
@@ -77,7 +79,6 @@ export class Ameen3Component implements OnInit {
             requestorName: p.requestorName,
             documentNumber: p.documentNumber,
             managerSignature: p.managerSignature,
-            spendNote: p.spendNote,
             items: []
           };
         }
@@ -102,12 +103,12 @@ export class Ameen3Component implements OnInit {
   }
 
   /* ================= تنفيذ الصرف ================= */
+
   approvePermission(perm: any) {
     const issueDate = new Date().toISOString();
 
     this.stockService.getAllStocks().subscribe(stocks => {
 
-      /* 🔹 تجميع الكميات */
       const groupedItems = new Map<string, any>();
 
       perm.items.forEach((item: any) => {
@@ -115,10 +116,11 @@ export class Ameen3Component implements OnInit {
         if (!groupedItems.has(key)) {
           groupedItems.set(key, { ...item, totalQuantity: 0 });
         }
-        groupedItems.get(key).totalQuantity += item.requestedQuantity;
+
+        groupedItems.get(key).totalQuantity +=
+          (item.issuedQuantity ?? item.requestedQuantity);
       });
 
-      /* 🔹 خصم المخزن */
       const stockRequests = Array.from(groupedItems.values()).map(group => {
         const stock = stocks.find(s =>
           this.normalize(s.itemName) === this.normalize(group.itemName) &&
@@ -141,64 +143,107 @@ export class Ameen3Component implements OnInit {
 
       forkJoin(stockRequests).subscribe(() => {
 
-        /* 🔹 تحديث SpendPermissions (محاولة فقط) */
-        const permissionUpdates = perm.items.map((item: any) =>
-          this.spendPermissionService.update(item.permissionId, {
+        const permissionUpdates = perm.items.map((item: any) => {
+
+          const updatedPermission = {
             ...item.fullPermission,
-            permissionStatus: 'تم الصرف',
             issueDate: issueDate,
-            issuedQuantity: item.requestedQuantity
-          })
-        );
+            issuedQuantity: item.issuedQuantity ?? item.requestedQuantity,
+            permissionStatus: 'تم الصرف' 
+          };
+
+          return this.spendPermissionService.update(
+            item.permissionId,
+            updatedPermission
+          );
+        });
 
         forkJoin(permissionUpdates).subscribe(() => {
-          /* 🔹 تحديث SpendNotes بالطريقة المضمونة */
-          this.updateGroupedSpendNotes(perm);
+
+          this.updateSpendNotesLikeModeer(perm);
+
         });
 
       });
-
     });
   }
 
-  /* ================= تحديث SpendNotes (زي Modeer3) ================= */
-  updateGroupedSpendNotes(perm: any) {
-  const targetDate = new Date(perm.requestDate).toDateString();
+  /* ================= تحديث SpendNotes (نفس طريقة المدير) ================= */
+
+  updateSpendNotesLikeModeer(perm: any) {
 
   this.spendNoteService.getAll().subscribe(allNotes => {
 
-    const matchedNotes = allNotes.filter((n: any) =>
-      new Date(n.requestDate).toDateString() === targetDate &&
-      n.category === perm.category &&
-      perm.items.some((it: any) => it.fullPermission.spendNoteId === n.id)
-    );
+    const matchedNotes = allNotes.filter((n: any) => {
+
+      const noteDate = new Date(n.requestDate);
+      const permDate = new Date(perm.requestDate);
+
+      const sameRequestDay =
+        noteDate.getFullYear() === permDate.getFullYear() &&
+        noteDate.getMonth() === permDate.getMonth() &&
+        noteDate.getDate() === permDate.getDate();
+
+      const sameCategory =
+        (n.category || '').trim() === (perm.category || '').trim();
+
+      const sameUser =
+        (n.userSignature || '').trim() === (perm.requestorName || '').trim();
+
+      const sameCollege =
+        (n.college || '').trim() === (perm.destinationName || '').trim();
+
+      const sameItem =
+        perm.items.some((it: any) =>
+          (it.itemName || '').trim() === (n.itemName || '').trim()
+        );
+
+      return (
+        sameRequestDay &&
+        sameCategory &&
+        sameUser &&
+        sameCollege &&
+        sameItem
+      );
+    });
 
     if (matchedNotes.length === 0) {
-      console.warn('⚠️ لم يتم العثور على SpendNotes مطابقة');
+      console.warn(
+        'NO MATCHED NOTES (DATE + CATEGORY + USER + COLLEGE + ITEM)',
+        { perm, allNotes }
+      );
       this.finishUI(perm);
       return;
     }
 
     const updates = matchedNotes.map(note => {
 
-      // ✅ DTO نظيف – بدون spread
-      const cleanUpdate = {
-        id: note.id,
-        itemName: note.itemName,
-        quantity: note.quantity,
-        requestDate: note.requestDate,
-        userSignature: note.userSignature,
-        college: note.college,
-        category: note.category,
+      console.log('NOTE BEFORE UPDATE', note);
 
-        permissinStatus: 'تم الصرف',
-        confirmationStatus: 'تم الصرف',
-        collageKeeper: this.fullName,
+      const updatedNote = {
+  id: note.id,
+  itemName: note.itemName,
+  quantity: note.quantity,
+  requestDate: note.requestDate,
 
-        employeeId: note.employeeId
-      };
+  // ✅ دول لازم يكونوا موجودين
+  userSignature: note.userSignature,
+  college: note.college,
+  category: note.category,
 
-      return this.spendNoteService.updateSpendNoteStatus(note.id, cleanUpdate);
+  // ❗ مهم جدًا: لازم تبعتي employeeId
+  employeeId: note.employeeId,
+
+  // ✅ التحديث
+  permissinStatus: 'تم الصرف',
+  confirmationStatus: 'مؤكد',
+  collageKeeper: this.fullName
+};
+
+      return this.spendNoteService.updateSpendNoteStatus(
+        note.id,
+        updatedNote
+      );
     });
 
     forkJoin(updates).subscribe({
@@ -215,6 +260,7 @@ export class Ameen3Component implements OnInit {
 
 
   /* ================= UI ================= */
+
   finishUI(perm: any) {
     this.groupedPermissions = this.groupedPermissions.filter(p => p !== perm);
     this.confirmingPerm = null;
