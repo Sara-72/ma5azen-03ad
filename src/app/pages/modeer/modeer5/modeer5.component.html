@@ -1,0 +1,146 @@
+<app-header></app-header>
+
+
+
+<div class="page-container">
+  <aside class="sidebar">
+    <h5>
+  مرحبًا بك
+      <!-- <span *ngIf="displayName">، {{ displayName }}</span> -->
+    </h5>
+
+    <ul class="mt-5">
+      <li><a href="/modeer1">المخزن</a></li>
+      <li><a href="/modeer2">اذن الصرف</a></li>
+      <li><a href="/modeer3">مذكرات الصرف</a></li>
+      <li><a href="/modeer4">اذونات الصرف</a></li>
+      <li class="active"><a>الجرد</a></li>
+    </ul>
+  </aside>
+
+
+
+
+<div class="big-container m-5 flex-grow-1">
+    <div class="form-container" dir="rtl">
+
+      <header class="form-header">
+        <h2 class="title">كشف جرد المخزن</h2>
+        <h3 class="subtitle">مطابقة الرصيد الفعلي والدفتري</h3>
+      </header>
+
+
+
+      <div class="filter-bar mb-4 d-flex align-items-center gap-3">
+
+
+    <div class="d-flex align-items-center gap-2 border-end pe-3">
+    <label class="fw-bold">عرض:</label>
+    <select class="form-select shadow-sm" [(ngModel)]="viewMode" (change)="onViewModeChange()">
+      <option value="live">الحالة الحالية (اليوم)</option>
+      <option value="history">سجلات سابقة (الأرشيف)</option>
+    </select>
+  </div>
+
+  <div class="d-flex align-items-center gap-2 border-end pe-3" *ngIf="viewMode === 'history'">
+    <label class="fw-bold">اختر التاريخ:</label>
+    <input type="date" class="form-control shadow-sm" [(ngModel)]="selectedHistoryDate" (change)="loadHistoryData()">
+  </div>
+
+        <div class="d-flex align-items-center gap-2 flex-grow-1">
+          <label class="fw-bold">الفئة</label>
+          <select class="form-select w-60 shadow-sm"
+                  [(ngModel)]="selectedCategory"
+                  (change)="applyFilter()">
+            <option value="الكل">جميع الفئات (عرض الكل)</option>
+            <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+          </select>
+        </div>
+
+        <div class="stats-badge">
+          <span>إجمالي الأصناف: </span>
+          <span class="count">{{ filteredInventory.length }}</span>
+        </div>
+
+      </div>
+
+      <div class="info-section">
+        <div class="row">
+          <div class="field mb-2">
+            <label>التاريخ :</label>
+            <span>{{ today | date:'fullDate' }}</span>
+          </div>
+          <div class="field mb-2">
+            <label>القائم بالجرد :</label>
+            <span>{{ fullName }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-section">
+        <table>
+          <thead>
+            <tr>
+              <th>اسم الصنف</th>
+              <th>الكمية الكلية</th>
+              <th> الكمية المنصرفة</th>
+              <th>الكمية المتبقية (الفعلية)</th>
+              <th>العجز</th>
+              <th>الفئة</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of filteredInventory">
+              <td class="fw-bold">{{ item.itemName }}</td>
+              <td>{{ item.totalQuantity }}</td>
+              <td>{{ item.issuedQuantity }}</td>
+              <td>{{ item.remainingQuantity }}</td>
+              <td [ngClass]="{'text-danger fw-bold': getDeficit(item) > 0}">
+                {{ getDeficit(item) }}
+              </td>
+              <td><span class="category-pill">{{ item.category }}</span></td>
+            </tr>
+            <tr *ngIf="filteredInventory.length === 0">
+              <td colspan="6" class="text-center py-4 text-muted">
+                لا توجد أصناف تندرج تحت هذه الفئة
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <hr class="my-4">
+
+      <div class="d-flex justify-content-center">
+        <button type="button" class="btn px-5 py-2 fw-bold" (click)="confirmInventoryAudit()">
+           اعتماد وحفظ التقرير نهائياً
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="statusMessage" class="status-overlay">
+  <div class="status-box" [ngClass]="statusType">
+    <div class="mb-3" style="font-size: 4rem;">
+       {{ statusType === 'success' ? '✅' : '❌' }}
+    </div>
+
+    <h3 class="fw-bold mb-3" [style.color]="statusType === 'success' ? '#28a745' : '#dc3545'">
+       {{ statusType === 'success' ? 'تمت العملية' : 'تنبيه' }}
+    </h3>
+
+    <p class="fs-5 text-dark">
+      {{ statusMessage }}
+    </p>
+
+    <button class="close-btn" (click)="closeStatusMessage()">موافق</button>
+  </div>
+
+
+
+  </div>
+
+<app-footer>
+
+</app-footer>

@@ -125,16 +125,11 @@ a {
     padding: 30px;
     border-radius: 15px;
     position: relative;
-    transform: rotateY(-2deg) rotateX(1deg);
-
-    /* Soft Blue Glow & Depth */
-    box-shadow:
-        -15px 20px 40px rgba(0, 0, 0, 0.08),
-        0 0 30px rgba(0, 123, 255, 0.12),
-        0 5px 15px rgba(0, 0, 0, 0.05);
-
+    /*transform: rotateY(-2deg) rotateX(1deg);
+    *//*SoftBlueGlow&Depth*/box-shadow:        -15px 20px 40px rgba(0, 0, 0, 0.08),        0 0 30px rgba(0, 123, 255, 0.12),        0 5px 15px rgba(0, 0, 0, 0.05);
     transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
     animation: paperEntrance 0.8s ease-out backwards;
+    -webkit-animation: paperEntrance 0.8s ease-out backwards;
 }
 
 .table-container:hover {

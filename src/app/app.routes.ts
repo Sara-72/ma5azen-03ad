@@ -18,6 +18,7 @@ import { Modeer1Component } from './pages/modeer/modeer1/modeer1.component';
 import { Modeer2Component } from './pages/modeer/modeer2/modeer2.component';
 import { Modeer3Component } from './pages/modeer/modeer3/modeer3.component';
 import { Modeer4Component } from './pages/modeer/modeer4/modeer4.component';
+import { Modeer5Component } from './pages/modeer/modeer5/modeer5.component';
 import { Employee1Component } from './pages/employee/employee1/employee1.component';
 import { Employee2Component } from './pages/employee/employee2/employee2.component';
 import { Employee3Component } from './pages/employee/employee3/employee3.component';
@@ -50,6 +51,7 @@ export const routes: Routes = [
   { path: 'modeer2', component: Modeer2Component, title: 'modeer2'},
   { path: 'modeer3', component: Modeer3Component, title: 'modeer3'},
   { path: 'modeer4', component: Modeer4Component, title: 'modeer4'},
+  { path: 'modeer5', component: Modeer5Component, title: 'modeer5'},
   { path: 'employee1', component: Employee1Component, title: 'employee1'},
   { path: 'employee2', component: Employee2Component, title: 'employee2'},
   { path: 'employee3', component: Employee3Component, title: 'employee3'},
@@ -59,7 +61,7 @@ export const routes: Routes = [
   { path: 'employee_ma5azen4', component:EmployeeMa5azen4Component , title:'employee_ma5azen4'},
   { path: 'employee_ma5azen5', component:EmployeeMa5azen5Component , title:'employee_ma5azen5'},
   { path: 'elda3m' , component :Elda3mComponent , title:'elda3m'},
- 
+
 
 
 
