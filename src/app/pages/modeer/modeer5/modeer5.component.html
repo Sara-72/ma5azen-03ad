@@ -87,25 +87,36 @@
               <th>الكمية المتبقية (الفعلية)</th>
               <th>العجز</th>
               <th>الفئة</th>
+              <th>نوع الصنف</th>
             </tr>
           </thead>
-          <tbody>
-            <tr *ngFor="let item of filteredInventory">
-              <td class="fw-bold">{{ item.itemName }}</td>
-              <td>{{ item.totalQuantity }}</td>
-              <td>{{ item.issuedQuantity }}</td>
-              <td>{{ item.remainingQuantity }}</td>
-              <td [ngClass]="{'text-danger fw-bold': getDeficit(item) > 0}">
-                {{ getDeficit(item) }}
-              </td>
-              <td><span class="category-pill">{{ item.category }}</span></td>
-            </tr>
-            <tr *ngIf="filteredInventory.length === 0">
-              <td colspan="6" class="text-center py-4 text-muted">
-                لا توجد أصناف تندرج تحت هذه الفئة
-              </td>
-            </tr>
-          </tbody>
+         <tbody>
+  <tr *ngFor="let item of filteredInventory">
+    <td class="fw-bold">{{ item.itemName }}</td>
+    <td>{{ item.totalQuantity }}</td>
+    <td>{{ item.issuedQuantity }}</td>
+    <td>{{ item.remainingQuantity }}</td>
+    <td [ngClass]="{'text-danger fw-bold': getDeficit(item) > 0}">
+      {{ getDeficit(item) }}
+    </td>
+    <td><span class="category-pill">{{ item.category }}</span></td>
+
+    <td>
+      <span [ngClass]="{
+        'badge-permanent': item.itemType === 'مستديم',
+        'badge-consumable': item.itemType === 'مستهلك'
+      }">
+        {{ item.itemType }}
+      </span>
+    </td>
+  </tr>
+
+  <tr *ngIf="filteredInventory.length === 0">
+    <td colspan="7" class="text-center py-4 text-muted">
+      لا توجد أصناف تندرج تحت هذه الفئة
+    </td>
+  </tr>
+</tbody>
         </table>
       </div>
 

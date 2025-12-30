@@ -347,3 +347,25 @@ input[type="date"] {
 .btn:active {
     transform: scale(0.95); /* Click feel */
 }
+
+
+/* Color coding for Item Type */
+.badge-permanent {
+    background-color: #e3f2fd;
+    color: var(--primary-color);
+    padding: 5px 12px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    border: 1px solid #bbdefb;
+    font-weight: bold;
+}
+
+.badge-consumable {
+    background-color: #e3f2fd;
+    color: var(--secondary-color);
+    padding: 5px 12px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    border: 1px solid #bbdefb;
+    font-weight: bold;
+}

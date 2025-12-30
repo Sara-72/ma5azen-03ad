@@ -5,6 +5,18 @@ import { CommonModule } from '@angular/common'; // 1. Import this
 import { FormsModule } from '@angular/forms';
 import { StoreKeeperStockService } from '../../../services/store-keeper-stock.service';
 
+
+
+
+// 1. Define the structure of your item
+export interface InventoryItem {
+  itemName: string;
+  totalQuantity: number;
+  issuedQuantity: number;
+  remainingQuantity: number;
+  category: string;
+  itemType: string; // <--- Make sure this is here!
+}
 @Component({
   selector: 'app-modeer5',
   standalone: true,
@@ -15,7 +27,11 @@ import { StoreKeeperStockService } from '../../../services/store-keeper-stock.se
   templateUrl: './modeer5.component.html',
   styleUrl: './modeer5.component.css'
 })
+
+
+
 export class Modeer5Component implements OnInit {
+
 fullName: string = '';
   displayName: string = '';
   today: Date = new Date();
@@ -38,23 +54,26 @@ fullName: string = '';
     this.loadInventory();
   }
 
-  loadInventory(): void {
-    this.stockService.getAllStocks().subscribe({
-      next: (data) => {
-        this.inventoryData = data.map(item => ({
-          itemName: item.itemName,
-          totalQuantity: item.initialQuantity || item.quantity,
-          issuedQuantity: (item.initialQuantity || item.quantity) - item.quantity,
-          remainingQuantity: item.quantity,
-          // Use the functional category from your DB (e.g., item.category)
-          category: item.category || 'غير مصنف'
-        }));
+loadInventory(): void {
+  this.stockService.getAllStocks().subscribe({
+    next: (data) => {
+      this.inventoryData = data.map(item => ({
+        itemName: item.itemName,
+        totalQuantity: item.initialQuantity || item.quantity,
+        issuedQuantity: (item.initialQuantity || item.quantity) - item.quantity,
+        remainingQuantity: item.quantity,
+        category: item.category || 'غير مصنف', // e.g., أدوات مكتبية
+        itemType: item.storeType || 'مستهلك'   // e.g., مستديم أو مستهلك
+      }));
 
         // Dynamically extract unique categories for the dropdown
         this.categories = [...new Set(this.inventoryData.map(item => item.category))];
 
         this.filteredInventory = [...this.inventoryData];
       },
+
+
+
       error: (err) => this.showStatus('❌ فشل في تحميل بيانات المخزن', 'error')
     });
   }
@@ -79,7 +98,7 @@ historyRecords: any[] = []; // This would normally come from your database
 onViewModeChange(): void {
   if (this.viewMode === 'live') {
     this.loadInventory(); // Reload current data
-  
+
   } else {
     // Logic to fetch history based on selectedHistoryDate
     this.loadHistoryData();
