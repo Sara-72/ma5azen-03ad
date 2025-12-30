@@ -16,6 +16,10 @@
   </aside>
 
   <main class="content"> <div class="table-container"> <div class="filter-section mb-4">
+
+      <h2 class="mb-4 fw-bold text-center" style="color: var(--primary-color);">
+        عرض المخزن
+      </h2>
         <label for="categorySelect" class="form-label">اختر الفئة:</label>
         <select id="categorySelect" class="form-select custom-select" [(ngModel)]="selectedCategory" (change)="filterByCategory()">
           <option value="">الكل</option>

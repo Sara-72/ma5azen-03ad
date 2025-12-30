@@ -274,7 +274,7 @@ finishUI(perm: any) {
   this.groupedPermissions = this.groupedPermissions.filter(p => p !== perm);
   this.confirmingPerm = null;
 
-  this.statusMessage = '✅ تم الصرف وتحديث المخزون بنجاح';
+  this.statusMessage = '✅ تم الصرف وتحديث المخزن بنجاح';
   this.statusType = 'success';
 }
 

@@ -359,7 +359,7 @@ removeRowFromForm(form: FormGroup) {
       return Promise.all(updateRequests);
     })
     .then(() => {
-  this.statusMessage = 'تم الحفظ وتأكيد المذكرات بنجاح ✅';
+  this.statusMessage = 'تم الحفظ وتأكيد الاذن بنجاح ✅';
   this.statusType = 'success';
 
   // إزالة الفورم الحالي من الصفحة
