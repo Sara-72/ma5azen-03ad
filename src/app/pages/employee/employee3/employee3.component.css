@@ -335,3 +335,25 @@ input[type="text"] {
   background-color: #6c757d; /* قيد المراجعة */
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
+
+
+
+/* SIGNATURE SECTION */
+.signature-section {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.signature-section div {
+    flex: 1;
+    min-width: 120px;
+    text-align: center;
+    font-size: 0.85em;
+    font-weight: bold;
+    color: #333;
+}
