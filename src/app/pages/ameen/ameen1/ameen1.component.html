@@ -50,6 +50,7 @@
               <th>حالة الصنف</th>
               <th>الوحدة</th>
               <th>العدد</th>
+              <th>تاريخ اليوم</th>
             </tr>
           </thead>
           <tbody formArrayName="tableData">
@@ -81,6 +82,10 @@
               </td>
               <td><input formControlName="unit" class="form-control" /></td>
               <td><input type="number" formControlName="count" class="form-control" /></td>
+
+              <td>
+        <input type="date" formControlName="entryDate" class="form-control bg-light" readonly />
+      </td>
             </tr>
             }
           </tbody>

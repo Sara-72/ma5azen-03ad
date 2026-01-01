@@ -125,20 +125,23 @@ export class Ameen1Component implements OnInit ,OnDestroy{
     return this.simpleForm.get('tableData') as FormArray;
   }
 
+
+  // 1. Add this helper to get the date string
+private getTodayDate(): string {
+  return new Date().toISOString().split('T')[0];
+}
+
+
   // Helper function to create the form group for a single table row (4 columns)
   private createTableRowFormGroup(): FormGroup {
     return this.fb.group({
       item: [null,Validators.required],
       category: ['',Validators.required],
 
-    //   dateGroup: this.fb.group({
-    //     yy: ['', Validators.required],
-    //     mm: ['', Validators.required],
-    //     dd: ['', Validators.required]
-    // }),
       count: ['', Validators.required],
       itemType: ['', Validators.required], // نوع الصنف
-      unit:['',Validators.required]
+      unit:['',Validators.required],
+      entryDate: [{ value: this.getTodayDate(), disabled: true }, Validators.required]
     });
   }
 
@@ -225,8 +228,7 @@ onSubmit(): void {
 
   this.isSubmitting.set(true);
 
-  const rows = this.simpleForm.value.tableData;
-  let completed = 0;
+const rows = this.simpleForm.getRawValue().tableData;  let completed = 0;
   const total = rows.length;
 
   rows.forEach((row: any) => {

@@ -228,6 +228,16 @@ tbody tr:hover {
   font-size: 1rem;
 }
 
+/* Add to existing CSS */
+input[type="date"] {
+    max-width: 160px; /* Prevents dates from stretching too far */
+    font-size: 0.9rem;
+}
+
+.filter-bar label {
+    white-space: nowrap; /* Keeps 'From' and 'To' labels on one line */
+}
+
 .form-select {
     border: 1px solid #ced4da;
     font-family: inherit;

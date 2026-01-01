@@ -30,6 +30,8 @@
                 <th>حالة الصنف</th>
                 <th>الوحدة</th>
                 <th>العدد</th>
+                <th>تاريخ اليوم</th>
+
               </tr>
             </thead>
 
@@ -62,6 +64,14 @@
                 </td>
                 <td><input type="text" formControlName="unit" class="form-control text-center"></td>
                 <td><input type="number" min="0" formControlName="count" class="form-control text-center" /></td>
+
+    <td>
+  <input
+    type="date"
+    formControlName="entryDate"
+    class="form-control text-center bg-light"
+    readonly>
+</td>
               </tr>
               }
             </tbody>

@@ -163,6 +163,14 @@ td {
   transition: 0.2s;
 }
 
+/* Styling for the read-only date field */
+input[formControlName="entryDate"]:disabled {
+  background-color: #f1f3f5 !important;
+  cursor: not-allowed;
+  color: #6c757d;
+  border: 1px solid #ced4da;
+}
+
 .form-control:focus {
   background-color: #fff;
   border-color: var(--secondary-color);

@@ -116,20 +116,23 @@ ngOnInit(): void {
     return this.simpleForm.get('tableData') as FormArray;
   }
 
+
+  // Add this helper method to get today's date in YYYY-MM-DD format
+private getTodayDate(): string {
+  return new Date().toISOString().split('T')[0];
+}
+
   // Helper function to create the form group for a single table row (4 columns)
   private createTableRowFormGroup(): FormGroup {
     return this.fb.group({
       item: [null,Validators.required],
       category: ['',Validators.required],
 
-    //   dateGroup: this.fb.group({
-    //     yy: ['', Validators.required],
-    //     mm: ['', Validators.required],
-    //     dd: ['', Validators.required]
-    // }),
+
       count: ['', Validators.required],
       itemType: ['', Validators.required], // نوع الصنف
-      unit:[ '',Validators.required]
+      unit:[ '',Validators.required],
+entryDate: [{ value: this.getTodayDate(), disabled: true }, Validators.required]
     });
   }
 
@@ -197,7 +200,7 @@ onSubmit(): void {
       }
 
       this.isSubmitting.set(true);
-      const formData = this.simpleForm.value;
+      const formData = this.simpleForm.getRawValue();
       console.log('Sending Form Data:', formData);
 
       setTimeout(() => {

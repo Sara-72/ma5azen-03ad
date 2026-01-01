@@ -39,6 +39,9 @@ fullName: string = '';
   inventoryData: any[] = [];
   filteredInventory: any[] = [];
 
+  startDate: string = '';
+endDate: string = '';
+
   // Filter variables
   categories: string[] = []; // Will hold ['أدوات مكتبية', 'إلكترونيات', etc.]
   selectedCategory: string = 'الكل';
@@ -106,7 +109,12 @@ onViewModeChange(): void {
 }
 
 loadHistoryData(): void {
-  // Mock data for now since you don't have the history service
+if (!this.startDate || !this.endDate) {
+    // Optionally show a message asking to pick both dates
+    return;
+  }
+
+  console.log(`Searching records from ${this.startDate} to ${this.endDate}`);
 
 }
 

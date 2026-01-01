@@ -134,6 +134,7 @@ a {
   transform: rotateY(-2deg);
   transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
   animation: paperFadeUp 0.7s ease-out;
+  -webkit-animation: paperFadeUp 0.7s ease-out;
 }
 
 .table-section:hover {
@@ -147,6 +148,14 @@ a {
   border-bottom: 2px double #eee;
   padding-bottom: 15px;
   margin-bottom: 30px;
+}
+/* Styling for the read-only date field */
+input[formControlName="entryDate"]:disabled {
+  background-color: #e9ecef; /* Light grey background */
+  cursor: not-allowed;       /* Change cursor to indicate no-entry */
+  border: 1px solid #dee2e6;
+  color: #495057;
+  font-weight: bold;
 }
 
 /* --- TABLE & INPUTS --- */
