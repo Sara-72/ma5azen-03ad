@@ -48,7 +48,7 @@ export const routes: Routes = [
   { path: 'ameen3', component: Ameen3Component, title: 'ameen3'},
   { path: 'ameen4', component: Ameen4Component, title: 'ameen4'},
   { path: 'ameen5', component: Ameen5Component, title: 'ameen5'},
-  { path: 'ameen6', component: Ameen5Component, title: 'ameen6'},
+  { path: 'ameen6', component: Ameen6Component, title: 'ameen6'},
   { path: 'modeer1', component: Modeer1Component, title: 'modeer1'},
   { path: 'modeer2', component: Modeer2Component, title: 'modeer2'},
   { path: 'modeer3', component: Modeer3Component, title: 'modeer3'},
