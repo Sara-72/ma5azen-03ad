@@ -1,0 +1,248 @@
+.page-container {
+    background: radial-gradient(circle at top right, #f8f9fa, #e9ecef);
+    min-height: 100vh;
+}
+
+/* 3D Search Box */
+.search-container {
+    max-width: 600px;
+    border-radius: 20px;
+    background: white;
+    padding: 5px;
+    border: 1px solid #ddd;
+    transition: transform 0.3s ease;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    -ms-border-radius: 20px;
+    -o-border-radius: 20px;
+}
+.search-container:focus-within { transform: translateY(-5px); }
+
+/* The 3D Card */
+.table-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.05);
+    background: linear-gradient(145deg, #ffffff, #f0f0f0);
+}
+
+
+
+/* Custom Table Design */
+.custom-table { margin-bottom: 0; }
+
+.custom-table tbody tr {
+    transition: all 0.3s ease;
+    border-bottom: 1px solid #eee;
+    background-color: none;
+
+    vertical-align: middle;
+}
+
+
+/* Glassmorphism Header */
+.custom-table thead th {
+    background: var(--primary-color);
+    backdrop-filter: blur(5px);
+    color: white;
+    padding: 20px;
+    border: none;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* Floating Row Effect */
+.row-animate {
+    background: white;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.row-animate:hover {
+    transform: scale(1.02) translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    background: #fff;
+    z-index: 100;
+    position: relative;
+    border-radius: 10px;
+}
+
+/* Modal 3D appearance */
+.modal-card {
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+
+/* Input styling to match the 3D theme */
+.form-control, .form-select {
+    border: 2px solid #f0f0f0;
+    border-radius: 12px;
+    padding: 12px 30px;
+    transition: all 0.3s;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 15px rgba(0, 77, 153, 0.1);
+    transform: translateX(-5px);
+}
+
+.custom-table tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.04)  !important;
+    transform: scale(1.01) translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    z-index: 10;
+}
+
+/* Role Pills */
+.role-pill {
+    padding: 6px 15px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.bg-emp,.bg-store-emp ,.bg-keeper ,.bg-manager  { background: #e0f2fe; color: var(--secondary-color); }
+/* .bg-store-emp { background: #fef9c3; color: #854d0e; }
+.bg-keeper { background: #dcfce7; color: #166534; }
+.bg-manager { background: #fce7f3; color: #9d174d; } */
+
+/* 3D Buttons */
+.btn-3d {
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 3px 3px 6px #c5c5c5, -3px -3px 6px #ffffff;
+}
+.btn-3d:active { box-shadow: inset 2px 2px 5px #b1b1b1, inset -2px -2px 5px #ffffff; }
+
+.edit { color: #f59e0b; background: #fffbeb; }
+.delete { color: #ef4444; background: #fef2f2; }
+
+/* Animations */
+.row-animate {
+    opacity: 0;
+    animation: slideUp 0.5s ease-out forwards;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Modal Styling */
+.status-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.status-box {
+    background: white;
+    padding: 40px;
+    border-radius: 25px;
+    text-align: center;
+    width: 90%;
+    max-width: 450px;
+}
+
+.modal-close-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 12px 40px;
+    border-radius: 12px;
+    font-weight: bold;
+    margin-top: 20px;
+    transition: 0.3s;
+    -webkit-transition: 0.3s;
+    -moz-transition: 0.3s;
+    -ms-transition: 0.3s;
+    -o-transition: 0.3s;
+}
+
+.modal-close-btn:hover{
+  background-color: var(--secondary-color);
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.modal-card {
+    background: white;
+    padding: 30px;
+    border-radius: 25px;
+    width: 90%;
+    max-width: 450px;
+    animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.edit-card { border-top: 8px solid var(--primary-color); }
+.delete-card { border-top: 8px solid #dc3545; }
+
+.warning-icon {
+    font-size: 3rem;
+    animation: shake 0.5s infinite ease-in-out;
+}
+
+@keyframes modalPop {
+    from { transform: scale(0.8) translateY(20px); opacity: 0; }
+    to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+@keyframes shake {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(5deg); }
+    75% { transform: rotate(-5deg); }
+}
+
+.shadow-3d {
+    box-shadow: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff !important;
+}
+
+.btn-3d {
+    transition: transform 0.2s;
+    cursor: pointer;
+
+}
+
+.add-btn{
+  background-color: var(--primary-color);
+  color:white;
+  transition: 0.3s;
+  -webkit-transition: 0.3s;
+  -moz-transition: 0.3s;
+  -ms-transition: 0.3s;
+  -o-transition: 0.3s;
+}
+
+
+.add-btn:hover{
+  background-color: var(--secondary-color);
+  color:white;
+}
+
+.btn-3d:hover {
+    transform: translateY(-3px) scale(1.1);
+}

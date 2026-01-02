@@ -171,6 +171,10 @@ a {
 .custom-3d-table tbody tr:hover {
     background-color: rgba(0, 123, 255, 0.04);
     transform: scale(1.01) translateZ(5px);
+    -webkit-transform: scale(1.01) translateZ(5px);
+    -moz-transform: scale(1.01) translateZ(5px);
+    -ms-transform: scale(1.01) translateZ(5px);
+    -o-transform: scale(1.01) translateZ(5px);
 }
 
 /* --- ANIMATIONS --- */

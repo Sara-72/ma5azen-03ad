@@ -1,5 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { forkJoin, map, Observable } from 'rxjs'; // 👈 Import these
 
 @Injectable({
   providedIn: 'root'
@@ -65,5 +66,37 @@ export class AuthService {
      }
     return this.http.get(url); // يفترض السيرفر يرجع [] لو مش موجود أو object لو موجود
   }
+
+
+  // ===== FETCH ALL ACCOUNTS =====
+  getAllAccounts(): Observable<any[]> {
+    return forkJoin({
+      users: this.http.get<any[]>(`${this.api}/Users`),
+      employees: this.http.get<any[]>(`${this.api}/Employees`),
+      keepers: this.http.get<any[]>(`${this.api}/StoreKeepers`),
+      managers: this.http.get<any[]>(`${this.api}/InventoryManagers`)
+    }).pipe(
+      map(res => {
+        // We add the 'role' manually so the admin knows which table the user belongs to
+        const u = res.users.map(x => ({ ...x, role: 'موظف', endpoint: 'Users' }));
+        const e = res.employees.map(x => ({ ...x, role: 'موظف مخزن', endpoint: 'Employees' }));
+        const k = res.keepers.map(x => ({ ...x, role: 'أمين مخزن', endpoint: 'StoreKeepers' }));
+        const m = res.managers.map(x => ({ ...x, role: 'مدير مخزن', endpoint: 'InventoryManagers' }));
+        return [...u, ...e, ...k, ...m];
+      })
+    );
+  }
+
+  // ===== DELETE ACCOUNT =====
+  deleteAccount(id: number, endpoint: string) {
+    return this.http.delete(`${this.api}/${endpoint}/${id}`);
+  }
+
+  // ===== UPDATE ACCOUNT (Example: Update Password/Name) =====
+  updateAccount(id: number, endpoint: string, data: any) {
+    return this.http.put(`${this.api}/${endpoint}/${id}`, data);
+  }
+
+
 
 }

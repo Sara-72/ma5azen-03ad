@@ -1,0 +1,129 @@
+<app-header></app-header>
+
+<div class="page-container" dir="rtl">
+  <div class="container py-5">
+
+    <div class="admin-header mb-5 text-center">
+      <h2 class="title fw-bold" style="color:var(--primary-color)">إدارة منظومة الحسابات</h2>
+      <div class="underline mx-auto"></div>
+
+      <div class="search-container mt-4 mx-auto">
+        <div class="input-group">
+          <span class="input-group-text bg-white border-0"><i class="fas fa-search" style="color:var(--primary-color)" ></i></span>
+          <input type="text" class="form-control border-0 shadow-none" placeholder="ابحث بالاسم أو البريد الإلكتروني..." [(ngModel)]="searchTerm">
+        </div>
+      </div>
+    </div>
+
+    <div class="table-card shadow-3d mb-5 m-2">
+      <div class="table-responsive">
+        <table class="table custom-table text-center">
+          <thead>
+            <tr>
+              <th>الاسم رباعي</th>
+              <th>البريد الإلكتروني</th>
+              <th>الصلاحية</th>
+              <th>الجهة</th>
+              <th class="text-center">الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of filteredAccounts(); let i = index"
+                [style.animation-delay]="(i * 0.05) + 's'"
+                class="row-animate">
+              <td class="fw-bold">{{ user.name }}</td>
+              <td class="text-muted">{{ user.email }}</td>
+              <td><span [ngClass]="getRoleClass(user.role)" class="role-pill shadow-sm">{{ user.role }}</span></td>
+              <td>{{ user.faculty || 'إدارة مركزية' }}</td>
+              <td>
+                <div class="d-flex justify-content-center gap-3">
+                  <button (click)="openEditModal(user)" class="btn-3d edit"><i class="fas fa-edit"></i></button>
+                  <button (click)="openDeleteModal(user)" class="btn-3d delete"><i class="fas fa-trash"></i></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="text-center">
+      <button routerLink="/admin" class="add-btn btn btn-lg px-5 shadow-3d pulse-btn">
+        إضافة حساب جديد <i class="fas fa-plus-circle ms-2"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showEditModal">
+  <div class="modal-card edit-card shadow-3d">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h4 class="fw-bold mb-0" style="color: var(--primary-color);">تعديل بيانات الحساب</h4>
+      <button class="btn-close" (click)="showEditModal = false"></button>
+    </div>
+
+    <div class="modal-body text-end">
+      <div class="mb-3">
+        <label class="form-label fw-bold">الاسم رباعي</label>
+        <input type="text" class="form-control shadow-sm" [(ngModel)]="selectedUser.name">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-bold">البريد الإلكتروني</label>
+        <input type="email" class="form-control shadow-sm" [(ngModel)]="selectedUser.email">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-bold">كلمة السر</label>
+        <input type="text" class="form-control shadow-sm" [(ngModel)]="selectedUser.password">
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label fw-bold">الصلاحية (الوظيفة)</label>
+        <select class="form-select shadow-sm" [(ngModel)]="selectedUser.role">
+          <option value="موظف">موظف</option>
+          <option value="موظف مخزن">موظف مخزن</option>
+          <option value="أمين مخزن">أمين مخزن</option>
+          <option value="مدير مخزن">مدير مخزن</option>
+        </select>
+        <small class="text-danger" *ngIf="selectedUser.role !== originalRole">
+          * ملاحظة: تغيير الرتبة سيؤدي لنقل الحساب لقسم آخر.
+        </small>
+      </div>
+    </div>
+
+    <div class="d-flex gap-2">
+      <button class="btn btn-success flex-grow-1 shadow-sm" (click)="confirmEdit()">
+        <i class="fas fa-check-circle me-1"></i> حفظ التعديلات
+      </button>
+      <button class="btn btn-light flex-grow-1 border shadow-sm" (click)="showEditModal = false">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showDeleteModal">
+  <div class="modal-card delete-card shadow-3d text-center">
+    <div class="warning-icon mb-3">⚠️</div>
+    <h4 class="fw-bold">تأكيد الحذف</h4>
+    <p>هل أنت متأكد من حذف حساب <b>{{ selectedUser.name }}</b>؟ لا يمكن التراجع عن هذا الإجراء.</p>
+    <div class="d-flex gap-2 mt-4">
+      <button class="btn btn-danger flex-grow-1" (click)="confirmDelete()">تأكيد الحذف</button>
+      <button class="btn btn-light flex-grow-1" (click)="showDeleteModal = false">تراجع</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="statusMessage">
+  <div class="status-box shadow-3d" [ngClass]="statusType">
+    <div class="icon-circle mb-3">{{ statusType === 'success' ? '✅' : '❌' }}</div>
+    <h3 class="fw-bold mb-3">{{ statusType === 'success' ? 'تمت العملية' : 'تنبيه' }}</h3>
+    <p class="fs-5 text-dark">{{ statusMessage }}</p>
+    <button class="modal-close-btn w-100" (click)="closeStatusMessage()">موافق</button>
+  </div>
+</div>
+
+
+
+<app-footer>
+
+</app-footer>

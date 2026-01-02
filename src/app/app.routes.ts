@@ -9,6 +9,7 @@ import { Login5PageComponent } from './pages/login5-page/login5-page.component';
 import { FeaturesComponent } from './pages/features/features.component';
 import { AboutComponent } from './pages/about/about.component';
 import { AdminComponent } from './pages/admin/admin.component';
+import { Admin2Component } from './pages/admin2/admin2.component';
 import { Ameen1Component } from './pages/ameen/ameen1/ameen1.component';
 import { Ameen2Component } from './pages/ameen/ameen2/ameen2.component';
 import { Ameen3Component } from './pages/ameen/ameen3/ameen3.component';
@@ -43,6 +44,7 @@ export const routes: Routes = [
   { path: 'features', component: FeaturesComponent, title: 'features'},
   { path: 'about', component: AboutComponent, title: 'about'},
   { path: 'admin', component: AdminComponent, title: 'admin'},
+  { path: 'admin2', component: Admin2Component, title: 'admin2'},
   { path: 'ameen1', component: Ameen1Component, title: 'ameen1'},
   { path: 'ameen2', component: Ameen2Component, title: 'ameen2'},
   { path: 'ameen3', component: Ameen3Component, title: 'ameen3'},

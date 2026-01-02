@@ -11,6 +11,7 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
+import { RouterModule } from '@angular/router';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { HeaderComponent } from '../../components/header/header.component';
 import { AuthService } from '../../services/auth.service';
@@ -57,6 +58,7 @@ export function fourStringsValidator(): ValidatorFn {
     HeaderComponent,
     FooterComponent ,CommonModule,
     ReactiveFormsModule,
+    RouterModule
 
   ],
   templateUrl: './admin.component.html',
