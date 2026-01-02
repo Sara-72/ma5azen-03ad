@@ -12,25 +12,37 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   // ===== LOGIN =====
-  adminLogin(data: any) {
-    return this.http.post(`${this.api}/Auth/admin/login`, data);
-  }
+adminLogin(data: any) {
+  return this.http.post(`${this.api}/Auth/admin/login`, data, {
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
 
-  employeeLogin(data: any) {
-    return this.http.post(`${this.api}/Auth/employee/login`, data);
-  }
+employeeLogin(data: any) {
+  return this.http.post(`${this.api}/Auth/employee/login`, data, {
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
 
-  storeKeeperLogin(data: any) {
-    return this.http.post(`${this.api}/Auth/store-keeper/login`, data);
-  }
+storeKeeperLogin(data: any) {
+  return this.http.post(`${this.api}/Auth/store-keeper/login`, data, {
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
 
-  inventoryManagerLogin(data: any) {
-    return this.http.post(`${this.api}/Auth/inventory-manager/login`, data);
-  }
+inventoryManagerLogin(data: any) {
+  return this.http.post(`${this.api}/Auth/inventory-manager/login`, data, {
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
 
-  userLogin(data: any) {
-    return this.http.post(`${this.api}/Auth/user/login`, data);
-  }
+
+ userLogin(data: any) {
+  return this.http.post(`${this.api}/Auth/user/login`, data, {
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
 
   // ===== ADMIN CREATE =====
   addUser(data: any) {
@@ -66,6 +78,25 @@ export class AuthService {
      }
     return this.http.get(url); // يفترض السيرفر يرجع [] لو مش موجود أو object لو موجود
   }
+  loginByRole(role: string, data: { email: string; password: string }) {
+  switch (role) {
+    case 'ADMIN':
+      return this.adminLogin(data);
+
+    case 'EMPLOYEE':
+      return this.employeeLogin(data);
+
+    case 'STORE_KEEPER':
+      return this.storeKeeperLogin(data);
+
+    case 'INVENTORY_MANAGER':
+      return this.inventoryManagerLogin(data);
+
+    default:
+      return this.userLogin(data);
+  }
+}
+
 
 
   // ===== FETCH ALL ACCOUNTS =====

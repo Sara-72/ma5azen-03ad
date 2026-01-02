@@ -1,57 +1,43 @@
-<app-header>
-
-</app-header>
-
+<app-header></app-header>
 
 <div class="container d-flex justify-content-center align-items-center vh-100">
-    <div class="card shadow-lg p-4 auth-card" dir="rtl">
-        <form [formGroup]="adminForm" (ngSubmit)="submit()"  class="auth-form">
+  <div class="card shadow-lg p-4 auth-card" dir="rtl">
+    <form [formGroup]="adminForm" (ngSubmit)="submit()" class="auth-form">
 
-
-
-
-          <div class="mb-4">
-                <label for="name" class="form-label d-block text-end">أضف الاسم رباعي</label>
-                <div class="input-group">
-                    <input type="text"
-                            id="name"
-                            formControlName="name"
-                            name="name"
-                            class="form-control text-end"
-                            placeholder="أدخل الاسم رباعي"
-                            required>
-                    <span class="input-group-text">
-                        <i class="fas fa-user"></i>
-                    </span>
-                </div>
-
-
-        @if (adminForm.get('name')?.invalid && adminForm.get('name')?.touched) {
-        <div class="text-danger mt-1 text-end small">
-            @if (adminForm.get('name')?.hasError('required')) {
-              من فضلك أدخل الاسم.
-            }
-            @if (adminForm.get('name')?.hasError('fourStrings')) {
-                يجب إدخال الاسم رباعي (أربع كلمات بالضبط).
-            }
+      <!-- الاسم الرباعي -->
+      <div class="mb-4">
+        <label for="name" class="form-label d-block text-end">أضف الاسم رباعي</label>
+        <div class="input-group">
+          <input type="text" id="name" formControlName="name" class="form-control text-end" placeholder="أدخل الاسم رباعي">
+          <span class="input-group-text"><i class="fas fa-user"></i></span>
         </div>
-    }
-            </div>
+        <div *ngIf="adminForm.get('name')?.touched && adminForm.get('name')?.invalid" class="text-danger mt-1 text-end small">
+          <span *ngIf="adminForm.get('name')?.errors?.['required']">من فضلك أدخل الاسم.</span>
+          <span *ngIf="adminForm.get('name')?.errors?.['fourStrings']">يجب إدخال الاسم رباعي (أربع كلمات بالضبط).</span>
+        </div>
+      </div>
 
-            <div class="mb-4">
-                <label for="email" class="form-label d-block text-end">أضف الحساب الإلكتروني</label>
-                <div class="input-group">
-                    <input type="email" id="email" formControlName="email" name="email" class="form-control text-end"
-                        placeholder="أدخل الحساب الالكتروني" required>
-                    <span class="input-group-text">
-                        <i class="fas fa-envelope"></i>
-                    </span>
-                </div>
+      <!-- الإيميل -->
+      <!-- حقل الحساب -->
+<div class="mb-4">
+  <label for="email" class="form-label d-block text-end">أضف الحساب الإلكتروني</label>
+  <div class="input-group">
+    <input
+      type="text"
+      id="email"
+      formControlName="email"
+      class="form-control text-end"
+      placeholder="أدخل اسم الحساب"
+      (blur)="completeEmail()"
+    >
+    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+  </div>
+</div>
 
 
 
 
-            </div>
+
 
             <div class="mb-4">
                 <label for="password" class="form-label d-block text-end">أضف كلمة السر</label>
@@ -63,42 +49,44 @@
                     </span>
                 </div>
             </div>
-
-            <div class="mb-3">
-                <div class="d-flex justify-content-end flex-wrap gap-3 role-selection">
-                    <div class="form-check form-check-inline m-auto"
-                        *ngFor="let role of ['موظف','موظف مخزن', 'أمين مخزن', 'مدير مخزن']">
-                        <input class="form-check-input mx-2" type="radio" name="role" [value]="role"
-    [id]="role" formControlName="role">
-                        <label class="form-check-label"  [for]="role">{{ role }}</label>
-                    </div>
-                </div>
-            </div>
-
-            <hr>
-
-            <div class="mb-4" *ngIf="showCollegeSelection">
-  <div class="d-flex justify-content-end flex-wrap gap-3 college-selection">
-
-    <div class="form-check form-check-inline m-auto"
-         *ngFor="let college of colleges">
-
-      <input
-        class="form-check-input mx-2"
-        type="radio"
-        name="college"
-        formControlName="college"
-        [value]="college.value"
-        [id]="college.value">
-
-      <label class="form-check-label" [for]="college.value">
-        {{ college.label }}
-      </label>
-
-    </div>
-
-  </div>
+      <!-- كلمة السر -->
+      <div class="mb-4">
+        <label for="password" class="form-label d-block text-end">أضف كلمة السر</label>
+        <div class="input-group">
+          <input type="password" id="password" formControlName="password" class="form-control text-end" placeholder="أدخل كلمة السر">
+          <span class="input-group-text"><i class="fas fa-lock"></i></span>
+        </div>
+      <div *ngIf="adminForm.get('password')?.invalid && (adminForm.get('password')?.touched || adminForm.get('password')?.dirty)" class="text-danger mt-1 small">
+  <span *ngIf="adminForm.get('password')?.errors?.['required']">من فضلك أدخل كلمة السر.</span>
+  <span *ngIf="adminForm.get('password')?.errors?.['invalidPassword']">
+    {{ adminForm.get('password')?.errors?.['invalidPassword']?.message }}
+  </span>
 </div>
+
+
+      </div>
+
+      <!-- اختيار الدور -->
+      <div class="mb-3">
+        <div class="d-flex justify-content-end flex-wrap gap-3 role-selection">
+          <div class="form-check form-check-inline m-auto" *ngFor="let role of roles">
+            <input class="form-check-input mx-2" type="radio" [id]="role" [value]="role" formControlName="role">
+            <label class="form-check-label" [for]="role">{{ role }}</label>
+          </div>
+        </div>
+      </div>
+
+      <hr>
+
+      <!-- اختيار الكلية -->
+      <div class="mb-4" *ngIf="showCollegeSelection">
+        <div class="d-flex justify-content-end flex-wrap gap-3 college-selection">
+          <div class="form-check form-check-inline m-auto" *ngFor="let college of colleges">
+            <input class="form-check-input mx-2" type="radio" [id]="college.value" [value]="college.value" formControlName="college">
+            <label class="form-check-label" [for]="college.value">{{ college.label }}</label>
+          </div>
+        </div>
+      </div>
 
 
             <button type="submit" class="btn btn-primary submit-button w-100 mt-4">
@@ -108,10 +96,13 @@
         <button type="button" routerLink="/admin2" class="btn w-100 mt-2 btn2 fw-bold">
     عرض جميع الحسابات
 </button>
-        </form>
+
+</form>
+
     </div>
-</div>
 
-<app-footer>
 
-</app-footer>
+    </div>
+
+
+<app-footer></app-footer>

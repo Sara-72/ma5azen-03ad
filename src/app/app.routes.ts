@@ -1,4 +1,6 @@
 import { NgModule } from '@angular/core';
+import { AuthGuard } from './services/auth.guard';
+
 import { Routes ,RouterModule } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component';
 import { LoginPageComponent } from './pages/login-page/login-page.component';
@@ -56,25 +58,28 @@ export const routes: Routes = [
   { path: 'modeer3', component: Modeer3Component, title: 'modeer3'},
   { path: 'modeer4', component: Modeer4Component, title: 'modeer4'},
   { path: 'modeer5', component: Modeer5Component, title: 'modeer5'},
-  { path: 'employee1', component: Employee1Component, title: 'employee1'},
-  { path: 'employee2', component: Employee2Component, title: 'employee2'},
-  { path: 'employee3', component: Employee3Component, title: 'employee3'},
+  {
+  path: 'employee1',
+  component: Employee1Component,
+  title: 'employee1'
+},
+{
+  path: 'employee2',
+  component: Employee2Component,
+  title: 'employee2'
+},
+{
+  path: 'employee3',
+  component: Employee3Component,
+  title: 'employee3'
+},
+
   { path: 'employee_ma5azen1', component: EmployeeMa5azen1Component, title: 'employee_ma5azen1'},
   { path: 'employee_ma5azen2', component: EmployeeMa5azen2Component, title: 'employee_ma5azen2'},
   { path: 'employee_ma5azen3', component: EmployeeMa5azen3Component, title: 'employee_ma5azen3'},
   { path: 'employee_ma5azen4', component:EmployeeMa5azen4Component , title:'employee_ma5azen4'},
   { path: 'employee_ma5azen5', component:EmployeeMa5azen5Component , title:'employee_ma5azen5'},
   { path: 'elda3m' , component :Elda3mComponent , title:'elda3m'},
-
-
-
-
-
-
-
-
-
-
 
 
 

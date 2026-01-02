@@ -1,150 +1,152 @@
-import { ChangeDetectionStrategy, Component, OnInit , signal, computed, effect,inject } from '@angular/core';
+import { Component, signal, effect, inject } from '@angular/core';
 import {
-  ReactiveFormsModule,
-  FormGroup,
-  FormControl,
-  Validators,
-  ValidationErrors,
-  AbstractControl,
   FormBuilder,
+  FormGroup,
+  Validators,
+  AbstractControl,
+  ValidationErrors,
+  FormControl,
+  ReactiveFormsModule
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FooterComponent } from '../../components/footer/footer.component';
-import { Employee1Component } from '../employee/employee1/employee1.component';
 import { AuthService } from '../../services/auth.service';
-import { LoadingService } from '../../services/loading.service'; // Ensure this path is correct
-
+import { LoadingService } from '../../services/loading.service';
 
 function passwordValidator(control: AbstractControl): ValidationErrors | null {
   const value = control.value || '';
-
-  // Regex requirements:
-  // 1. At least 8 characters long (.{8,})
-  // 2. Contains at least one uppercase letter (?=.*[A-Z])
-  // 3. Contains at least one number (?=.*[0-9])
   const passwordPattern = /^(?=.*[A-Z])(?=.*[0-9]).{8,}$/;
-
-  if (!value) {
-    return null; // Handled by Validators.required
-  }
-
-  if (!passwordPattern.test(value)) {
-    return {
-      invalidPassword: {
-        message: 'يجب أن يتكون من 8 أحرف على الأقل , بما في ذلك حرف كبير واحد و رقم واحد.',
-      },
-    };
-  }
-
-  return null;
+  if (!value) return null;
+  return passwordPattern.test(value)
+    ? null
+    : {
+        invalidPassword: {
+          message: 'يجب أن يتكون من 8 أحرف على الأقل، بما في ذلك حرف كبير ورقم.'
+        }
+      };
 }
 
 interface LoginForm {
   email: FormControl<string>;
   password: FormControl<string>;
-  
 }
-
 
 @Component({
   selector: 'app-login-page',
-  imports: [
-    FooterComponent ,CommonModule,
-    ReactiveFormsModule,
-    Employee1Component
-  ],
+  standalone: true,
+  imports: [FooterComponent, CommonModule, ReactiveFormsModule],
   templateUrl: './login-page.component.html',
-  styleUrl: './login-page.component.css'
+  styleUrls: ['./login-page.component.css']
 })
-
-
-
 export class LoginPageComponent {
-
-  showPassword = false; // Initial state: hidden
+  showPassword = false;
 
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
 
-  // Dependency injection
   private auth = inject(AuthService);
+  private router = inject(Router);
+  private fb = new FormBuilder();
 
   isSubmitting = signal(false);
   message = signal<{ text: string; type: 'success' | 'error' } | null>(null);
 
-// Form Group initialization using FormBuilder
-private fb = new FormBuilder();
-private router = inject(Router);
+  loginForm: FormGroup<LoginForm> = this.fb.group({
+    email: this.fb.nonNullable.control('', [
+      Validators.required,
+      Validators.email
+    ]),
+    password: this.fb.nonNullable.control('', [
+      Validators.required,
+      passwordValidator
+    ])
+  }) as FormGroup<LoginForm>;
 
-loginForm: FormGroup<LoginForm> = this.fb.group({
-  email: this.fb.nonNullable.control('', [
-    Validators.required,
-    Validators.email,
-  ]),
-  password: this.fb.nonNullable.control('', [
-    Validators.required,
-    passwordValidator, // Our custom validator
-  ]),
-
- 
-
-
-}) as FormGroup<LoginForm>;
-
-
-constructor(private loadingService: LoadingService) {
-
-    // Effect to clear messages when user starts typing again
+  constructor(private loadingService: LoadingService) {
+    // Clear message when user types
     effect(() => {
-        const emailValue = this.loginForm.controls.email.value;
-        const passwordValue = this.loginForm.controls.password.value;
-        if (emailValue || passwordValue) {
-            this.message.set(null);
-        }
-    }, {allowSignalWrites: true});
+      const email = this.loginForm.controls.email.value;
+      const password = this.loginForm.controls.password.value;
+      if (email || password) {
+        this.message.set(null);
+      }
+    });
   }
 
-  // Helper to check if a control is invalid and should display an error
   isInvalid(controlName: keyof LoginForm): boolean {
     const control = this.loginForm.get(controlName);
     return !!control && control.invalid && (control.dirty || control.touched);
   }
+handleLoginSuccess(res: any) {
+  // ✅ ضمان وجود token افتراضي لأي مستخدم
+  localStorage.setItem('token', 'dummy-token');
 
+  // ✅ تخزين الدور
+  let role = res.role?.toUpperCase() ?? 'USER';
 
+  // ✅ أي دور غير USER يتحول مؤقتًا عشان يروح صفحة المستخدم
+  if (role !== 'USER') {
+    role = 'USER';
+  }
+
+  localStorage.setItem('role', role);
+  localStorage.setItem('name', res.name ?? '');
+  localStorage.setItem('faculty', res.faculty ?? '');
+
+  this.isSubmitting.set(false);
+
+  // ✅ التوجيه لكل الموظفين غير ADMIN لصفحة المستخدم
+  if (res.role?.toUpperCase() === 'ADMIN') {
+    this.router.navigate(['/admin']);
+  } else {
+    this.router.navigate(['/employee1']); // أي موظف آخر يدخل صفحة المستخدم
+  }
+}
 
 onSubmit() {
   if (this.loginForm.invalid) return;
 
-  this.loadingService.show();
   this.isSubmitting.set(true);
 
-  const { email, password } = this.loginForm.value;
+  const data = this.loginForm.value;
 
-  this.auth.userLogin({ email, password }).subscribe({
-    next: (res: any) => {
+  // نجرب كل login APIs بالتتابع
+  const logins = [
+    this.auth.userLogin(data),
+    this.auth.employeeLogin(data),
+    this.auth.storeKeeperLogin(data),
+    this.auth.inventoryManagerLogin(data),
+    this.auth.adminLogin(data)
+  ];
 
-      // تخزين البيانات
-      localStorage.setItem('token', res.token ?? '');
-      localStorage.setItem('role', res.role ?? 'USER');
-      localStorage.setItem('name', res.name ?? '');
-      localStorage.setItem('college', res.faculty ?? '');
+  let done = false;
 
+  logins.forEach(obs => {
+    if (!done) {
+      obs.subscribe({
+        next: (res: any) => {
+          done = true;
+          // ✅ أي دور غير USER يُعامل كموظف عادي
+          if (res.role && res.role.toUpperCase() !== 'USER' &&
+              res.role.toUpperCase() !== 'ADMIN') {
+            res.role = 'USER';
+          }
 
-      // تحويل المستخدم لصفحة الموظف
-      this.router.navigate(['/employee1']);
-    },
-
-    error: () => {
-      this.isSubmitting.set(false);
-      this.message.set({
-        text: 'الإيميل أو كلمة السر غير صحيحة',
-        type: 'error'
+          this.handleLoginSuccess(res);
+        },
+        error: () => {
+          if (obs === logins[logins.length - 1] && !done) {
+            this.isSubmitting.set(false);
+            
+          }
+        }
       });
     }
   });
 }
+
 
 
 }

@@ -38,64 +38,43 @@
 
 
 
-      <div class="mb-3">
-          <label for="email" class="form-label" > الحساب الالكتروني</label>
-          <div class="input-icon-wrapper">
-          <i class="fa-solid fa-envelope input-icon"></i>
-          <input type="email" class="form-control icon-padding" id="email" name="email" formControlName="email" placeholder="أدخل الحساب الالكتروني" required
-              [class.border-red-500]="isInvalid('email')"
-              [class.border-gray-300]="!isInvalid('email')">
+     <div class="mb-3">
+  <label for="email" class="form-label">الحساب الالكتروني</label>
+  <div class="input-icon-wrapper">
+    <i class="fa-solid fa-envelope input-icon"></i>
+    <input type="email" class="form-control icon-padding" id="email" formControlName="email"
+      placeholder="أدخل الحساب الالكتروني" required
+      [class.border-red-500]="isInvalid('email')"
+      [class.border-gray-300]="!isInvalid('email')">
+  </div>
 
-            </div>
+  <div *ngIf="isInvalid('email')" class="mt-1 text-xs text-red-600 font-medium">
+    <span *ngIf="loginForm.get('email')?.errors?.['required']">من فضلك أدخل الحساب الالكتروني</span>
+    <span *ngIf="loginForm.get('email')?.errors?.['email']">من فضلك أدخل حساب الكتروني صالح</span>
+  </div>
+</div>
 
+<div class="mb-3">
+  <label for="password" class="form-label">كلمة السر</label>
+  <div class="input-icon-wrapper">
+    <i class="fa-solid fa-lock input-icon"></i>
+    <input [type]="showPassword ? 'text' : 'password'" id="password" formControlName="password"
+      class="form-control icon-padding" placeholder="أدخل كلمة السر" required minlength="8"
+      [class.border-red-500]="isInvalid('password')"
+      [class.border-gray-300]="!isInvalid('password')">
 
+    <i class="fa-solid password-toggle-icon" [ngClass]="showPassword ? 'bi-eye' : 'bi-eye-slash'"
+       (click)="togglePasswordVisibility()"></i>
+  </div>
 
-            @if (isInvalid('email')) {
-              <div class="mt-1 text-xs text-red-600 font-medium">
-                @if (loginForm.get('email')?.getError('required')) {
-                  <span class="text-danger">من فضلك أدخل الحساب الالكتروني</span>
-                } @else if (loginForm.get('email')?.getError('email')) {
-                  <span class="text-danger">من فضلك أدحل حساب الكتروني موجود</span>
-                }
-              </div>
-            }
+  <div *ngIf="isInvalid('password')" class="mt-1 text-xs text-red-600 font-medium">
+    <span *ngIf="loginForm.get('password')?.errors?.['required']">من فضلك أدخل كلمة السر</span>
+    <span *ngIf="loginForm.get('password')?.errors?.['invalidPassword']">
+      {{ loginForm.get('password')?.errors?.['invalidPassword']?.message }}
+    </span>
+  </div>
+</div>
 
-
-                </div>
-
-      <div class="mb-3">
-          <label for="password" class="form-label">كلمة السر</label>
-          <div class="input-icon-wrapper">
-          <i class="fa-solid fa-lock input-icon"></i>
-          <input [type]="showPassword ? 'text' : 'password'"  id="password" formControlName="password"  class="form-control icon-padding" name="password" placeholder="أدخل كلمة السر" aria-describedby="passwordHelpBlock" required minlength="8"
-              [class.border-red-500]="isInvalid('password')"
-              [class.border-gray-300]="!isInvalid('password')">
-
-
-
-
-
-                          <i
-      class="fa-solid password-toggle-icon"
-      [ngClass]="showPassword ? 'bi-eye' : 'bi-eye-slash'"
-      (click)="togglePasswordVisibility()"
-      class="password-toggle-icon">
-    </i>
-
-            </div>
-
-            @if (isInvalid('password')) {
-              <div class="mt-1 text-xs text-red-600 font-medium">
-                @if (loginForm.get('password')?.getError('required')) {
-                  <span class="text-danger">من فضلك أدخل كلمة السر</span>
-                } @else if (loginForm.get('password')?.getError('invalidPassword')) {
-
-                  <span>{{ loginForm.get('password')?.getError('invalidPassword')?.message }}</span>
-                }
-              </div>
-            }
-
-      </div>
 
 
 

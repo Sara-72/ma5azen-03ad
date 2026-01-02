@@ -57,7 +57,8 @@
                   formControlName="category"
                   class="table-input form-select placeholder-style"
                   (change)="updateFilteredItems(getCategoryValue($event), $index)">
-                  <option value="" disabled selected hidden>اختر الفئة</option>
+                  <option value="" disabled hidden>اختر الفئة</option>
+
                   <option *ngFor="let category of categoriesFromStock" [value]="category">
                     {{ category }}
                   </option>
@@ -72,19 +73,32 @@
             <div *ngIf="memoGroup.get('category')?.value" formArrayName="itemLines" class="item-lines-container">
               <div *ngFor="let itemLine of getItemLines($index).controls; let i = index" [formGroupName]="i" class="row item-line">
 
-                <!-- اسم الصنف -->
-                <div class="field">
-                  <label>الصنف {{ i + 1 }}:</label>
-                  <select formControlName="itemName" class="table-input form-select">
-                    <option value="" disabled hidden>اختر الصنف</option>
-                    <option *ngFor="let item of getAvailableItems($index, i)" [value]="item">
-                      {{ item }}
-                    </option>
-                  </select>
-                  <div *ngIf="itemLine.get('itemName')?.touched && itemLine.get('itemName')?.hasError('required')" class="text-danger small mt-1">
-                    الرجاء اختيار الصنف
-                  </div>
-                </div>
+              <!-- اسم الصنف -->
+<div class="field">
+  <label>الصنف {{ i + 1 }}:</label>
+
+  <select formControlName="itemName" class="table-input form-select">
+    <option value="" disabled hidden>اختر الصنف</option>
+
+    <option *ngFor="let item of getAvailableItems($index, i)" [value]="item">
+      {{ item === 'OTHER' ? 'أخرى' : item }}
+    </option>
+  </select>
+
+  <div *ngIf="itemLine.get('itemName')?.touched && itemLine.get('itemName')?.hasError('required')" class="text-danger small mt-1">
+    الرجاء اختيار الصنف
+  </div>
+</div>
+<!-- صنف مخصص -->
+<div class="field" *ngIf="itemLine.get('itemName')?.value === 'OTHER'">
+  <label>اسم الصنف:</label>
+  <input type="text" formControlName="customItemName" class="table-input" placeholder="اكتب اسم الصنف">
+
+  <div *ngIf="itemLine.get('customItemName')?.touched && itemLine.get('customItemName')?.hasError('required')" class="text-danger small mt-1">
+    اسم الصنف مطلوب
+  </div>
+</div>
+
 
                 <!-- الكمية -->
                 <div class="field count-input">
@@ -123,11 +137,14 @@
                     <div *ngIf="memoGroup.get('employeeSignature')?.hasError('fourStrings')">يجب إدخال الاسم كاملاً (أربع كلمات بالضبط).</div>
                   </div>
                 </div>
+<div class="ms-3">
+  <strong>المركز الرئيسي</strong><br>
+  <input type="text" class="form-control" 
+         [value]="userCollege === 'مركزية' ? 'مركزية' : userCollege" readonly>
+</div>
 
-                <div class="ms-3">
-                  <strong>الكلية</strong><br>
-                  <input type="text" class="form-control" [value]="memoGroup.get('collegeName')?.value" disabled>
-                </div>
+
+
 
                 <div class="ms-3">
                   <strong>تاريخ الطلب</strong><br>

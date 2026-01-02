@@ -3,7 +3,7 @@
 <div class="page-container">
   <aside class="sidebar">
     <h5>
-  مرحبًا بك
+      مرحبًا بك
       <span *ngIf="displayName">، {{ displayName }}</span>
     </h5>
     <ul>
@@ -14,7 +14,7 @@
   </aside>
 
   <main class="content">
-    <div class="table-container">
+    <div class="table-container" *ngIf="spendPermissions.length > 0; else noData">
       <table class="custom-3d-table">
         <thead>
           <tr>
@@ -24,24 +24,18 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>دباسة</td>
-            <td>2/11/2025</td>
-            <td>2</td>
-          </tr>
-          <tr>
-            <td>أوراق تصوير</td>
-            <td>3/11/2025</td>
-            <td>10</td>
-          </tr>
-          <tr>
-            <td>أقلام</td>
-            <td>5/11/2025</td>
-            <td>20</td>
+          <tr *ngFor="let sp of spendPermissions">
+            <td>{{ sp.itemName }}</td>
+            <td>{{ sp.issueDate | date:'dd/MM/yyyy' }}</td>
+            <td>{{ sp.issuedQuantity }}</td>
           </tr>
         </tbody>
       </table>
     </div>
+
+    <ng-template #noData>
+      <p>لا توجد عهد متاحة حالياً.</p>
+    </ng-template>
   </main>
 </div>
 

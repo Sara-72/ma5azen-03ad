@@ -16,6 +16,7 @@ interface SpendNote {
   college: string;
   requestDate: string;
   collageKeeper: string;
+  rejectionReason?: string;
 }
 
 @Component({

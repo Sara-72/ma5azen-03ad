@@ -111,7 +111,13 @@
   >
     {{ getStatusText(note.permissinStatus) }}
   </span>
+
+  <!-- عرض سبب الرفض إذا كانت الحالة مرفوضة -->
+  <div *ngIf="isRejected(note.permissinStatus)" class="rejection-reason mt-1">
+    <strong>سبب الرفض:</strong> {{ note.rejectionReason || 'غير محدد' }}
+  </div>
 </div>
+
       </div>
     </div>
 

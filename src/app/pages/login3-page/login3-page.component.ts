@@ -113,7 +113,8 @@ export class Login3PageComponent {
   next: (res: any) => {
     console.log('Login response:', res);
     localStorage.setItem('token', res.token);
-    localStorage.setItem('role', 'INVENTORY_MANAGER');
+    localStorage.setItem('role', 'STORE_KEEPER');
+
     localStorage.setItem('name', res.name);
 
 

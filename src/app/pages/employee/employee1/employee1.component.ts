@@ -98,41 +98,72 @@ private setEmployeeSignatureIfValid(memoGroup: FormGroup): void {
 ngOnInit(): void {
   this.userName = localStorage.getItem('name') || '';
   this.displayName = this.getFirstTwoNames(this.userName);
-  this.userCollege = localStorage.getItem('college') || '';
-  this.collegeAdmin = this.collegeAdminMap[this.userCollege] || '';
+  const role = (localStorage.getItem('role') || 'USER').toUpperCase();
+
+  // أي موظف مخزن أو أمين/مدير مخزن يظهر له "مركزية"
+  if (role !== 'USER' && role !== 'ADMIN') {
+    this.userCollege = 'مركزية'; // ✅ القيمة المنطقية للعرض
+    this.collegeAdmin = 'حمدي محمد علي'; // أو الاسم اللي يخص المركز
+  } else {
+    this.userCollege = localStorage.getItem('faculty') || 'مركزية';
+
+    this.collegeAdmin = this.collegeAdminMap[this.userCollege] || '';
+  }
+
   this.todayDate = new Date().toISOString().substring(0, 10);
 
-  this.stockService.getAllStocks().subscribe(stocks => {
-    this.allStocks = stocks;
-    this.availableQuantityMap = {};
-    stocks.forEach(stock => {
-      const key = `${stock.category}|${stock.itemName}`;
-      this.availableQuantityMap[key] = stock.quantity;
-    });
-    this.categoriesFromStock = [...new Set(stocks.map(s => s.category))];
-    this.itemDataFromStock = {};
-    this.categoriesFromStock.forEach(cat => {
-      this.itemDataFromStock[cat] = [
-        ...new Set(stocks.filter(s => s.category === cat).map(s => s.itemName))
-      ];
-    });
-    const firstMemo = this.createRequestMemoGroup();
-    this.fillFixedData(firstMemo);
-    this.requests.push(firstMemo);
+  // باقي الكود لتحميل المخزن
+ this.stockService.getAllStocks().subscribe(stocks => {
+  this.allStocks = stocks;
+
+  // استخراج الفئات بدون تكرار
+  this.categoriesFromStock = [
+    ...new Set(stocks.map(s => s.category))
+  ];
+
+  // ربط كل فئة بالأصناف الخاصة بها
+  this.itemDataFromStock = {};
+  this.availableQuantityMap = {};
+
+  stocks.forEach(stock => {
+    if (!this.itemDataFromStock[stock.category]) {
+      this.itemDataFromStock[stock.category] = [];
+    }
+
+    this.itemDataFromStock[stock.category].push(stock.itemName);
+
+    const key = `${stock.category}|${stock.itemName}`;
+    this.availableQuantityMap[key] = stock.quantity;
   });
+
+  // إنشاء أول طلب
+  const firstMemo = this.createRequestMemoGroup();
+  this.fillFixedData(firstMemo);
+  this.requests.push(firstMemo);
+});
+
 }
 
+
+
+
 private fillFixedData(memoGroup: FormGroup): void {
+  const displayCollege = this.userCollege === 'مركزية' ? 'المركز الرئيسي' : this.userCollege;
+  const adminName = this.userCollege === 'مركزية' ? 'حمدي محمد علي' : this.collegeAdmin;
+
   memoGroup.patchValue({
     employeeSignature: this.userName,
-    collegeName: this.userCollege,
-    collegeAdminName: this.collegeAdmin,
+    collegeName: displayCollege,
+    collegeAdminName: adminName,
     requestDate: this.todayDate
   });
+
   memoGroup.get('collegeName')?.disable();
   memoGroup.get('requestDate')?.disable();
   memoGroup.get('employeeSignature')?.disable();
 }
+
+
 
 getFirstTwoNames(fullName: string): string {
   if (!fullName) return '';
@@ -161,28 +192,27 @@ getCategoryValue(event: Event): string {
 addItemLine(memoIndex: number): void {
   const itemGroup = this.fb.group({
     itemName: [null, Validators.required],
+    customItemName: [''],
     count: [1, [Validators.required, Validators.min(1)]]
   });
-  const countControl = itemGroup.get('count');
-  countControl?.valueChanges.subscribe(countValue => {
-    const memoGroup = this.requests.at(memoIndex) as FormGroup;
-    const category = memoGroup.get('category')?.value;
-    const itemName = itemGroup.get('itemName')?.value;
-    if (!category || !itemName || countValue == null) return;
-    const key = `${category}|${itemName}`;
-    const available = this.availableQuantityMap[key] ?? 0;
-    if (countValue > available) {
-      countControl.setErrors({ ...countControl.errors, exceedStock: true });
+
+  // مراقبة اختيار الصنف
+  itemGroup.get('itemName')?.valueChanges.subscribe(value => {
+    const customCtrl = itemGroup.get('customItemName');
+
+    if (value === 'OTHER') {
+      customCtrl?.setValidators([Validators.required]);
     } else {
-      if (countControl.hasError('exceedStock')) {
-        const errors = { ...countControl.errors };
-        delete errors['exceedStock'];
-        countControl.setErrors(Object.keys(errors).length ? errors : null);
-      }
+      customCtrl?.clearValidators();
+      customCtrl?.setValue('');
     }
+
+    customCtrl?.updateValueAndValidity();
   });
+
   this.getItemLines(memoIndex).push(itemGroup);
 }
+
 
 private createItemLineGroup(): FormGroup {
   return this.fb.group({
@@ -193,15 +223,22 @@ private createItemLineGroup(): FormGroup {
 
 updateFilteredItems(category: string, memoIndex: number): void {
   if (!category) return;
-  const availableItems = this.itemDataFromStock[category] || [];
+
+  const availableItems = [
+    ...(this.itemDataFromStock[category] || []),
+    'OTHER'
+  ];
+
   const itemLinesArray = this.getItemLines(memoIndex);
   itemLinesArray.clear();
-  const firstItemName = availableItems.length > 0 ? availableItems[0] : '';
+
   itemLinesArray.push(this.fb.group({
     itemName: [null, Validators.required],
+    customItemName: [''],
     count: [1, [Validators.required, Validators.min(1)]]
   }));
 }
+
 closeStatusMessage(): void {
   this.statusMessage = null;
   this.statusType = null;
@@ -211,13 +248,20 @@ getAvailableItems(memoIndex: number, itemLineIndex: number): string[] {
   const memoGroup = this.requests.at(memoIndex) as FormGroup;
   const category = memoGroup.get('category')?.value;
   if (!category) return [];
+
   const allItems = this.itemDataFromStock[category] || [];
+
   const itemLines = this.getItemLines(memoIndex).controls;
   const selectedItems = itemLines
     .map((ctrl, idx) => idx !== itemLineIndex ? ctrl.get('itemName')?.value : null)
     .filter(Boolean);
-  return allItems.filter(item => !selectedItems.includes(item));
+
+  return [
+    ...allItems.filter(item => !selectedItems.includes(item)),
+    'OTHER'   // ✅ هنا الحل
+  ];
 }
+
 
 getItemLines(memoIndex: number): FormArray {
   const memoGroup = this.requests.at(memoIndex);
@@ -253,18 +297,34 @@ removeRow(): void {
 
 private hasInvalidQuantity(): boolean {
   let hasError = false;
+
   this.requests.controls.forEach((memoCtrl) => {
     const memo = memoCtrl as FormGroup;
     const category = memo.get('category')?.value;
     const itemLines = memo.get('itemLines') as FormArray;
+
     itemLines.controls.forEach((itemCtrl) => {
       const itemGroup = itemCtrl as FormGroup;
       const itemName = itemGroup.get('itemName')?.value;
       const count = itemGroup.get('count')?.value;
+      const control = itemGroup.get('count');
+
       if (!category || !itemName) return;
+
+      // ✅ تجاهل الأصناف الجديدة (OTHER)
+      if (itemName === 'OTHER') {
+        // امسحي أي error قديم
+        if (control?.hasError('exceedStock')) {
+          const errors = { ...control.errors };
+          delete errors['exceedStock'];
+          control.setErrors(Object.keys(errors).length ? errors : null);
+        }
+        return;
+      }
+
       const key = `${category}|${itemName}`;
       const available = this.availableQuantityMap[key] ?? 0;
-      const control = itemGroup.get('count');
+
       if (count > available) {
         control?.setErrors({ ...control.errors, exceedStock: true });
         control?.markAsTouched();
@@ -279,8 +339,10 @@ private hasInvalidQuantity(): boolean {
       }
     });
   });
+
   return hasError;
 }
+
 
 onSubmit(): void {
   this.statusMessage = null;
@@ -337,17 +399,23 @@ onSubmit(): void {
     const itemLines = memo.get('itemLines')?.value || [];
     itemLines.forEach((item: any) => {
       requestsToSend++;
-      const payload = {
-        itemName: item.itemName,
-        quantity: item.count,
-        requestDate: new Date(memo.get('requestDate')?.value).toISOString(),
-        userSignature: memo.get('employeeSignature')?.value,
-        college: memo.get('collegeName')?.value,
-        category: memo.get('category')?.value,
-        permissinStatus: 'قيد المراجعة',
-        collageKeeper: memo.get('collegeAdminName')?.value,
-        employeeId: 1
-      };
+      const finalItemName =
+  item.itemName === 'OTHER'
+    ? item.customItemName
+    : item.itemName;
+
+const payload = {
+  itemName: finalItemName,
+  quantity: item.count,
+  requestDate: new Date(memo.get('requestDate')?.value).toISOString(),
+  userSignature: memo.get('employeeSignature')?.value,
+  college: memo.get('collegeName')?.value,
+  category: memo.get('category')?.value,
+  permissinStatus: 'قيد المراجعة',
+  collageKeeper: memo.get('collegeAdminName')?.value,
+  employeeId: 1
+};
+
 
       this.spendNotesService.createSpendNote(payload).subscribe({
         next: () => {

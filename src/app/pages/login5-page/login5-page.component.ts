@@ -112,36 +112,30 @@ export class Login5PageComponent {
     return !!control && control.invalid && (control.dirty || control.touched);
   }
 onSubmit() {
-  this.message.set(null);
-
   if (this.loginForm.invalid) {
     this.loginForm.markAllAsTouched();
     return;
   }
 
   this.isSubmitting.set(true);
-
   this.auth.adminLogin(this.loginForm.value).subscribe({
     next: (res: any) => {
-      this.isSubmitting.set(false);
-
-      // ✅ هنا فقط
-      localStorage.setItem('token', res.token);
+      console.log('Admin login response:', res);
+      localStorage.setItem('token', res.token ?? '');
       localStorage.setItem('role', 'ADMIN');
-      localStorage.setItem('name', res.name);
-
+      localStorage.setItem('name', res.name ?? '');
+      this.isSubmitting.set(false);
 
       this.router.navigate(['/admin']);
     },
-    error: () => {
+    error: (err) => {
+      console.error('Admin login error:', err);
       this.isSubmitting.set(false);
-      this.message.set({
-        text: 'الإيميل أو كلمة السر غير صحيحة',
-        type: 'error'
-      });
+      this.message.set({ text: 'الإيميل أو كلمة السر غير صحيحة', type: 'error' });
     }
   });
 }
+
 
 
 
