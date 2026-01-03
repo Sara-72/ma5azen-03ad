@@ -37,11 +37,15 @@
   </aside>
 
   <main class="forms-container m-auto">
-    <form *ngFor="let form of consumableForms; let fIndex = index"
-          [formGroup]="form"
-          (ngSubmit)="onSubmitForm(form)"
-          class="form-container mb-5"
-          dir="rtl">
+  
+    <!--  لو مفيش أذونات -->
+    <div *ngIf="consumableForms.length === 0" class="no-data-message">
+      لا يوجد أذونات حالية
+    </div>
+  
+    <!--  لو فيه أذونات -->
+    <form *ngFor="let form of consumableForms; let fIndex = index" [formGroup]="form" (ngSubmit)="onSubmitForm(form)"
+      class="form-container mb-5" dir="rtl">
 
       <header class="form-header text-center">
         <h2 class="title">طلب و إذن صرف</h2>

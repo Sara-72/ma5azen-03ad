@@ -27,6 +27,20 @@ export function fourStringsValidator(): ValidatorFn {
       : { fourStrings: { requiredCount: 4, actualCount: words.length } };
   };
 }
+/** Validator يمنع القيم الفاضية أو المسافات فقط */
+export function notEmptyTrimmed(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = control.value;
+    if (value === null || value === undefined) return { required: true };
+
+    if (typeof value === 'string' && value.trim() === '') {
+      return { emptyTrimmed: true };
+    }
+
+    return null;
+  };
+}
+
 @Component({
   selector: 'app-modeer2',
   standalone: true,
@@ -160,39 +174,64 @@ checkIssuedQuantity(formIndex: number, rowIndex: number) {
 
   /** إنشاء فورم جاهز */
   private createForm(): FormGroup {
-    return this.fb.group({
-      destinationName: ['', Validators.required],
-      category: ['', Validators.required],
-      requestDateGroup: ['', Validators.required],
-      regularDateGroup: [this.getTodayDate(), Validators.required],
-      requestorName: ['', [Validators.required, fourStringsValidator()]],
-      documentNumber: ['', Validators.required],
-       managerSignature: [
+  return this.fb.group({
+    destinationName: ['', Validators.required],
+    category: ['', Validators.required],
+    requestDateGroup: ['', Validators.required],
+    regularDateGroup: [this.getTodayDate(), Validators.required],
+
+    requestorName: ['', [Validators.required, fourStringsValidator()]],
+
+    documentNumber: [
+      '',
+      [Validators.required, notEmptyTrimmed()]
+    ],
+
+    managerSignature: [
       this.userName,
       [Validators.required, fourStringsValidator()]
     ],
-      tableData: this.fb.array([])
-    });
-  }
+
+    tableData: this.fb.array([])
+  });
+}
+
 
   private createTableRowFormGroup(): FormGroup {
-    return this.fb.group({
-      storeType: ['', Validators.required],
-      itemName: [''],
-      itemSearchText: [''],
-      category: [''],
-      unit: [''],
-      quantityRequired: [''],
-      quantityAuthorized: [''],
-      quantityIssued: [''],
-      itemCondition: [''],
-      unitPrice: [
+  return this.fb.group({
+    storeType: ['', Validators.required],
+
+    itemName: ['', [Validators.required, notEmptyTrimmed()]],
+    itemSearchText: ['', [Validators.required, notEmptyTrimmed()]],
+    category: ['', Validators.required],
+    unit: ['', Validators.required],
+
+    quantityRequired: [
+      '',
+      [Validators.required, Validators.min(1)]
+    ],
+
+    quantityAuthorized: [
+      '',
+      [Validators.required, Validators.min(1)]
+    ],
+
+    quantityIssued: [
+      '',
+      [Validators.required, Validators.min(1)]
+    ],
+
+    itemCondition: ['', Validators.required],
+
+    unitPrice: [
       null,
       [Validators.required, Validators.min(0.01)]
     ],
-      value: this.fb.control({ value: 0, disabled: true })
-    });
-  }
+
+    value: this.fb.control({ value: 0, disabled: true })
+  });
+}
+
 
   private loadSpendNotes() {
     this.http.get<any[]>('https://newwinventoryapi.runasp.net/api/SpendNotes')
@@ -287,13 +326,42 @@ removeRowFromForm(form: FormGroup) {
   }
 
   /** حفظ الفورم */
-  onSubmitForm(form: FormGroup) {
-  if (form.invalid) {
-  form.markAllAsTouched();
-  this.scrollToFirstInvalidControl(form);
-  return;
-}
+onSubmitForm(form: FormGroup) {
 
+  // 1️⃣ فاليديشن الفورم الأساسي
+  if (form.invalid) {
+    form.markAllAsTouched();
+    this.scrollToFirstInvalidControl(form);
+    return;
+  }
+
+  // 2️⃣ فاليديشن الصفوف (tableData)
+  const tableArray = form.get('tableData') as FormArray;
+
+  let hasRowError = false;
+
+  tableArray.controls.forEach(control => {
+  const row = control as FormGroup; // 👈 الحل هنا
+
+  Object.values(row.controls).forEach(ctrl => {
+    ctrl.markAsTouched();
+    ctrl.updateValueAndValidity();
+  });
+
+  if (row.invalid) {
+    hasRowError = true;
+  }
+});
+
+
+  if (hasRowError) {
+    this.scrollToFirstInvalidControl(form);
+    return;
+  }
+
+  // ===============================
+  // لو وصلنا هنا → كله VALID ✅
+  // ===============================
 
   this.isSubmitting.set(true);
   const formVal = form.value;
@@ -309,68 +377,68 @@ removeRowFromForm(form: FormGroup) {
     documentNumber: formVal.documentNumber
   };
 
+  // اسم مختلف عشان مايحصلش redeclare
+  const tableRows = formVal.tableData;
 
-
-
-
-  const tableData = formVal.tableData;
-
-  // حفظ كل صفوف الفورم الحالي
-  const saveRequests = tableData.map((row: any) => {
-    return this.http.post('https://newwinventoryapi.runasp.net/api/SpendPermissions', {
-      ...basePayload,
-      itemName: row.itemName,
-      unit: row.unit,
-      storeType: row.storeType,
-      requestedQuantity: Number(row.quantityRequired || 0),
-      approvedQuantity: Number(row.quantityAuthorized || 0),
-      issuedQuantity: Number(row.quantityIssued || 0),
-      storeHouse: row.storeType,
-      stockStatus: row.itemCondition || 'جديدة',
-      unitPrice: Number(row.unitPrice || 0),
-      totalValue: Number(row.quantityIssued || 0) * Number(row.unitPrice || 0)
-    }).toPromise();
+  const saveRequests = tableRows.map((row: any) => {
+    return this.http.post(
+      'https://newwinventoryapi.runasp.net/api/SpendPermissions',
+      {
+        ...basePayload,
+        itemName: row.itemName,
+        unit: row.unit,
+        storeType: row.storeType,
+        requestedQuantity: Number(row.quantityRequired),
+        approvedQuantity: Number(row.quantityAuthorized),
+        issuedQuantity: Number(row.quantityIssued),
+        storeHouse: row.storeType,
+        stockStatus: row.itemCondition,
+        unitPrice: Number(row.unitPrice),
+        totalValue: Number(row.quantityIssued) * Number(row.unitPrice)
+      }
+    ).toPromise();
   });
 
-
-
   Promise.all(saveRequests)
-    .then(() => this.http.get<any[]>('https://newwinventoryapi.runasp.net/api/SpendNotes').toPromise())
+    .then(() =>
+      this.http
+        .get<any[]>('https://newwinventoryapi.runasp.net/api/SpendNotes')
+        .toPromise()
+    )
     .then(notes => {
       if (!notes) return;
 
-      // فلترة المذكرات المرتبطة فقط بالفورم الحالي
       const notesToUpdate = notes.filter(n =>
         n.permissinStatus === 'الطلب مقبول' &&
         n.confirmationStatus === 'لم يؤكد' &&
         n.category === formVal.category &&
         n.college === formVal.destinationName &&
-        n.requestDate?.slice(0,10) === formVal.requestDateGroup
+        n.requestDate?.slice(0, 10) === formVal.requestDateGroup
       );
 
-      // تحديث الحالة فقط لهذه المذكرات
       const updateRequests = notesToUpdate.map(note =>
-        this.http.put(`https://newwinventoryapi.runasp.net/api/SpendNotes/${note.id}`, {
-          ...note,
-          confirmationStatus: 'مؤكد'
-        }).toPromise()
+        this.http.put(
+          `https://newwinventoryapi.runasp.net/api/SpendNotes/${note.id}`,
+          {
+            ...note,
+            confirmationStatus: 'مؤكد'
+          }
+        ).toPromise()
       );
 
       return Promise.all(updateRequests);
     })
     .then(() => {
-  this.statusMessage = 'تم الحفظ وتأكيد الاذن بنجاح ✅';
-  this.statusType = 'success';
+      this.statusMessage = 'تم الحفظ وتأكيد الاذن بنجاح ✅';
+      this.statusType = 'success';
 
-  // إزالة الفورم الحالي من الصفحة
-  const index = this.consumableForms.indexOf(form);
-  if (index > -1) {
-    this.consumableForms.splice(index, 1);
-  }
+      const index = this.consumableForms.indexOf(form);
+      if (index > -1) {
+        this.consumableForms.splice(index, 1);
+      }
 
-  this.isSubmitting.set(false);
-})
-
+      this.isSubmitting.set(false);
+    })
     .catch(err => {
       console.error('Save error:', err);
       this.statusMessage = 'حدث خطأ أثناء الحفظ ❌';
@@ -378,6 +446,7 @@ removeRowFromForm(form: FormGroup) {
       this.isSubmitting.set(false);
     });
 }
+
 
 
 
