@@ -122,23 +122,63 @@ export class Ameen3Component implements OnInit {
       });
 
       const stockRequests = Array.from(groupedItems.values()).map(group => {
-        const stock = stocks.find(s =>
-          this.normalize(s.itemName) === this.normalize(group.itemName) &&
-          this.normalize(s.storeType) === this.normalize(group.storeHouse) &&
-          this.normalize(s.unit) === this.normalize(group.unit)
-        );
+        const matchedStocks = stocks
+  .filter(s =>
+    this.normalize(s.itemName) === this.normalize(group.itemName) &&
+    this.normalize(s.category) === this.normalize(perm.category) &&
+    this.normalize(s.storeType) === this.normalize(group.storeHouse) &&
+    this.normalize(s.unit) === this.normalize(group.unit)
+  )
+  .sort(
+    (a, b) =>
+      new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
 
-        if (!stock) throw new Error(`الصنف ${group.itemName} غير موجود`);
-        if (stock.quantity < group.totalQuantity)
-          throw new Error(`الكمية غير كافية للصنف ${group.itemName}`);
+if (matchedStocks.length === 0) {
+  throw new Error(`الصنف ${group.itemName} غير موجود بالمخزن`);
+}
 
-        return this.stockService.updateStock(stock.id, {
-          stock: {
-            ...stock,
-            quantity: stock.quantity - group.totalQuantity,
-            storeKeeperSignature: this.fullName
-          }
-        });
+let remainingQty = group.totalQuantity;
+const updates: any[] = [];
+
+for (const stock of matchedStocks) {
+  if (remainingQty <= 0) break;
+
+  if (stock.quantity <= remainingQty) {
+    // نخصم كل الكمية من السجل ده
+    updates.push(
+      this.stockService.updateStock(stock.id, {
+        stock: {
+          ...stock,
+          quantity: 0,
+          storeKeeperSignature: this.fullName
+        }
+      })
+    );
+
+    remainingQty -= stock.quantity;
+  } else {
+    // نخصم جزء ونقف
+    updates.push(
+      this.stockService.updateStock(stock.id, {
+        stock: {
+          ...stock,
+          quantity: stock.quantity - remainingQty,
+          storeKeeperSignature: this.fullName
+        }
+      })
+    );
+
+    remainingQty = 0;
+  }
+}
+
+if (remainingQty > 0) {
+  throw new Error(`الكمية غير كافية للصنف ${group.itemName}`);
+}
+
+return forkJoin(updates);
+
       });
 
       forkJoin(stockRequests).subscribe(() => {
