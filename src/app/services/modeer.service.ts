@@ -50,5 +50,10 @@ export class ModeerSercive {
       updatedNote
     );
   }
+  //Ledger Entries service
+  getLedgerEntries(): Observable<any[]> {
+  return this.http.get<any[]>(`${this.api}/LedgerEntries`);
+}
+
 }
 

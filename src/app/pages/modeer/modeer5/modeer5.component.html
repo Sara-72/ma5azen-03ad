@@ -42,29 +42,26 @@
           *ngIf="viewMode === 'history'"
         >
           <label class="fw-bold">من:</label>
-          <input
-            type="date"
-            class="form-control shadow-sm"
-            [(ngModel)]="startDate"
-            (change)="loadHistoryByPeriod()"
-          />
+          <input type="date" class="form-control shadow-sm" [(ngModel)]="startDate" (blur)="onDateBlur()" />
+          
+          <small *ngIf="startDateError" class="text-danger">
+            {{ startDateError }}
+          </small>
           <label class="fw-bold">إلى:</label>
-          <input
-            type="date"
-            class="form-control shadow-sm"
-            [(ngModel)]="endDate"
-            (change)="loadHistoryByPeriod()"
-          />
+          <input type="date" class="form-control shadow-sm" [(ngModel)]="endDate" (blur)="onDateBlur()" />
+          
+          <small *ngIf="endDateError" class="text-danger">
+            {{ endDateError }}
+          </small>
         </div>
 
         <div class="d-flex align-items-center gap-2 flex-grow-1">
           <label class="fw-bold">الفئة</label>
-          <select
-            class="form-select w-60 shadow-sm"
-            [(ngModel)]="selectedCategory"
-            (change)="applyFilter()"
-          >
+        
+          <select class="form-select w-60 shadow-sm" [(ngModel)]="selectedCategory" (change)="applyFilter()"
+            [disabled]="categories.length === 0">
             <option value="الكل">جميع الفئات (عرض الكل)</option>
+        
             <option *ngFor="let cat of categories" [value]="cat">
               {{ cat }}
             </option>
