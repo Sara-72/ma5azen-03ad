@@ -41,28 +41,47 @@ export class Modeer1Component implements OnInit {
   }
 
   loadStoreKeeperStocks() {
-    this.modeerSercive.getStoreKeeperStocks().subscribe({
-      next: (data: any[]) => {
-        console.log('STORE KEEPER STOCKS:', data);
+  this.modeerSercive.getStoreKeeperStocks().subscribe({
+    next: (data: any[]) => {
+      console.log('STORE KEEPER STOCKS RAW:', data);
 
-        this.getStoreKeeperStocks = data.map(item => ({
-          id: item.id,
-          itemName: item.itemName,
-          category: item.category,
-          quantity: item.quantity,
-          storeType: item.storeType, 
-          unit: item.unit
-        }));
+      const groupedMap: { [key: string]: any } = {};
 
-        // 🔹 جمع جميع الفئات بدون تكرار
-        this.categories = Array.from(new Set(this.getStoreKeeperStocks.map(i => i.category)));
+      data.forEach(item => {
+        // 🔑 مفتاح التجميع (غيره حسب منطقك لو حابب)
+        const key = `${item.itemName}|${item.storeType}|${item.unit}|${item.category}`;
 
-        // 🔹 عرض كل الأصناف مبدئيًا
-        this.filteredStocks = [...this.getStoreKeeperStocks];
-      },
-      error: (err: any) => console.error('Error loading store keeper stocks', err)
-    });
-  }
+        if (!groupedMap[key]) {
+          groupedMap[key] = {
+            itemName: item.itemName,
+            category: item.category,
+            storeType: item.storeType,
+            unit: item.unit,
+            quantity: Number(item.quantity) || 0
+          };
+        } else {
+          groupedMap[key].quantity += Number(item.quantity) || 0;
+        }
+      });
+
+      // 🔹 نحول الـ object لـ array
+      this.getStoreKeeperStocks = Object.values(groupedMap);
+
+      // 🔹 استخراج الفئات بدون تكرار
+      this.categories = Array.from(
+        new Set(this.getStoreKeeperStocks.map(i => i.category))
+      );
+
+      // 🔹 عرض كل الأصناف مبدئيًا
+      this.filteredStocks = [...this.getStoreKeeperStocks];
+
+      console.log('STORE KEEPER STOCKS GROUPED:', this.getStoreKeeperStocks);
+    },
+    error: (err: any) =>
+      console.error('Error loading store keeper stocks', err)
+  });
+}
+
 
   // =========================
   // فلترة حسب الفئة

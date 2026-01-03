@@ -37,11 +37,15 @@
   </aside>
 
   <main class="forms-container m-auto">
-    <form *ngFor="let form of consumableForms; let fIndex = index"
-          [formGroup]="form"
-          (ngSubmit)="onSubmitForm(form)"
-          class="form-container mb-5"
-          dir="rtl">
+  
+    <!--  لو مفيش أذونات -->
+    <div *ngIf="consumableForms.length === 0" class="no-data-message">
+      لا يوجد أذونات حالية
+    </div>
+  
+    <!--  لو فيه أذونات -->
+    <form *ngFor="let form of consumableForms; let fIndex = index" [formGroup]="form" (ngSubmit)="onSubmitForm(form)"
+      class="form-container mb-5" dir="rtl">
 
       <header class="form-header text-center">
         <h2 class="title">طلب و إذن صرف</h2>
@@ -122,19 +126,27 @@
 
               <td>
                 <input type="number" min="0" formControlName="quantityRequired" class="table-input"
-                       (input)="updateValue(fIndex, i)">
+                       (input)="updateValue(fIndex, i)" readonly>
               </td>
-              <td><input type="number" min="0" formControlName="quantityAuthorized" class="table-input"></td>
+              <td><input type="number" min="0" formControlName="quantityAuthorized" class="table-input"
+                (input)="syncIssuedQuantity(fIndex, i); updateValue(fIndex, i)" />
+              </td>
               <td>
-                <input type="number" min="0" formControlName="quantityIssued" class="table-input"
-                  (input)="updateValue(fIndex, i); checkIssuedQuantity(fIndex, i)" />
-
-                <div *ngIf="rowGroup.get('quantityIssued')?.errors?.['exceedStock']" class="text-danger small mt-1">
-                  الكمية المطلوبة أكبر من المتاح في المخزن
-                  (المتاح: {{ rowGroup.get('quantityIssued')?.errors?.['exceedStock']?.available }})
+                <input type="number" formControlName="quantityIssued" class="table-input" readonly />
+              
+                <!-- ❌ الصنف غير موجود -->
+                <div *ngIf="rowGroup.errors?.['stockError']" class="text-danger small mt-1">
+                  الصنف غير موجود في المخزن
+                </div>
+              
+                <!-- ❌ الكمية الإجمالية غير كافية -->
+                <div *ngIf="rowGroup.errors?.['exceedStock']" class="text-danger small mt-1">
+                  الكمية الإجمالية المطلوبة
+                  ({{ rowGroup.errors?.['exceedStock']?.required }})
+                  أكبر من المتاح في المخزن
+                  (المتاح: {{ rowGroup.errors?.['exceedStock']?.available }})
                 </div>
               </td>
-
 
               <td>
                 <input type="text" formControlName="storeType" class="table-input" readonly />

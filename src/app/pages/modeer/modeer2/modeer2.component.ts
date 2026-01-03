@@ -27,6 +27,20 @@ export function fourStringsValidator(): ValidatorFn {
       : { fourStrings: { requiredCount: 4, actualCount: words.length } };
   };
 }
+/** Validator يمنع القيم الفاضية أو المسافات فقط */
+export function notEmptyTrimmed(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = control.value;
+    if (value === null || value === undefined) return { required: true };
+
+    if (typeof value === 'string' && value.trim() === '') {
+      return { emptyTrimmed: true };
+    }
+
+    return null;
+  };
+}
+
 @Component({
   selector: 'app-modeer2',
   standalone: true,
@@ -66,6 +80,26 @@ export class Modeer2Component implements OnInit {
   });
 }
 
+public syncIssuedQuantity(formIndex: number, rowIndex: number): void {
+  const row = (this.consumableForms[formIndex]
+    .get('tableData') as FormArray).at(rowIndex) as FormGroup;
+
+  const required = Number(row.get('quantityRequired')?.value || 0);
+  const approved = Number(row.get('quantityAuthorized')?.value || 0);
+
+  if (required <= approved) {
+    row.get('quantityIssued')?.setValue(required, { emitEvent: false });
+  } else {
+    row.get('quantityIssued')?.setValue(approved, { emitEvent: false });
+  }
+
+  // تحديث القيمة الإجمالية
+  const unitPrice = Number(row.get('unitPrice')?.value || 0);
+  row.patchValue(
+    { value: row.get('quantityIssued')?.value * unitPrice },
+    { emitEvent: false }
+  );
+}
 
   private getAvailableQuantity(itemName: string, storeType: string): number {
   const stockItem = this.storeKeeperStocks.find(
@@ -74,30 +108,81 @@ export class Modeer2Component implements OnInit {
 
   return stockItem?.quantity || 0;
 }
+public checkStockForForm(form: FormGroup): boolean {
 
-checkIssuedQuantity(formIndex: number, rowIndex: number) {
-  const row = (this.consumableForms[formIndex].get('tableData') as FormArray).at(rowIndex);
+  const tableArray = form.get('tableData') as FormArray;
+  let hasError = false;
 
-  const issued = Number(row.get('quantityIssued')?.value || 0);
-  const itemName = row.get('itemName')?.value;
-  const storeType = row.get('storeType')?.value;
+  // 🔹 مسح أي أخطاء قديمة
+  tableArray.controls.forEach(ctrl => {
+    (ctrl as FormGroup).setErrors(null);
+  });
 
-  const available = this.getAvailableQuantity(itemName, storeType);
+  // 1️⃣ تجميع الكمية المطلوبة لكل صنف
+  const requiredMap = new Map<string, number>();
 
-  if (issued > available) {
-    row.get('quantityIssued')?.setErrors({
-      exceedStock: { available }
-    });
-  } else {
-    const errors = row.get('quantityIssued')?.errors;
-    if (errors) {
-      delete errors['exceedStock'];
-      if (Object.keys(errors).length === 0) {
-        row.get('quantityIssued')?.setErrors(null);
-      }
+  tableArray.controls.forEach(ctrl => {
+    const row = ctrl as FormGroup;
+
+    const itemName = row.get('itemName')?.value;
+    const storeType = row.get('storeType')?.value;
+    const category = form.get('category')?.value;
+    const qty = Number(row.get('quantityIssued')?.value || 0);
+
+    const key = `${itemName}|${storeType}|${category}`;
+    requiredMap.set(key, (requiredMap.get(key) || 0) + qty);
+  });
+
+  //  فحص المخزون
+  requiredMap.forEach((totalRequired, key) => {
+    const [itemName, storeType, category] = key.split('|');
+
+    const matchingStocks = this.storeKeeperStocks.filter(s =>
+  s.itemName?.trim() === itemName?.trim() &&
+  s.storeType?.trim() === storeType?.trim() &&
+  s.category?.trim() === category?.trim()
+);
+
+
+    //  الصنف غير موجود
+    if (matchingStocks.length === 0) {
+      hasError = true;
+
+      tableArray.controls.forEach(ctrl => {
+        const row = ctrl as FormGroup;
+        if (row.get('itemName')?.value === itemName) {
+          row.setErrors({ stockError: true });
+        }
+      });
+
+      return;
     }
-  }
+
+    const totalAvailable = matchingStocks
+      .reduce((sum, s) => sum + Number(s.quantity || 0), 0);
+
+    // ❌ الكمية غير كافية
+    if (totalRequired > totalAvailable) {
+      hasError = true;
+
+      tableArray.controls.forEach(ctrl => {
+        const row = ctrl as FormGroup;
+        if (row.get('itemName')?.value === itemName) {
+          row.setErrors({
+            exceedStock: {
+              required: totalRequired,
+              available: totalAvailable
+            }
+          });
+        }
+      });
+    }
+  });
+
+  return hasError;
 }
+
+
 
   private getItemDefaults(itemName: string): { unit: string; storeType: string } {
   if (!itemName) {
@@ -160,39 +245,64 @@ checkIssuedQuantity(formIndex: number, rowIndex: number) {
 
   /** إنشاء فورم جاهز */
   private createForm(): FormGroup {
-    return this.fb.group({
-      destinationName: ['', Validators.required],
-      category: ['', Validators.required],
-      requestDateGroup: ['', Validators.required],
-      regularDateGroup: [this.getTodayDate(), Validators.required],
-      requestorName: ['', [Validators.required, fourStringsValidator()]],
-      documentNumber: ['', Validators.required],
-       managerSignature: [
+  return this.fb.group({
+    destinationName: ['', Validators.required],
+    category: ['', Validators.required],
+    requestDateGroup: ['', Validators.required],
+    regularDateGroup: [this.getTodayDate(), Validators.required],
+
+    requestorName: ['', [Validators.required, fourStringsValidator()]],
+
+    documentNumber: [
+      '',
+      [Validators.required, notEmptyTrimmed()]
+    ],
+
+    managerSignature: [
       this.userName,
       [Validators.required, fourStringsValidator()]
     ],
-      tableData: this.fb.array([])
-    });
-  }
+
+    tableData: this.fb.array([])
+  });
+}
+
 
   private createTableRowFormGroup(): FormGroup {
-    return this.fb.group({
-      storeType: ['', Validators.required],
-      itemName: [''],
-      itemSearchText: [''],
-      category: [''],
-      unit: [''],
-      quantityRequired: [''],
-      quantityAuthorized: [''],
-      quantityIssued: [''],
-      itemCondition: [''],
-      unitPrice: [
+  return this.fb.group({
+    storeType: ['', Validators.required],
+
+    itemName: ['', [Validators.required, notEmptyTrimmed()]],
+    itemSearchText: ['', [Validators.required, notEmptyTrimmed()]],
+    category: ['', Validators.required],
+    unit: ['', Validators.required],
+
+    quantityRequired: [
+      '',
+      [Validators.required, Validators.min(1)]
+    ],
+
+    quantityAuthorized: [
+      '',
+      [Validators.required, Validators.min(1)]
+    ],
+
+    quantityIssued: [
+      '',
+      [Validators.required, Validators.min(1)]
+    ],
+
+    itemCondition: ['', Validators.required],
+
+    unitPrice: [
       null,
       [Validators.required, Validators.min(0.01)]
     ],
-      value: this.fb.control({ value: 0, disabled: true })
-    });
-  }
+
+    value: this.fb.control({ value: 0, disabled: true })
+  });
+}
+
 
   private loadSpendNotes() {
     this.http.get<any[]>('https://newwinventoryapi.runasp.net/api/SpendNotes')
@@ -287,13 +397,42 @@ removeRowFromForm(form: FormGroup) {
   }
 
   /** حفظ الفورم */
-  onSubmitForm(form: FormGroup) {
-  if (form.invalid) {
-  form.markAllAsTouched();
-  this.scrollToFirstInvalidControl(form);
-  return;
-}
+onSubmitForm(form: FormGroup) {
 
+  // 1️⃣ فاليديشن الفورم الأساسي
+  if (form.invalid) {
+    form.markAllAsTouched();
+    this.scrollToFirstInvalidControl(form);
+    return;
+  }
+
+  // 2️⃣ فاليديشن الصفوف (tableData)
+  const tableArray = form.get('tableData') as FormArray;
+
+  let hasRowError = false;
+
+  tableArray.controls.forEach(control => {
+  const row = control as FormGroup; // 👈 الحل هنا
+
+  Object.values(row.controls).forEach(ctrl => {
+    ctrl.markAsTouched();
+    ctrl.updateValueAndValidity();
+  });
+
+  if (row.invalid) {
+    hasRowError = true;
+  }
+});
+
+
+  if (hasRowError) {
+    this.scrollToFirstInvalidControl(form);
+    return;
+  }
+
+  // ===============================
+  // لو وصلنا هنا → كله VALID ✅
+  // ===============================
 
   this.isSubmitting.set(true);
   const formVal = form.value;
@@ -309,75 +448,83 @@ removeRowFromForm(form: FormGroup) {
     documentNumber: formVal.documentNumber
   };
 
+  // اسم مختلف عشان مايحصلش redeclare
+  const tableRows = formVal.tableData;
 
-
-
-
-  const tableData = formVal.tableData;
-
-  // حفظ كل صفوف الفورم الحالي
-  const saveRequests = tableData.map((row: any) => {
-    return this.http.post('https://newwinventoryapi.runasp.net/api/SpendPermissions', {
-      ...basePayload,
-      itemName: row.itemName,
-      unit: row.unit,
-      storeType: row.storeType,
-      requestedQuantity: Number(row.quantityRequired || 0),
-      approvedQuantity: Number(row.quantityAuthorized || 0),
-      issuedQuantity: Number(row.quantityIssued || 0),
-      storeHouse: row.storeType,
-      stockStatus: row.itemCondition || 'جديدة',
-      unitPrice: Number(row.unitPrice || 0),
-      totalValue: Number(row.quantityIssued || 0) * Number(row.unitPrice || 0)
-    }).toPromise();
+  const saveRequests = tableRows.map((row: any) => {
+    return this.http.post(
+      'https://newwinventoryapi.runasp.net/api/SpendPermissions',
+      {
+        ...basePayload,
+        itemName: row.itemName,
+        unit: row.unit,
+        storeType: row.storeType,
+        requestedQuantity: Number(row.quantityRequired),
+        approvedQuantity: Number(row.quantityAuthorized),
+        issuedQuantity: Number(row.quantityIssued),
+        storeHouse: row.storeType,
+        stockStatus: row.itemCondition,
+        unitPrice: Number(row.unitPrice),
+        totalValue: Number(row.quantityIssued) * Number(row.unitPrice)
+      }
+    ).toPromise();
   });
 
-
-
   Promise.all(saveRequests)
-    .then(() => this.http.get<any[]>('https://newwinventoryapi.runasp.net/api/SpendNotes').toPromise())
+    .then(() =>
+      this.http
+        .get<any[]>('https://newwinventoryapi.runasp.net/api/SpendNotes')
+        .toPromise()
+    )
     .then(notes => {
       if (!notes) return;
 
-      // فلترة المذكرات المرتبطة فقط بالفورم الحالي
       const notesToUpdate = notes.filter(n =>
         n.permissinStatus === 'الطلب مقبول' &&
         n.confirmationStatus === 'لم يؤكد' &&
         n.category === formVal.category &&
         n.college === formVal.destinationName &&
-        n.requestDate?.slice(0,10) === formVal.requestDateGroup
+        n.requestDate?.slice(0, 10) === formVal.requestDateGroup
       );
 
-      // تحديث الحالة فقط لهذه المذكرات
       const updateRequests = notesToUpdate.map(note =>
-        this.http.put(`https://newwinventoryapi.runasp.net/api/SpendNotes/${note.id}`, {
-          ...note,
-          confirmationStatus: 'مؤكد'
-        }).toPromise()
+        this.http.put(
+          `https://newwinventoryapi.runasp.net/api/SpendNotes/${note.id}`,
+          {
+            ...note,
+            confirmationStatus: 'مؤكد'
+          }
+        ).toPromise()
       );
 
       return Promise.all(updateRequests);
     })
     .then(() => {
-  this.statusMessage = 'تم الحفظ وتأكيد الاذن بنجاح ✅';
-  this.statusType = 'success';
+      this.statusMessage = 'تم الحفظ وتأكيد الاذن بنجاح ✅';
+      this.statusType = 'success';
 
-  // إزالة الفورم الحالي من الصفحة
-  const index = this.consumableForms.indexOf(form);
-  if (index > -1) {
-    this.consumableForms.splice(index, 1);
-  }
+      const index = this.consumableForms.indexOf(form);
+      if (index > -1) {
+        this.consumableForms.splice(index, 1);
+      }
 
-  this.isSubmitting.set(false);
-})
-
+      this.isSubmitting.set(false);
+    })
     .catch(err => {
       console.error('Save error:', err);
       this.statusMessage = 'حدث خطأ أثناء الحفظ ❌';
       this.statusType = 'error';
+      const hasStockError = this.checkStockForForm(form);
+
+if (hasStockError) {
+  this.scrollToFirstInvalidControl(form);
+  return;
+}
+
       this.isSubmitting.set(false);
     });
 }
+
 
 
 

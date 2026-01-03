@@ -69,6 +69,13 @@
                                     <label>العدد:</label>
                                     <span>{{ item.quantity }}</span>
                                 </div>
+                                <!-- رسالة الخطأ تحت الصنف -->
+                                <div *ngIf="item.stockError" class="text-danger small mt-1 me-3">
+                                    {{ item.stockError }}
+                                    <span *ngIf="item.availableQty !== null">
+                                        — المتاح: {{ item.availableQty }}
+                                    </span>
+                                </div>
                             </div>
                         </div>
 

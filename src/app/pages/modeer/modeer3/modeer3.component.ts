@@ -17,6 +17,8 @@ userName: string = '';
 
   spendNotes: any[] = [];
   groupedNotes: any[] = [];
+  storeKeeperStocks: any[] = [];
+
 
   constructor(private modeerService: ModeerSercive) {}
 
@@ -69,29 +71,161 @@ userName: string = '';
     return Array.from(map.values())
       .sort((a, b) => new Date(b.requestDate).getTime() - new Date(a.requestDate).getTime());
   }
+  loadStoreKeeperStocks(): Promise<any[]> {
+  return new Promise((resolve, reject) => {
+    this.modeerService.getStoreKeeperStocks().subscribe({
+      next: (data) => resolve(data),
+      error: (err) => reject(err)
+    });
+  });
+}
+groupStoreStocks(stocks: any[]): Map<string, number> {
+  const map = new Map<string, number>();
 
-// 1. تحديث دالة changeStatus
-changeStatus(note: any, decision: 'مقبول' | 'مرفوض'): void {
-  note.showButtons = false;
-  note.decision = decision;
-  note.rejectionReason = '';
-  note.showReasonError = false;
+  stocks.forEach(stock => {
+    const key = `${stock.itemName}|${stock.storeType}|${stock.unit}`;
 
-  note.currentStatus =
-    decision === 'مقبول'
-      ? 'هل تريد قبول الطلب ؟'
-      : 'هل تريد رفض الطلب ؟';
+    const currentQty = map.get(key) || 0;
+    map.set(key, currentQty + Number(stock.quantity || 0));
+  });
+
+  return map;
+}
+checkStockAvailability(note: any, stockMap: Map<string, number>, stocks: any[]): boolean {
+
+  let hasError = false;
+  const reasons: string[] = [];
+
+  // نمسح أي أخطاء قديمة
+  note.items.forEach((item: any) => {
+    item.stockError = null;
+    item.availableQty = null;
+  });
+
+  for (const item of note.items) {
+
+    const sameNameStocks = stocks.filter(
+      s => s.itemName === item.itemName
+    );
+
+    if (sameNameStocks.length === 0) {
+      item.stockError = 'الصنف غير موجود في المخزن';
+      reasons.push(`الصنف (${item.itemName}) غير موجود في المخزن`);
+      hasError = true;
+      continue;
+    }
+
+    const sameCategoryStocks = sameNameStocks.filter(
+      s => s.category === note.category
+    );
+
+    if (sameCategoryStocks.length === 0) {
+      const foundCategories = Array.from(
+        new Set(sameNameStocks.map(s => s.category))
+      ).join(' ، ');
+
+      item.stockError =
+        `الصنف موجود ولكن من فئة (${foundCategories}) وليس من فئة (${note.category})`;
+
+      reasons.push(
+        `الصنف (${item.itemName}) موجود في فئة (${foundCategories}) وليس في فئة (${note.category})`
+      );
+
+      hasError = true;
+      continue;
+    }
+
+    const totalAvailable = sameCategoryStocks
+      .reduce((sum, s) => sum + Number(s.quantity || 0), 0);
+
+    if (item.quantity > totalAvailable) {
+      item.stockError = 'الكمية غير كافية';
+      item.availableQty = totalAvailable;
+
+      reasons.push(
+        `الكمية غير كافية للصنف (${item.itemName}) — المتاح: ${totalAvailable}`
+      );
+
+      hasError = true;
+    }
+  }
+
+  //  نخزن سبب الرفض تلقائيًا
+  note.autoRejectionReason = reasons.join(' | ');
+
+  return hasError;
 }
 
 
-// 2. تحديث دالة confirmNote
-confirmNote(note: any): void {
+
+async changeStatus(note: any, decision: 'مقبول' | 'مرفوض'): Promise<void> {
+
+  // نخزن القرار
+  note.decision = decision;
+  note.showReasonError = false;
+
+  try {
+    // 🔹 نحمّل المخزون ونعمل فحص في الحالتين
+    const stocks = await this.loadStoreKeeperStocks();
+    const stockMap = this.groupStoreStocks(stocks);
+
+    const hasStockError = this.checkStockAvailability(note, stockMap, stocks);
+
+    // =================================
+    // 🔴 حالة الرفض
+    // =================================
+    if (decision === 'مرفوض') {
+
+      note.showButtons = false;
+
+      // ✅ سبب الرفض تلقائي
+      if (hasStockError && note.autoRejectionReason) {
+        note.rejectionReason = note.autoRejectionReason;
+      } else {
+        note.rejectionReason = 'تم رفض الطلب';
+      }
+
+      note.currentStatus = 'سبب الرفض';
+      return;
+    }
+
+    // =================================
+    // 🟢 حالة القبول
+    // =================================
+    if (decision === 'مقبول') {
+
+      // ❌ لو فيه مشاكل مخزون → نمنع القبول
+      if (hasStockError) {
+        note.showButtons = true;   // يفضل في نفس المرحلة
+        note.currentStatus = '';
+        note.decision = null;
+        return;
+      }
+
+      // ✅ لو كله تمام
+      note.showButtons = false;
+      note.rejectionReason = '';
+      note.currentStatus = 'هل تريد قبول الطلب ؟';
+      return;
+    }
+
+  } catch (err) {
+    // ❌ خطأ تقني
+    note.showButtons = true;
+    note.currentStatus = '';
+  }
+}
+
+async confirmNote(note: any): Promise<void> {
 
   // ❌ منع التأكيد بدون سبب رفض
   if (note.decision === 'مرفوض' && !note.rejectionReason?.trim()) {
     note.showReasonError = true;
     return;
   }
+
+  // هنا مفيش فحص مخزون
+  // لأن الفحص تم وقت الضغط على "قبول الطلب"
 
   const finalStatus =
     note.decision === 'مقبول' ? 'الطلب مقبول' : 'الطلب مرفوض';
@@ -134,6 +268,7 @@ confirmNote(note: any): void {
 
   this.groupedNotes = this.groupedNotes.filter(n => n !== note);
 }
+
 
   cancelChange(note: any): void {
     note.showButtons = true;
