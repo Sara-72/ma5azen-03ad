@@ -143,11 +143,18 @@
                 </div>
             </ng-container>
 
-            <ng-template #noData>
-                <p class="text-center mt-5 fs-4 text-muted">
-                    لا توجد مذكرات صرف
-                </p>
-            </ng-template>
+<ng-template #noData>
+  <div class="no-data-wrapper">
+    <div class="text-center">
+      <i class="fas fa-clipboard-list d-block mb-3 empty-icon m-auto"></i>
+
+      <p class="fw-bold fs-4 text-muted m-0">
+        لا توجد مذكرات صرف حالياً.
+      </p>
+
+    </div>
+  </div>
+</ng-template>
 
         </div>
     </div>

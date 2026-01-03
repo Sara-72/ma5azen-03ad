@@ -37,12 +37,14 @@
   </aside>
 
   <main class="forms-container m-auto">
-  
-    <!--  لو مفيش أذونات -->
-    <div *ngIf="consumableForms.length === 0" class="no-data-message">
-      لا يوجد أذونات حالية
+
+<div *ngIf="consumableForms.length === 0" class="no-data-wrapper">
+    <div class="text-center">
+        <i class="fas fa-clipboard-list d-block mb-3 empty-icon m-auto"></i>
+        <p class="fw-bold fs-4 text-muted m-0">لا توجد أذونات صرف حالياً.</p>
     </div>
-  
+</div>
+
     <!--  لو فيه أذونات -->
     <form *ngFor="let form of consumableForms; let fIndex = index" [formGroup]="form" (ngSubmit)="onSubmitForm(form)"
       class="form-container mb-5" dir="rtl">
@@ -133,12 +135,12 @@
               </td>
               <td>
                 <input type="number" formControlName="quantityIssued" class="table-input" readonly />
-              
+
                 <!-- ❌ الصنف غير موجود -->
                 <div *ngIf="rowGroup.errors?.['stockError']" class="text-danger small mt-1">
                   الصنف غير موجود في المخزن
                 </div>
-              
+
                 <!-- ❌ الكمية الإجمالية غير كافية -->
                 <div *ngIf="rowGroup.errors?.['exceedStock']" class="text-danger small mt-1">
                   الكمية الإجمالية المطلوبة

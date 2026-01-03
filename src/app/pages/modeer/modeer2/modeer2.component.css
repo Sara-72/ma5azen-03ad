@@ -368,10 +368,42 @@ textarea.ng-invalid.ng-touched {
     0% { opacity: 0; transform: scale(0.8) translateZ(-100px); }
     100% { opacity: 1; transform: scale(1) translateZ(0); }
 }
-.no-data-message {
+
+
+
+/* Center the container in the middle of the screen/parent */
+.no-data-wrapper {
+    display: flex;
+    justify-content: center;   /* Horizontal centering */
+    align-items: center;       /* Vertical centering */
+    min-height: 60vh;          /* Position it in the center of the viewport */
+    width: 100%;
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+/* Icon Styling: Primary color with a subtle drop shadow */
+.empty-icon {
+    font-size: 5rem;
+
+    color: var(--primary-color);
+ 
+
+    margin-bottom: 20px;
+}
+
+/* Smooth fade-in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Ensure FontAwesome is centered if using d-block */
+.text-center {
     text-align: center;
-    font-size: 1.4rem;
-    color: #6c757d;
-    margin-top: 4rem;
-    font-weight: 500;
 }
