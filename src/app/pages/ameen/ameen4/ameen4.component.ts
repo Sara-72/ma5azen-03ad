@@ -50,17 +50,23 @@ export class Ameen4Component implements OnInit {
       const consumer: any[] = [];
       const durable: any[] = [];
 
-      ledgerEntries.forEach(entry => {
-        const row = {
-          date: entry.date ? new Date(entry.date) : new Date(),
-          itemName: entry.itemName,
-          category: entry.storeType === 0 ? 'مستهلك' : 'مستديم',
-          quantity: entry.itemsValue,
-          source: entry.documentReference
-        };
+      ledgerEntries
+  .sort((a, b) => {
+    return new Date(a.date).getTime() - new Date(b.date).getTime();
+  })
+  .forEach(entry => {
 
-        entry.storeType === 0 ? consumer.push(row) : durable.push(row);
-      });
+    const row = {
+      date: entry.date ? new Date(entry.date) : new Date(),
+      itemName: entry.itemName,
+      category: entry.storeType === 0 ? 'مستهلك' : 'مستديم',
+      quantity: entry.itemsValue,
+      source: entry.documentReference
+    };
+
+    entry.storeType === 0 ? consumer.push(row) : durable.push(row);
+  });
+
 
       this.consumerEntries.set(consumer);
       this.durableEntries.set(durable);
