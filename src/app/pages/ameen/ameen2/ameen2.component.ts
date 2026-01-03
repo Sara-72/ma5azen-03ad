@@ -23,6 +23,10 @@ export class Ameen2Component implements OnInit {
 
   userName: string = '';
   displayName: string = '';
+  statusMessage: string | null = null;
+  statusType: 'success' | 'error' | null = null;
+  simpleForm!: FormGroup;
+
 
   assetTypes: string[] = ['مستهلك', 'مستديم'];
   sourceDestinationOptions: string[] = ['وارد من', 'منصرف الى'];
@@ -89,6 +93,10 @@ export class Ameen2Component implements OnInit {
       transactionType: ['added', Validators.required] // 'added' = وارد | 'issued' = منصرف
     });
   }
+  private sameDay(d1: string, d2: string): boolean {
+  return d1.split('T')[0] === d2.split('T')[0];
+}
+
 
   addRow(): void {
     this.tableData.push(this.createTableRowFormGroup());
@@ -102,52 +110,111 @@ export class Ameen2Component implements OnInit {
     }
   }
 
-  onSubmit(): void {
-    if (this.inventoryLogForm.invalid) {
-      this.inventoryLogForm.markAllAsTouched();
-      return;
-    }
+ onSubmit(): void {
+  if (this.inventoryLogForm.invalid) {
+    this.inventoryLogForm.markAllAsTouched();
+    return;
+  }
 
-    this.isSubmitting.set(true);
+  this.isSubmitting.set(true);
 
-    const assetTypeIndex = this.assetTypes.indexOf(this.inventoryLogForm.value.assetType);
+  const assetTypeIndex =
+    this.assetTypes.indexOf(this.inventoryLogForm.value.assetType);
 
-    const requests = this.tableData.value.map((row: any) => {
-      const itemsValue =
-        row.transactionType === 'added'
-          ? Number(row.addedValue || 0)
-          : -(Number(row.issuedValue || 0));
+  /* ========== STEP 1: GROUP FORM ROWS ========== */
+  const rawRows = this.inventoryLogForm.getRawValue().tableData;
 
-      const entry: LedgerEntry = {
-        date: new Date(row.date).toISOString(),
+  const groupedMap = new Map<string, any>();
+
+  rawRows.forEach((row: any) => {
+    const value =
+      row.transactionType === 'added'
+        ? Number(row.addedValue || 0)
+        : -(Number(row.issuedValue || 0));
+
+    const key = [
+      row.date,
+      row.itemName,
+      assetTypeIndex,
+      row.sourceOrDestination
+    ].join('|');
+
+    if (groupedMap.has(key)) {
+      groupedMap.get(key).itemsValue += value;
+    } else {
+      groupedMap.set(key, {
+        date: row.date,
         itemName: row.itemName,
         documentReference: row.sourceOrDestination,
-        itemsValue: itemsValue,
         storeType: assetTypeIndex,
-        spendPermissionId: null,
-        spendPermission: null
-      };
+        itemsValue: value
+      });
+    }
+  });
 
-      return lastValueFrom(
-        this.ledgerService.addLedgerEntry(entry).pipe(
-          catchError(err => {
-            console.error('API Error:', err);
-            throw err;
-          })
-        )
+  const rows = Array.from(groupedMap.values());
+
+  /* ========== STEP 2: SAVE TO DATABASE ========== */
+  let completed = 0;
+  const total = rows.length;
+
+  this.ledgerService.getLedgerEntries().pipe(
+    catchError(() => of([]))
+  ).subscribe(existingEntries => {
+
+    rows.forEach(row => {
+
+      const existing = existingEntries.find(e =>
+        e.itemName === row.itemName &&
+        e.documentReference === row.documentReference &&
+        e.storeType === row.storeType &&
+        this.sameDay(e.date, row.date)
       );
-    });
 
-    Promise.all(requests)
-      .then(() => {
-        alert('تم حفظ البيانات بنجاح');
-        this.inventoryLogForm.reset();
-        this.tableData.clear();
-        this.addRow();
-      })
-      .catch(() => {
-        alert('فشل حفظ البيانات');
-      })
-      .finally(() => this.isSubmitting.set(false));
+      /* ===== UPDATE ===== */
+      if (existing) {
+        this.ledgerService.updateLedgerEntry(existing.id!, {
+          ...existing,
+          itemsValue: existing.itemsValue + row.itemsValue
+        }).subscribe(() => {
+          this.handleComplete(++completed, total);
+        });
+
+      /* ===== ADD ===== */
+      } else {
+        this.ledgerService.addLedgerEntry({
+          date: new Date(row.date).toISOString(),
+          itemName: row.itemName,
+          documentReference: row.documentReference,
+          itemsValue: row.itemsValue,
+          storeType: row.storeType,
+          spendPermissionId: null,
+          spendPermission: null
+        }).subscribe(() => {
+          this.handleComplete(++completed, total);
+        });
+      }
+    });
+  });
+}
+private handleComplete(done: number, total: number) {
+  if (done === total) {
+    this.isSubmitting.set(false);
+    alert('تم حفظ البيانات بنجاح');
+    this.showStatus('تم حفظ البيانات بنجاح', 'success');
+    this.simpleForm.reset();
+    this.tableData.clear();
+    this.addRow();
   }
+}
+ showStatus(msg: string, type: 'success' | 'error') {
+    this.statusMessage = msg;
+    this.statusType = type;
+  }
+
+  closeStatusMessage() {
+    this.statusMessage = null;
+    this.statusType = null;
+  }
+
 }
