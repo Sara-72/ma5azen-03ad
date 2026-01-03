@@ -69,6 +69,13 @@
                                     <label>العدد:</label>
                                     <span>{{ item.quantity }}</span>
                                 </div>
+                                <!-- رسالة الخطأ تحت الصنف -->
+                                <div *ngIf="item.stockError" class="text-danger small mt-1 me-3">
+                                    {{ item.stockError }}
+                                    <span *ngIf="item.availableQty !== null">
+                                        — المتاح: {{ item.availableQty }}
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
@@ -114,12 +121,11 @@
 
                         <!-- Rejection Reason -->
                         <div *ngIf="note.decision === 'مرفوض'" class="mb-3">
-                            <label class="fw-bold">سبب الرفض</label>
                             <textarea class="form-control" rows="3" [(ngModel)]="note.rejectionReason"
-                                placeholder="اكتب سبب الرفض"></textarea>
+                                placeholder="من فضلك قم بكتابة سبب الرفض هنا"></textarea>
 
                             <small class="text-danger" *ngIf="note.showReasonError">
-                                سبب الرفض مطلوب
+                                سبب الرفض لا يمكن ان يكون فارغ
                             </small>
                         </div>
 
