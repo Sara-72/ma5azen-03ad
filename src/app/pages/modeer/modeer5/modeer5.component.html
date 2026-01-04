@@ -45,10 +45,14 @@
         <div class="d-flex align-items-center gap-2 border-end pe-3"
           *ngIf="viewMode === 'history' && auditMode === 'range'">
           <label class="fw-bold">من:</label>
-          <input type="date" class="form-control shadow-sm" [(ngModel)]="startDate" (blur)="onDateBlur()" />
+          <input type="date" class="form-control shadow-sm" [(ngModel)]="startDate" (change)="onDateChange()" />
 
           <label class="fw-bold">إلى:</label>
-          <input type="date" class="form-control shadow-sm" [(ngModel)]="endDate" (blur)="onDateBlur()" />
+          <input type="date" class="form-control shadow-sm" [(ngModel)]="endDate" (change)="onDateChange()" />
+          <!-- رسالة الخطأ -->
+          <div *ngIf="endDateError" class="text-danger small mt-1">
+            {{ endDateError }}
+          </div>
         </div>
 
         <!-- يوم معين -->
@@ -121,21 +125,27 @@
           </thead>
 
           <tbody>
-            <tr *ngFor="let item of filteredInventory">
+            <tr *ngFor="let item of filteredInventory" [ngClass]="getRowClass(item)">
+          
               <td class="fw-bold">{{ item.itemName }}</td>
               <td>{{ item.unit }}</td>
               <td>{{ item.totalQuantity }}</td>
+          
               <td *ngIf="viewMode === 'history'">
                 {{ item.incomingQuantity }}
               </td>
+          
               <td>{{ item.issuedQuantity }}</td>
               <td>{{ item.remainingQuantity }}</td>
+          
               <td [ngClass]="{ 'text-danger fw-bold': getDeficit(item) > 0 }">
                 {{ getDeficit(item) }}
               </td>
+          
               <td>
                 <span class="category-pill">{{ item.category }}</span>
               </td>
+          
               <td>
                 <span [ngClass]="{
                     'badge-permanent': item.itemType === 'مستديم',
@@ -145,7 +155,7 @@
                 </span>
               </td>
             </tr>
-
+          
             <tr *ngIf="filteredInventory.length === 0">
               <td [attr.colspan]="viewMode === 'history' ? 9 : 8" class="text-center py-4 text-muted">
                 لا توجد بيانات

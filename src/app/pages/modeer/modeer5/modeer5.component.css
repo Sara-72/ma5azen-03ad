@@ -379,3 +379,13 @@ input[type="date"] {
     border: 1px solid #bbdefb;
     font-weight: bold;
 }
+/*  صف فيه عجز */
+.row-deficit {
+    background-color: #ffe6e6 !important;
+}
+
+/*  أي منصرف (حالة حالية أو سجلات) */
+.row-live-issued,
+.row-history-move {
+    background-color: #e7f1ff;
+}

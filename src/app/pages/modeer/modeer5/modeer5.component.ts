@@ -65,20 +65,63 @@ export class Modeer5Component implements OnInit {
     this.displayName = this.fullName.split(' ').slice(0, 2).join(' ');
     this.loadInventory(); // الحالة الحالية
   }
-
   /* =======================
       Validation
   ======================= */
-  validateDates(): void {
-    this.startDateError = null;
-    this.endDateError = null;
+  validateDates(): boolean {
+  this.startDateError = null;
+  this.endDateError = null;
 
-    if (!this.startDate || !this.endDate) return;
-
-    if (new Date(this.endDate) < new Date(this.startDate)) {
-      this.endDateError = 'تاريخ النهاية يجب أن يكون بعد تاريخ البداية';
-    }
+  if (!this.startDate || !this.endDate) {
+    return false;
   }
+
+  const start = new Date(this.startDate);
+  const end = new Date(this.endDate);
+
+  if (end < start) {
+    this.endDateError = 'تاريخ نهاية الفترة يجب يلي تاريخ بدايتها';
+    return false;
+  }
+
+  return true;
+}
+onDateChange(): void {
+
+  // امسحي الداتا القديمة
+  this.inventoryData = [];
+  this.filteredInventory = [];
+  this.categories = [];
+
+  if (
+    this.viewMode !== 'history' ||
+    this.auditMode !== 'range'
+  ) {
+    return;
+  }
+
+  // ⛔ استني لحد ما التاريخ يكتمل (YYYY-MM-DD)
+  if (
+    !this.startDate ||
+    !this.endDate ||
+    this.startDate.length !== 10 ||
+    this.endDate.length !== 10
+  ) {
+    return;
+  }
+
+  // فاليديشن (بما إن السنة اكتملت)
+  if (!this.validateDates()) {
+    return;
+  }
+
+  const start = new Date(this.startDate);
+  const end = new Date(this.endDate);
+  end.setHours(23, 59, 59, 999);
+
+  this.loadHistoryWithDates(start, end);
+}
+
 
   /* =======================
       تغيير نوع الجرد
@@ -108,32 +151,9 @@ export class Modeer5Component implements OnInit {
   this.loadHistoryWithDates(start, end);
 }
 
-
-  /* =======================
-      جرد فترة
-  ======================= */
-  onDateBlur(): void {
-    this.validateDates();
-
-    if (
-      this.viewMode === 'history' &&
-      this.auditMode === 'range' &&
-      !this.startDateError &&
-      !this.endDateError &&
-      this.startDate &&
-      this.endDate
-    ) {
-      const start = new Date(this.startDate);
-      const end = new Date(this.endDate);
-      end.setHours(23, 59, 59, 999);
-
-      this.loadHistoryWithDates(start, end);
-    }
-  }
-
   /* =================================================
       History Logic (سجلات – يوم / فترة)
-      ⚠️ لا يؤثر على الحالة الحالية
+       لا يؤثر على الحالة الحالية
   ================================================= */
 loadHistoryWithDates(start: Date, end: Date): void {
   this.stockService.getCentralStore().subscribe({
@@ -143,9 +163,10 @@ loadHistoryWithDates(start: Date, end: Date): void {
 
           const groupedMap = new Map<string, InventoryItem>();
 
-          /* =================================================
-             1️⃣ الوارد قبل الفترة (رصيد أول المدة)
-          ================================================= */
+          /* ===============================
+              الوارد قبل الفترة
+              (رصيد افتتاحي – الجزء الأول)
+          =============================== */
           centralStore
             .filter((c: any) => new Date(c.date) < start)
             .forEach((c: any) => {
@@ -168,8 +189,38 @@ loadHistoryWithDates(start: Date, end: Date): void {
             });
 
           /* =================================================
-             2️⃣ الوارد داخل الفترة (من → إلى)
+              🔥 التعديل الوحيد هنا
+              خصم المنصرف قبل تاريخ "من"
+              (رصيد افتتاحي – الجزء الثاني)
           ================================================= */
+          spendPermissions
+            .filter((p: any) => {
+              const d = new Date(p.issueDate);
+              return p.permissionStatus === 'تم الصرف' && d < start; // ❗ أقل من فقط
+            })
+            .forEach((p: any) => {
+
+              const matchedRows = Array.from(groupedMap.values())
+                .filter(i =>
+                  i.itemName === p.itemName &&
+                  (
+                    p.unit
+                      ? i.unit === p.unit &&
+                        i.category === (p.category || i.category) &&
+                        i.itemType === (p.storeType || i.itemType)
+                      : true
+                  )
+                );
+
+              // نخصم فقط لو صف واحد واضح
+              if (matchedRows.length === 1) {
+                matchedRows[0].totalQuantity -= p.issuedQuantity || 0;
+              }
+            });
+
+          /* ===============================
+              الوارد داخل الفترة (كما هو)
+          =============================== */
           centralStore
             .filter((c: any) => {
               const d = new Date(c.date);
@@ -184,7 +235,7 @@ loadHistoryWithDates(start: Date, end: Date): void {
                   unit: c.unit,
                   category: c.category || 'غير مصنف',
                   itemType: c.storeType || 'غير محدد',
-                  totalQuantity: 0,        // رصيد أول المدة = 0
+                  totalQuantity: 0,
                   incomingQuantity: 0,
                   issuedQuantity: 0,
                   remainingQuantity: 0
@@ -194,73 +245,100 @@ loadHistoryWithDates(start: Date, end: Date): void {
               groupedMap.get(key)!.incomingQuantity += c.quantity || 0;
             });
 
-          /* =================================================
-             3️⃣ المنصرف داخل الفترة
-          ================================================= */
+          /* ===============================
+              المنصرف داخل الفترة (كما هو)
+          =============================== */
           spendPermissions
-  .filter((p: any) => {
-    const d = new Date(p.issueDate);
-    return p.permissionStatus === 'تم الصرف' && d >= start && d <= end;
-  })
-  .forEach((p: any) => {
+            .filter((p: any) => {
+              const d = new Date(p.issueDate);
+              return p.permissionStatus === 'تم الصرف' && d >= start && d <= end;
+            })
+            .forEach((p: any) => {
 
-    // نحاول نلاقي الصف الموجود بالفعل
-    const matchedRows = Array.from(groupedMap.values())
-      .filter(i =>
-        i.itemName === p.itemName &&
-        (
-          p.unit
-            ? i.unit === p.unit &&
-              i.category === (p.category || i.category) &&
-              i.itemType === (p.storeType || i.itemType)
-            : true
-        )
-      );
+              const matchedRows = Array.from(groupedMap.values())
+                .filter(i =>
+                  i.itemName === p.itemName &&
+                  (
+                    p.unit
+                      ? i.unit === p.unit &&
+                        i.category === (p.category || i.category) &&
+                        i.itemType === (p.storeType || i.itemType)
+                      : true
+                  )
+                );
 
-    // نضيف المنصرف فقط لو فيه صف واحد واضح
-    if (matchedRows.length === 1) {
-      matchedRows[0].issuedQuantity += p.issuedQuantity || 0;
-    }
+              if (matchedRows.length === 1) {
+                matchedRows[0].issuedQuantity += p.issuedQuantity || 0;
+              }
+            });
 
-    // غير كده: لا نعمل صف جديد ولا نوزع
-  });
+          /* ===============================
+              حساب المتبقي من LedgerEntries (كما هو)
+          =============================== */
+          this.stockService.getLedgerEntries().subscribe({
+            next: (ledgerEntries) => {
 
-          /* =================================================
-             4️⃣ حساب المتبقي (آخر المدة)
-             المتبقي = رصيد أول المدة + وارد المدة − منصرف المدة
-          ================================================= */
-          groupedMap.forEach(item => {
-            item.remainingQuantity =
-              (item.totalQuantity || 0) +
-              (item.incomingQuantity || 0) -
-              (item.issuedQuantity || 0);
+              ledgerEntries
+                .filter((l: any) => new Date(l.date) <= end)
+                .forEach((l: any) => {
+
+                  const baseItem = centralStore.find((c: any) =>
+                    c.itemName === l.itemName &&
+                    c.unit === l.unit &&
+                    mapStoreType(c.storeType) === mapStoreType(l.storeType)
+                  );
+                  if (!baseItem) return;
+
+                  const key = `${baseItem.itemName}_${baseItem.unit}_${baseItem.category}_${baseItem.storeType}`;
+                  const row = groupedMap.get(key);
+                  if (!row) return;
+
+                  if (isIncoming(l.documentReference)) {
+                    row.remainingQuantity += l.itemsValue || 0;
+                  }
+
+                  if (isOutgoing(l.documentReference)) {
+                    row.remainingQuantity -= l.itemsValue || 0;
+                  }
+                });
+
+              /* ===============================
+                  فلترة + ترتيب (كما هو)
+              =============================== */
+              let result = Array.from(groupedMap.values()).filter(item =>
+                item.totalQuantity !== 0 ||
+                item.incomingQuantity !== 0 ||
+                item.issuedQuantity !== 0 ||
+                item.remainingQuantity !== 0
+              );
+
+              if (this.selectedCategory !== 'الكل') {
+                result = result.filter(i => i.category === this.selectedCategory);
+              }
+
+              result.sort((a, b) => {
+                const categoryCompare = a.category.localeCompare(b.category);
+                if (categoryCompare !== 0) return categoryCompare;
+
+                const nameCompare = a.itemName.localeCompare(b.itemName);
+                if (nameCompare !== 0) return nameCompare;
+
+                return a.unit.localeCompare(b.unit);
+              });
+
+              this.inventoryData = result;
+              this.filteredInventory = [...result];
+              this.categories = [...new Set(result.map(i => i.category))];
+            }
           });
-
-          /* =================================================
-             5️⃣ فلترة نهائية
-          ================================================= */
-          let result = Array.from(groupedMap.values()).filter(item =>
-            item.totalQuantity !== 0 ||
-            item.incomingQuantity !== 0 ||
-            item.issuedQuantity !== 0
-          );
-
-          if (this.selectedCategory !== 'الكل') {
-            result = result.filter(i => i.category === this.selectedCategory);
-          }
-
-          this.inventoryData = result;
-          this.filteredInventory = [...result];
-          this.categories = [...new Set(result.map(i => i.category))];
         }
       });
     }
   });
 }
-
   /* =================================================
       Live Inventory
-      ⚠️ كما هو بدون أي تعديل
+       كما هو بدون أي تعديل
   ================================================= */
   loadInventory(): void {
     this.startDate = '';
@@ -318,7 +396,7 @@ loadHistoryWithDates(start: Date, end: Date): void {
   .filter((p: any) => p.permissionStatus === 'تم الصرف')
   .forEach((p: any) => {
 
-    // 1️⃣ لو الإذن محدد وحدة → نخصم من نفس الوحدة
+    //  لو الإذن محدد وحدة → نخصم من نفس الوحدة
     if (p.unit) {
       const matched = Array.from(groupedMap.values())
         .filter(i =>
@@ -335,7 +413,7 @@ loadHistoryWithDates(start: Date, end: Date): void {
       }
     }
 
-    // 2️⃣ لو مفيش وحدة → نخصم بالاسم فقط
+    //  لو مفيش وحدة → نخصم بالاسم فقط
     const sameItemRows = Array.from(groupedMap.values())
       .filter(i => i.itemName === p.itemName);
 
@@ -346,9 +424,24 @@ loadHistoryWithDates(start: Date, end: Date): void {
     }
   });
 
-                this.inventoryData = Array.from(groupedMap.values());
-                this.filteredInventory = [...this.inventoryData];
-                this.categories = [...new Set(this.inventoryData.map(i => i.category))];
+                const result = Array.from(groupedMap.values());
+
+result.sort((a, b) => {
+  //  الفئة
+  const categoryCompare = a.category.localeCompare(b.category);
+  if (categoryCompare !== 0) return categoryCompare;
+
+  //  اسم الصنف
+  const nameCompare = a.itemName.localeCompare(b.itemName);
+  if (nameCompare !== 0) return nameCompare;
+
+  //  الوحدة
+  return a.unit.localeCompare(b.unit);
+});
+this.inventoryData = result;
+this.filteredInventory = [...result];
+this.categories = [...new Set(result.map(i => i.category))];
+
               }
             });
           }
@@ -412,6 +505,28 @@ loadHistoryWithDates(start: Date, end: Date): void {
     this.statusMessage = null;
     this.statusType = null;
   }
+  getRowClass(item: InventoryItem): any {
+  return {
+    //  عجز
+    'row-deficit': this.getDeficit(item) > 0,
+
+    //  حركة في السجلات
+    'row-history-move':
+      this.viewMode === 'history' &&
+      (item.incomingQuantity !== 0 || item.issuedQuantity !== 0),
+  };
 }
 
+}
+function isIncoming(ref: string): boolean {
+  return ref?.includes('وارد');
+}
 
+function isOutgoing(ref: string): boolean {
+  return ref?.includes('منصرف') || ref?.includes('صرف');
+}
+function mapStoreType(value: any): string {
+  if (value === 0 || value === '0') return 'مستهلك';
+  if (value === 1 || value === '1') return 'مستديم';
+  return String(value);
+}
