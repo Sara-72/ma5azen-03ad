@@ -96,7 +96,6 @@ checkStockAvailability(note: any, stockMap: Map<string, number>, stocks: any[]):
   let hasError = false;
   const reasons: string[] = [];
 
-  // نمسح أي أخطاء قديمة
   note.items.forEach((item: any) => {
     item.stockError = null;
     item.availableQty = null;
