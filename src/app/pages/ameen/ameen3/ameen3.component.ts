@@ -5,7 +5,7 @@ import { SpendNoteService } from '../../../services/spend-note.service';
 import { CommonModule } from '@angular/common';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { HeaderComponent } from '../../../components/header/header.component';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { LedgerService } from '../../../services/ledger.service';
 
@@ -61,6 +61,10 @@ export class Ameen3Component implements OnInit {
       this.approvePermission(this.confirmingPerm);
     }
   }
+  getStoreTypeNumber(storeType: string): number {
+  return storeType?.trim() === 'مستديم' ? 1 : 0;
+}
+
 
   /* ================= تحميل الأذونات ================= */
 
@@ -111,30 +115,40 @@ export class Ameen3Component implements OnInit {
 
   this.stockService.getAllStocks().subscribe(stocks => {
 
+    /* ================= تجميع الأصناف ================= */
     const groupedItems = new Map<string, any>();
 
     perm.items.forEach((item: any) => {
       const key = `${item.itemName}|${item.storeHouse}|${item.unit}`;
+
       if (!groupedItems.has(key)) {
-        groupedItems.set(key, { ...item, totalQuantity: 0 });
+        groupedItems.set(key, {
+          ...item,
+          totalQuantity: 0
+        });
       }
 
-      groupedItems.get(key).totalQuantity +=
-        (item.issuedQuantity ?? item.requestedQuantity);
+      groupedItems.get(key).totalQuantity += item.issuedQuantity ?? 0;
     });
 
+    /* ================= خصم المخزن FIFO ================= */
     const stockRequests = Array.from(groupedItems.values()).map(group => {
+
       const matchedStocks = stocks
         .filter(s =>
           this.normalize(s.itemName) === this.normalize(group.itemName) &&
           this.normalize(s.category) === this.normalize(perm.category) &&
-          this.normalize(s.storeType) === this.normalize(group.storeHouse) &&
-          this.normalize(s.unit) === this.normalize(group.unit)
+          this.normalize(s.unit) === this.normalize(group.unit) &&
+          this.normalize(s.storeType) === this.normalize(group.storeHouse)
         )
-        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        .sort(
+          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+        );
 
       if (matchedStocks.length === 0) {
-        throw new Error(`الصنف ${group.itemName} غير موجود بالمخزن`);
+        this.statusMessage = `❌ الصنف ${group.itemName} غير موجود بالمخزن`;
+        this.statusType = 'error';
+        return of(null);
       }
 
       let remainingQty = group.totalQuantity;
@@ -142,68 +156,92 @@ export class Ameen3Component implements OnInit {
 
       for (const stock of matchedStocks) {
         if (remainingQty <= 0) break;
+
         const qtyToDeduct = Math.min(stock.quantity, remainingQty);
 
-        if (stock.quantity <= remainingQty) {
-          updates.push(
-            this.stockService.updateStock(stock.id, {
-              stock: { ...stock, quantity: 0, storeKeeperSignature: this.fullName }
-            })
-          );
-          remainingQty -= stock.quantity;
-        } else {
-          updates.push(
-            this.stockService.updateStock(stock.id, {
-              stock: { ...stock, quantity: stock.quantity - remainingQty, storeKeeperSignature: this.fullName }
-            })
-          );
-          remainingQty = 0;
-        }
+        const newQty = stock.quantity - qtyToDeduct;
+
+if (newQty > 0) {
+  // ✔️ تحديث عادي
+  updates.push(
+    this.stockService.updateStock(stock.id, {
+      stock: {
+        ...stock,
+        quantity: newQty,
+        storeKeeperSignature: this.fullName
+      }
+    })
+  );
+} else {
+  // 🔥 newQty === 0 → لا Update
+  // بس نكمل العملية عادي
+  updates.push(of(true));
+}
+
+
+
+        remainingQty -= qtyToDeduct;
       }
 
       if (remainingQty > 0) {
-        throw new Error(`الكمية غير كافية للصنف ${group.itemName}`);
-      }
+  this.statusMessage = `❌ الكمية غير كافية للصنف ${group.itemName}`;
+  this.statusType = 'error';
+  return of(null);
+}
 
-      return forkJoin(updates);
+if (updates.length === 0) {
+  return of(true); // 🔥 يمنع تعليق forkJoin
+}
+
+return forkJoin(updates);
+
     });
 
     forkJoin(stockRequests).subscribe(() => {
 
+      /* ================= تحديث أذونات الصرف ================= */
       const permissionUpdates = perm.items.map((item: any) => {
         const updatedPermission = {
           ...item.fullPermission,
           issueDate: issueDate,
-          issuedQuantity: item.issuedQuantity ?? item.requestedQuantity,
+          issuedQuantity: item.issuedQuantity,
           permissionStatus: 'تم الصرف'
         };
-        return this.spendPermissionService.update(item.permissionId, updatedPermission);
+
+        return this.spendPermissionService.update(
+          item.permissionId,
+          updatedPermission
+        );
       });
 
       forkJoin(permissionUpdates).subscribe(() => {
 
-        // ✅ إضافة LedgerEntries لكل صنف
+        /* ================= إضافة LedgerEntries ================= */
         const ledgerRequests = perm.items.map((item: any) => {
+
+          if (!item.issuedQuantity || item.issuedQuantity <= 0) {
+            return of(null);
+          }
+
           const ledgerEntry = {
             date: new Date().toISOString(),
             itemName: item.itemName,
             unit: item.unit,
-            documentReference: ' منصرف الي', // هنا حسب طلبك
-            itemsValue: item.issuedQuantity ?? item.requestedQuantity,
-            storeType: perm.category === 'مستديم' ? 1 : 0,
+            documentReference: 'منصرف إلى',
+            itemsValue: item.issuedQuantity, // ✅ من الإذن فقط
+            storeType: this.getStoreTypeNumber(item.storeHouse),
             spendPermissionId: item.permissionId,
             status: 'لم يؤكد'
           };
+
           return this.ledgerService.addLedgerEntry(ledgerEntry);
         });
 
         forkJoin(ledgerRequests).subscribe({
           next: () => {
-            // بعد تسجيل LedgerEntries حدث الـ SpendNotes كما هو
             this.updateSpendNotesLikeModeer(perm);
           },
-          error: err => {
-            console.error('❌ خطأ حفظ LedgerEntries', err);
+          error: () => {
             this.statusMessage = '❌ فشل تسجيل سندات اليومية';
             this.statusType = 'error';
           }
@@ -215,6 +253,7 @@ export class Ameen3Component implements OnInit {
 
   });
 }
+
 
 
   /* ================= تحديث SpendNotes (نفس طريقة المدير) ================= */
