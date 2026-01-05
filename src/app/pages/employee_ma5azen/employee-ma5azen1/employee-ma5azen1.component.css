@@ -298,3 +298,95 @@ td {
         width: 100%; /* Full width button for thumbs */
     }
 }
+/* ===== Overlay ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* ===== Modal Box ===== */
+.modal-box {
+  background: #fff;
+  padding: 2.5rem;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 420px;
+  text-align: center;
+  animation: scaleIn 0.25s ease-in-out;
+}
+
+/* ===== Icon ===== */
+.modal-box .icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+/* ===== Button ===== */
+.confirm-btn {
+  margin-top: 1.5rem;
+  padding: 10px 30px;
+  border: none;
+  border-radius: 8px;
+  background-color: #0d6efd;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.confirm-btn:hover {
+  opacity: 0.9;
+}
+
+/* ===== Animation ===== */
+@keyframes scaleIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.modal-overlay {
+  position: fixed !important;
+  inset: 0;
+  transform: none !important;
+}
+/* dropdown الأصناف */
+/* 🔥 dropdown يطلع برا الكارت الأبيض */
+.floating-dropdown {
+  position: absolute; /* مهم */
+  z-index: 9999;
+  max-height: 220px;
+  overflow-y: auto;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  border-radius: 8px;
+  width: 100%; /* بعرض input */
+  margin-top: 2px; /* اختياري */
+}
+
+
+.table-section.no-transform {
+  transform: none !important;
+}
+
+/* 🔥 الحل النهائي لقائمة الأصناف */
+.table-responsive {
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+}
+
+.table {
+  overflow: visible !important;
+}
+
+tbody, tr, td {
+  overflow: visible !important;
+}
