@@ -338,4 +338,7 @@ private mapStoreType(type: string): number {
     this.statusMessage = null;
     this.statusType = null;
   }
+
+
+  isSidebarOpen = false;
 }

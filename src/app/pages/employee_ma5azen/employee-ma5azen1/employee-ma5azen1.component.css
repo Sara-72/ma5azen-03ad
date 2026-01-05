@@ -199,6 +199,18 @@ td {
 }
 
 
+/* Custom Scrollbar for the table */
+.custom-scrollbar::-webkit-scrollbar {
+    height: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+}
+
+
+
+
 /* --- RESPONSIVE MEDIA QUERIES --- */
 @media (max-width: 1100px) {
   .content.d-flex.flex-row {

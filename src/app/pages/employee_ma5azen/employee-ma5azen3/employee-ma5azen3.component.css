@@ -198,6 +198,17 @@ td {
   opacity: 0.8;
 }
 
+/* Custom Scrollbar for the table */
+.custom-scrollbar::-webkit-scrollbar {
+    height: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+}
+
+
+
 
 
 /* --- RESPONSIVE MEDIA QUERIES --- */

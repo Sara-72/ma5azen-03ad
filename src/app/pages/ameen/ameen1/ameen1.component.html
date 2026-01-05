@@ -21,8 +21,11 @@
   </div>
 </div>
 
-<div class="page-container d-flex flex-row" >
-  <aside class="sidebar">
+
+
+<div class="content d-flex flex-row">
+
+    <aside class="sidebar">
     <h5>
   مرحبًا بك
       <span *ngIf="displayName">، {{ displayName }}</span>
@@ -43,7 +46,8 @@
     <div class="table-section">
       <h2 class="text-center">المخزن</h2>
 
-      <div class="table-responsive">
+      <div class="table-outer-wrapper">
+      <div class="table-responsive custom-scrollbar">
         <table class="table table-bordered text-center">
           <thead>
             <tr>
@@ -92,6 +96,7 @@
             }
           </tbody>
         </table>
+      </div>
       </div>
 
       <button type="button" class="remove-row-button" (click)="removeRow()">-</button>

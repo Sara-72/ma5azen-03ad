@@ -348,3 +348,16 @@
     margin: 10px !important;
     overflow-x: hidden; /* Prevent horizontal scroll bar */
 }
+
+
+
+/* Custom Scrollbar for the table */
+.custom-scrollbar::-webkit-scrollbar {
+    height: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+}
+
+

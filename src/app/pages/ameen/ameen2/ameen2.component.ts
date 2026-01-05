@@ -19,6 +19,10 @@ export class Ameen2Component implements OnInit {
   assetTypes: string[] = ['مستهلك', 'مستديم'];
   availableItems: string[] = [];
 
+  // --- MODAL STATUS STATE ---
+  statusMessage: string | null = null;
+  statusType: 'success' | 'error' = 'success';
+
   inventoryLogForm!: FormGroup;
   isSubmitting = signal(false);
 
@@ -38,6 +42,16 @@ export class Ameen2Component implements OnInit {
 
     this.loadAvailableItems();
     this.loadPendingLedgerEntries();
+  }
+
+  // --- MODAL METHODS ---
+  showStatus(message: string, type: 'success' | 'error') {
+    this.statusMessage = message;
+    this.statusType = type;
+  }
+
+  closeStatusMessage() {
+    this.statusMessage = null;
   }
 
   get dates(): FormArray {
@@ -103,63 +117,54 @@ export class Ameen2Component implements OnInit {
     return this.assetTypes[storeType] || '';
   }
 
- onSubmit() {
-  if (this.isSubmitting()) return;
-  this.isSubmitting.set(true);
+  onSubmit() {
+    if (this.isSubmitting()) return;
+    this.isSubmitting.set(true);
 
-  // نجمع كل الـ IDs اللي موجودة
-  const allEntries: { id: number; status: string }[] = [];
+    const allEntries: { id: number; status: string }[] = [];
 
-  this.dates.controls.forEach(dateGroup => {
-    const rows = dateGroup.get('rows') as FormArray;
-    rows.controls.forEach(r => {
-      if (r.value.id) {
-        allEntries.push({ id: r.value.id, status: 'تم التأكيد' });
-      }
-    });
-  });
-
-  if (allEntries.length === 0) {
-    this.isSubmitting.set(false);
-    return;
-  }
-
-  let completed = 0;
-  const total = allEntries.length;
-
-  allEntries.forEach(entry => {
-    this.ledgerService.updateLedgerStatus(entry.id, entry.status).subscribe({
-      next: () => {
-        completed++;
-        if (completed === total) {
-          // بعد انتهاء كل التحديثات، نفرغ الجدول كله مباشرة
-          this.dates.clear();
-          this.isSubmitting.set(false);
-          alert('تم تأكيد جميع الدفاتر بنجاح');
+    this.dates.controls.forEach(dateGroup => {
+      const rows = dateGroup.get('rows') as FormArray;
+      rows.controls.forEach(r => {
+        const idValue = r.get('id')?.value;
+        if (idValue) {
+          allEntries.push({ id: idValue, status: 'تم التأكيد' });
         }
-      },
-      error: err => {
-        console.error(err);
-        completed++;
-        if (completed === total) this.isSubmitting.set(false);
-      }
+      });
     });
-  });
-}
 
-
-
-  private removeConfirmedEntries() {
-    for (let i = this.dates.length - 1; i >= 0; i--) {
-      const rows = this.getDateRows(i);
-      for (let j = rows.length - 1; j >= 0; j--) {
-        if (rows.at(j).value.status === 'تم التأكيد') {
-          rows.removeAt(j);
-        }
-      }
-      if (rows.length === 0) {
-        this.dates.removeAt(i);
-      }
+    if (allEntries.length === 0) {
+      this.showStatus('لا توجد بيانات ليتم تأكيدها', 'error');
+      this.isSubmitting.set(false);
+      return;
     }
+
+    let completed = 0;
+    const total = allEntries.length;
+    let hasError = false;
+
+    allEntries.forEach(entry => {
+      this.ledgerService.updateLedgerStatus(entry.id, entry.status).subscribe({
+        next: () => {
+          completed++;
+          if (completed === total) {
+            this.dates.clear();
+            this.isSubmitting.set(false);
+            if (!hasError) {
+              this.showStatus('تم تأكيد جميع الدفاتر بنجاح', 'success');
+            }
+          }
+        },
+        error: err => {
+          console.error(err);
+          hasError = true;
+          completed++;
+          if (completed === total) {
+            this.isSubmitting.set(false);
+            this.showStatus('حدث خطأ أثناء تحديث بعض الدفاتر', 'error');
+          }
+        }
+      });
+    });
   }
 }
