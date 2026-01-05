@@ -1,6 +1,6 @@
 <app-header></app-header>
 
-<div class="page-container">
+<div class="content d-flex flex-row">
   <aside class="sidebar">
     <h5>
   مرحبًا بك
@@ -17,6 +17,7 @@
   </aside>
 
   <div class="big-container flex-grow-1 p-4">
+    <ng-container *ngIf="groupedPermissions && groupedPermissions.length > 0; else noData">
     <div *ngFor="let perm of groupedPermissions" class="form-container mb-5">
 
       <header class="form-header">
@@ -87,6 +88,22 @@
         <div>توقيع المستلم</div>
       </div>
     </div>
+
+    </ng-container>
+
+
+<ng-template #noData>
+  <div class="no-data-wrapper">
+    <div class="text-center">
+      <i class="fas fa-clipboard-list d-block mb-3 empty-icon m-auto"></i>
+
+      <p class="fw-bold fs-4 text-muted m-0">
+        لا توجد أذونات صرف حاليا.
+      </p>
+
+    </div>
+  </div>
+</ng-template>
   </div>
 </div>
 

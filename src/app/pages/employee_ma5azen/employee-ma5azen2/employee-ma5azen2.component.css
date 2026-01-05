@@ -121,14 +121,14 @@ a {
   background: white;
   border-radius: 12px;
   position: relative;
-  transform: rotateY(-2deg) rotateX(0deg);
+  /* transform: rotateY(-2deg) rotateX(0deg); */
   box-shadow: -15px 20px 40px rgba(0, 0, 0, 0.1), 0 0 30px rgba(0, 123, 255, 0.12);
   transition: all 0.6s ease;
   animation: tableEntrance 0.8s ease-out;
 }
 
 .table-container:hover {
-  transform: rotateY(0deg) rotateX(0deg) translateZ(15px);
+  /* transform: rotateY(0deg) rotateX(0deg) translateZ(15px); */
   box-shadow: -25px 35px 60px rgba(0, 0, 0, 0.15), 0 0 50px rgba(0, 123, 255, 0.25);
 }
 
@@ -180,3 +180,64 @@ a {
 tbody tr:nth-child(1) { animation-delay: 0.1s; }
 tbody tr:nth-child(2) { animation-delay: 0.2s; }
 tbody tr:nth-child(3) { animation-delay: 0.3s; }
+
+
+
+
+
+/* --- RESPONSIVE LOGIC (Added) --- */
+
+/* For smaller laptops and tablets */
+@media (max-width: 1150px) {
+  .page-container {
+    flex-direction: column; /* Stacks sidebar on top of table */
+    padding: 10px;
+    gap: 15px;
+  }
+
+  .sidebar {
+    width: 100%; /* Sidebar takes full width at top */
+    flex: none;
+    min-height: auto;
+    margin: 0 0 10px 0;
+    padding: 20px;
+  }
+
+  .sidebar ul {
+    display: flex; /* Makes the sidebar menu horizontal */
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 1.5rem !important;
+  }
+
+  .sidebar li {
+    flex: 1 1 auto;
+    margin-bottom: 0;
+    text-align: center;
+  }
+
+  .content {
+    padding: 10px;
+  }
+
+  .table-container {
+    transform: none !important; /* Removes 3D tilt on smaller screens to prevent clipping */
+    max-width: 100%;
+    overflow-x: auto; /* Allows the table to scroll if it's too wide */
+  }
+
+  .custom-3d-table {
+    min-width: 800px; /* Prevents the columns from squashing too much */
+  }
+}
+
+/* For Mobile Phones */
+@media (max-width: 768px) {
+  .sidebar ul {
+    flex-direction: column; /* Vertical menu again for phones */
+  }
+
+  .sidebar h5 {
+    text-align: center;
+  }
+}

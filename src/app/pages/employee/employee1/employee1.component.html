@@ -11,7 +11,7 @@
   </div>
 </div>
 
-<div class="page-container">
+<div class="content d-flex flex-row">
   <aside class="sidebar">
     <h5>مرحبًا بك<span *ngIf="displayName">، {{ displayName }}</span></h5>
     <ul class="mt-5">
@@ -21,7 +21,7 @@
     </ul>
   </aside>
 
-  <div class="d-flex align-items-center big-container my-3">
+  <div class="d-flex align-items-center flex-column big-container m-auto">
     <form [formGroup]="memoContainerForm" (ngSubmit)="onSubmit()" dir="rtl" class="mt-5 mx-5">
       <div formArrayName="requests">
         <div *ngFor="let memoGroup of requests.controls; let $index = index" [formGroupName]="$index" class="paper mt-3">
@@ -104,7 +104,7 @@
 
             <br /><p>وتفضلوا سيادتكم بقبول فائق التقدير و الاحترام،،،</p>
 
-            <div class="d-flex align-items-center">
+            <div class="d-flex align-items-center justify-content-center">
               <div class="signatures">
                 <div class="ms-3">
                   <strong>توقيع الموظف</strong><br />
@@ -137,12 +137,14 @@
         </button>
       </div>
     </form>
-  </div>
 
-  <div class="row-controls align-items-center my-3">
+    <div class="row-controls align-items-center my-3">
     <button type="button" class="remove-row-button" (click)="removeRow()">-</button>
     <button type="button" class="add-row-button" (click)="addRow()">+</button>
   </div>
+  </div>
+
+
 </div>
 
 

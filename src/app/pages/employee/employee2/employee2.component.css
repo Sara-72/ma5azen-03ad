@@ -5,164 +5,136 @@ a {
   transition: 0.3s;
 }
 
-.page-container {
-  display: flex;
-  background-color: #f4f7f6;
-  perspective: 2000px;
-  padding: 20px;
-  gap: 30px;
+/* Updated parent container to manage space better */
+.content.d-flex.flex-row {
+  background-color: var(--bg-light);
   min-height: 100vh;
+  perspective: 2000px; /* Crucial for the 3D depth */
+  padding: 20px;
+  gap: 20px;
+  width: 100%;
+  overflow-x: hidden; /* Prevents 3D tilt from creating scrollbars */
 }
 
-/* --- SIDEBAR --- */
-/* SIDEBAR - 3D Floating Slab Effect */
+/* --- SIDEBAR - Balanced Fixed Width --- */
 .sidebar {
-    width: 25%;
-    min-height: calc(100vh - 40px);
-    /*Leavespaceattop/bottom*/margin: 20px;
-    background: #ffffff;
-    padding: 30px 20px;
-    border-radius: 15px;
-    /*3DShadows:;
-    Onefordepth(dark),oneforhighlight(light)*/box-shadow:        20px 20px 60px #d9d9d9,        -5px -5px 20px #ffffff,        inset 0 0 0 1px rgba(0,0,0,0.05);
-    /*Slighttiltfor3Dperspective*/transform: perspective(1000px) rotateY(0deg);
-    transition: transform 0.5s ease, box-shadow 0.5s ease;
-    z-index: 10;
-    -webkit-transform: perspective(1000px) rotateY(0deg);
-    -moz-transform: perspective(1000px) rotateY(0deg);
-    -ms-transform: perspective(1000px) rotateY(0deg);
-    -o-transform: perspective(1000px) rotateY(0deg);
-    -webkit-transition: transform 0.5s ease, box-shadow 0.5s ease;
-    -moz-transition: transform 0.5s ease, box-shadow 0.5s ease;
-    -ms-transition: transform 0.5s ease, box-shadow 0.5s ease;
-    -o-transition: transform 0.5s ease, box-shadow 0.5s ease;
+  /* Changed from 25% to fixed width to prevent it being too wide on large screens */
+  flex: 0 0 280px;
+  min-height: calc(100vh - 40px);
+  margin: 0;
+  background: #ffffff;
+  padding: 30px 20px;
+  border-radius: 15px;
+  box-shadow: 20px 20px 60px #d9d9d9, -5px -5px 20px #ffffff, inset 0 0 0 1px rgba(0,0,0,0.05);
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+  z-index: 10;
 }
 
-/* Make it straighten up when you interact with it */
 .sidebar:hover {
-    transform: perspective(1000px) rotateY(0deg);
-    box-shadow:
-        30px 30px 70px #cecece,
-        -5px -5px 25px #ffffff;
+  transform: perspective(1000px) rotateY(0deg);
+  box-shadow: 30px 30px 70px #cecece, -5px -5px 25px #ffffff;
 }
 
-/* SIDEBAR LIST ITEMS */
 .sidebar ul {
-    padding: 0;
-    list-style: none;
-    perspective: 500px; /* Depth for children */
+  padding: 0;
+  list-style: none;
+  perspective: 500px;
 }
 
 .sidebar li {
-    padding: 15px 20px;
-    margin-bottom: 12px;
-    border-radius: 10px;
-    border: none; /* Removed the old flat border */
-    background: transparent;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    transform-style: preserve-3d;
+  padding: 15px 20px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  background: transparent;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform-style: preserve-3d;
 }
 
-/* 3D Hover Effect for Links */
 .sidebar li:hover {
-    background: #f8f9fa;
-    color:var(--secondary-color);
-    transform: translateZ(20px) translateX(-5px); /* Pops out toward the user */
-    box-shadow: 10px 10px 20px rgba(0,0,0,0.05);
-}
-.sidebar li:hover a{
-  color:var(--secondary-color);
+  background: #f8f9fa;
+  color: var(--secondary-color);
+  transform: translateZ(20px) translateX(-5px);
+  box-shadow: 10px 10px 20px rgba(0,0,0,0.05);
 }
 
-.sidebar li a {
-    display: block;
-    width: 100%;
-
-
+.sidebar li:hover a {
+  color: var(--secondary-color);
 }
 
-/* ACTIVE STATE - Looks "Pressed In" or "Carved" */
 .sidebar li.active {
-    background: #f0f4f8;
-    color: var(--primary-color);
-    font-weight: bold;
-    border-left: none; /* Removed flat border */
-
-    /* Inner shadow creates a "carved into the wood" look */
-    box-shadow:
-        inset 6px 6px 12px #d1d9e6,
-        inset -6px -6px 12px #ffffff;
-    transform: translateZ(-5px); /* Sinks slightly into the sidebar */
+  background: #f0f4f8;
+  color: var(--primary-color);
+  font-weight: bold;
+  box-shadow: inset 6px 6px 12px #d1d9e6, inset -6px -6px 12px #ffffff;
+  transform: translateZ(-5px);
+  position: relative;
 }
-
 
 .sidebar li.active::before {
-    content: "";
-    position: absolute;
-    right: -10px; /* Positions it on the edge */
-    top: 20%;
-    height: 60%;
-    width: 4px;
-    background: var(--primary-color);
-    border-radius: 10px;
-    box-shadow: 0 0 10px var(--primary-color);
+  content: "";
+  position: absolute;
+  right: -5px;
+  top: 20%;
+  height: 60%;
+  width: 4px;
+  background: var(--primary-color);
+  border-radius: 10px;
+  box-shadow: 0 0 10px var(--primary-color);
 }
 
 
-/* --- CONTENT AREA --- */
-.content {
-  flex: 1;
-  padding: 40px;
-  perspective: 1500px;
-}
-
+/* --- THE TABLE CONTAINER (The Floating Board) --- */
 .table-container {
+  flex: 1;
   width: 100%;
-  max-width: 800px;
-  margin: 20px auto;
+  max-width: 900px;
+  margin: 40px auto;
   background: white;
-  border-radius: 12px;
+  border-radius: 15px;
   position: relative;
-  /* transform: rotateY(-2deg) rotateX(0deg); */
-  box-shadow: -15px 20px 40px rgba(0, 0, 0, 0.1),              0 0 30px rgba(0, 123, 255, 0.12);
+  /* Initial 3D Tilt */
+  transform: rotateY(-2deg) rotateX(0deg);
+  box-shadow: -15px 20px 40px rgba(0, 0, 0, 0.1), 0 0 30px rgba(10, 58, 99, 0.1);
   transition: all 0.6s ease;
   animation: tableEntrance 0.8s ease-out;
-  /* -webkit-transform: rotateY(-2deg) rotateX(0deg);
-  -moz-transform: rotateY(-2deg) rotateX(0deg);
-  -ms-transform: rotateY(-2deg) rotateX(0deg);
-  -o-transform: rotateY(-2deg) rotateX(0deg); */
+  padding: 30px;
 }
 
 .table-container:hover {
   transform: rotateY(0deg) rotateX(0deg) translateZ(15px);
-  box-shadow: -25px 35px 60px rgba(0, 0, 0, 0.15),
-              0 0 50px rgba(0, 123, 255, 0.25);
+  box-shadow: -25px 35px 60px rgba(0, 0, 0, 0.15), 0 0 50px rgba(10, 58, 99, 0.2);
 }
 
-/* --- THE TABLE FIX --- */
+.table-container h2 {
+  color: var(--primary-color);
+  font-weight: 800;
+  margin-bottom: 25px;
+  border-bottom: 2px double #eee;
+  padding-bottom: 10px;
+}
+
+/* --- THE CUSTOM 3D TABLE --- */
 .custom-3d-table {
   width: 100%;
-  table-layout: fixed; /* MANDATORY: Forces columns to respect width */
-  border-collapse: collapse; /* Cleaner than separate for removing phantom gaps */
+  border-collapse: collapse;
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid #dee2e6;
 }
 
-.custom-3d-table th,
-.custom-3d-table td {
-  width: 33.333%; /* Explicitly divide into 3 parts */
-  padding: 20px;
-  text-align: center;
-  border: 1px solid #eee; /* Light borders for clean look */
-  vertical-align: middle;
-}
-
 .custom-3d-table th {
   background-color: #f8f9fa;
-  color: #0a3a63;
+  color: var(--primary-color);
+  padding: 20px;
   font-weight: bold;
-  border-bottom: 2px solid #dee2e6;
+  border: 1px solid #eee;
+}
+
+.custom-3d-table td {
+  padding: 18px;
+  text-align: center;
+  border: 1px solid #eee;
+  vertical-align: middle;
 }
 
 .custom-3d-table tbody tr {
@@ -177,7 +149,7 @@ a {
 
 /* --- ANIMATIONS --- */
 @keyframes tableEntrance {
-  from { opacity: 0; transform: translateY(30px) rotateY(-10deg); -webkit-transform: translateY(30px) rotateY(-10deg); -moz-transform: translateY(30px) rotateY(-10deg); -ms-transform: translateY(30px) rotateY(-10deg); -o-transform: translateY(30px) rotateY(-10deg); }
+  from { opacity: 0; transform: translateY(30px) rotateY(-10deg); }
   to { opacity: 1; transform: translateY(0) rotateY(-2deg); }
 }
 
@@ -186,10 +158,12 @@ a {
   to { opacity: 1; transform: translateX(0); }
 }
 
-/* Ensure row entrance delays */
+/* Staggered Row Entry */
 tbody tr:nth-child(1) { animation-delay: 0.1s; }
 tbody tr:nth-child(2) { animation-delay: 0.2s; }
 tbody tr:nth-child(3) { animation-delay: 0.3s; }
+tbody tr:nth-child(4) { animation-delay: 0.4s; }
+
 
 
 
@@ -212,4 +186,89 @@ tbody tr:nth-child(3) { animation-delay: 0.3s; }
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+
+
+
+
+
+
+/* --- RESPONSIVE LOGIC (Added without changing your existing styles) --- */
+
+/* For smaller laptops and tablets (approx. 1150px and down) */
+@media (max-width: 1150px) {
+  /* Stack sidebar and content vertically */
+  .page-container,
+  .content.d-flex.flex-row {
+    flex-direction: column !important;
+    padding: 10px;
+    gap: 15px;
+  }
+
+  /* Make sidebar a top navigation bar */
+  .sidebar {
+    width: 100% !important;
+    flex: none;
+    min-height: auto !important;
+    margin: 0 0 10px 0 !important;
+    padding: 20px !important;
+  }
+
+  .sidebar ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 1rem !important;
+  }
+
+  .sidebar li {
+    flex: 1 1 auto;
+    margin-bottom: 0 !important;
+    text-align: center;
+    padding: 10px !important;
+  }
+
+  /* Straighten the table container and make it full width */
+  .table-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    transform: none !important; /* Removes 3D tilt to prevent clipping */
+    margin: 10px 0 !important;
+    padding: 20px 10px !important;
+  }
+
+  /* Ensure the table doesn't squash too small */
+  .custom-3d-table {
+    min-width: 750px;
+  }
+
+  /* Allow the user to swipe the table left/right inside the board */
+  .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* For Mobile Phones (768px and down) */
+@media (max-width: 768px) {
+  .sidebar h5 {
+    text-align: center;
+  }
+
+  .sidebar ul {
+    flex-direction: column; /* Back to vertical on very small phones */
+  }
+
+  .table-container h2 {
+    font-size: 1.4rem;
+  }
+
+  .custom-3d-table th,
+  .custom-3d-table td {
+    padding: 12px 8px; /* Slightly tighter padding for mobile */
+    font-size: 0.9rem;
+  }
 }

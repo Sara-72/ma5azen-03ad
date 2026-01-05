@@ -219,8 +219,62 @@ tbody tr:hover { background-color: #f9fbff; }
     to { opacity: 1; transform: translateY(0); }
 }
 
-@media (max-width: 768px) {
-    .page-container { flex-direction: column; }
-    .sidebar { width: 100%; border-left: none; border-bottom: 1px solid #ddd; }
-    .form-container { width: 95%; padding: 20px; }
+/* Centering the Template content */
+.no-data-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vh; /* Takes up half the screen height to feel centered */
+    width: 100%;
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+/* The Modern Gray Icon Style */
+.empty-icon {
+    font-size: 5rem;
+    color: var(--primary-color);
+    opacity: 0.3;      /* Makes it look subtle/modern */
+
+    margin: 0 auto;
+}
+
+
+/* --- RESPONSIVE FIX (Keep your existing code, add this below) --- */
+@media (max-width: 1150px) {
+    .page-container {
+        flex-direction: column !important;
+        padding: 10px;
+    }
+
+    .sidebar {
+        width: 100% !important;
+        flex: none;
+        min-height: auto;
+        margin-bottom: 20px !important;
+    }
+
+    .sidebar ul {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .sidebar li {
+        flex: 1 1 auto;
+        margin-bottom: 0 !important;
+    }
+
+    .form-container {
+        transform: none !important; /* Remove tilt for mobile readability */
+        padding: 15px !important;
+    }
+
+    .table-section {
+        overflow-x: auto; /* Enable horizontal scroll for wide tables */
+    }
+
+    table {
+        min-width: 800px; /* Prevent table squashing */
+    }
 }

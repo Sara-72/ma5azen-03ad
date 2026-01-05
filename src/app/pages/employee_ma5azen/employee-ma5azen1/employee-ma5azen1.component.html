@@ -69,7 +69,7 @@
         <button type="button" class="add-row-button" (click)="addRow()">+</button>
       </div>
 
-      <div class="button-section">
+      <div class="button-section text-center">
         <button type="submit" [disabled]="isSubmitting() || inventoryLogForm.invalid" class="submit-btn mt-5">
           @if (isSubmitting()) { جاري الحفظ... } @else { حفظ البيانات }
         </button>
