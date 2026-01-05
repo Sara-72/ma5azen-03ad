@@ -107,45 +107,43 @@ handleLoginSuccess(res: any) {
 
 onSubmit() {
   if (this.loginForm.invalid) return;
-
   this.isSubmitting.set(true);
 
   const data = this.loginForm.value;
 
-  // نجرب كل login APIs بالتتابع
-  const logins = [
-    this.auth.userLogin(data),
-    this.auth.employeeLogin(data),
-    this.auth.storeKeeperLogin(data),
-    this.auth.inventoryManagerLogin(data),
-    this.auth.adminLogin(data)
-  ];
+  this.auth.getAllAccounts().subscribe({
+    next: (accounts) => {
+      const user = accounts.find(u => u.email === data.email && u.password === data.password);
 
-  let done = false;
-
-  logins.forEach(obs => {
-    if (!done) {
-      obs.subscribe({
-        next: (res: any) => {
-          done = true;
-          // ✅ أي دور غير USER يُعامل كموظف عادي
-          if (res.role && res.role.toUpperCase() !== 'USER' &&
-              res.role.toUpperCase() !== 'ADMIN') {
-            res.role = 'USER';
-          }
-
-          this.handleLoginSuccess(res);
-        },
-        error: () => {
-          if (obs === logins[logins.length - 1] && !done) {
-            this.isSubmitting.set(false);
-            
-          }
+      if (user) {
+        if (user.role !== 'موظف') {
+          // أي دور غير الموظف العادي
+          localStorage.setItem('role', 'USER'); // مؤقتًا كلهم USER
+          localStorage.setItem('name', user.name);
+          localStorage.setItem('faculty', 'مركزية');          // الكلية مركزية
+          localStorage.setItem('collegeAdmin', 'حمدي محمد علي'); // الأمين حمدي محمد علي
+        } else {
+          // الموظف العادي: البيانات حسب الموجود في الداتا بيز
+          localStorage.setItem('role', 'USER');
+          localStorage.setItem('name', user.name);
+          localStorage.setItem('faculty', user.faculty || ''); 
+          localStorage.setItem('collegeAdmin', user.collegeAdmin || ''); 
         }
-      });
+
+        this.isSubmitting.set(false);
+        this.router.navigate(['/employee1']); // صفحة الموظف
+      } else {
+        this.isSubmitting.set(false);
+        this.message.set({ text: 'البريد الإلكتروني أو كلمة المرور غير صحيحة', type: 'error' });
+      }
+    },
+    error: () => {
+      this.isSubmitting.set(false);
+      this.message.set({ text: 'حدث خطأ أثناء تسجيل الدخول', type: 'error' });
     }
   });
 }
+
 
 
 
