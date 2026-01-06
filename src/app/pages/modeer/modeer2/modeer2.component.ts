@@ -219,7 +219,7 @@ public checkStockForForm(form: FormGroup): boolean {
   itemConditions = ['جديدة', 'مستعمل', 'قابل للإصلاح', 'كهنة أو خردة'];
   documentNumbers = ['كشف العجز', 'سند خصم', 'أصناف تالفة', 'محضر بيع', 'إهداءات'];
 
-  consumableForms: FormGroup[] = []; // بدل Form واحد
+  consumableForms: FormGroup[] = []; 
 
   isSubmitting = signal(false);
 
@@ -372,7 +372,7 @@ removeRowFromForm(form: FormGroup) {
           itemSearchText: note.itemName,
           category: note.category,
           quantityRequired: note.quantity,
-          unit: this.getItemDefaults(note.itemName).unit,
+          unit: note.unit,
           storeType: this.getItemDefaults(note.itemName).storeType,
           itemCondition: 'جديدة',
           quantityAuthorized: '',
