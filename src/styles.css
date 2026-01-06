@@ -34,6 +34,15 @@ main {
 }
 
 
+/* Custom Scrollbar for the table */
+.custom-scrollbar::-webkit-scrollbar {
+    height: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+}
+
 /* The Modern Gray Icon Style */
 .empty-icon {
     font-size: 5rem;

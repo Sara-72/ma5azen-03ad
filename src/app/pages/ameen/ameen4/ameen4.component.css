@@ -1,112 +1,87 @@
-/* --- GLOBAL LAYOUT --- */
-.page-container {
-    display: flex;
-    background-color: #f4f7f6;
-    perspective: 2000px;
-    padding: 20px;
-    gap: 30px;
-    min-height: 100vh;
-}
-
-
+/* --- GLOBAL --- */
 a {
   text-decoration: none;
   color: var(--black-color);
   transition: 0.3s;
 }
-/* --- SIDEBAR - 3D NEUMORPHIC --- */
-/* SIDEBAR - 3D Floating Slab Effect */
+
+/* Updated parent container to manage space better */
+.content.d-flex.flex-row {
+  background-color: var(--bg-light);
+  min-height: 100vh;
+  perspective: 2000px; /* Crucial for the 3D depth */
+  padding: 20px;
+  gap: 20px;
+  width: 100%;
+  overflow-x: hidden; /* Prevents 3D tilt from creating scrollbars */
+}
+
+/* --- SIDEBAR - Balanced Fixed Width --- */
 .sidebar {
-    width: 25%;
-    min-height: calc(100vh - 40px);
-    /*Leavespaceattop/bottom*/margin: 20px;
-    background: #ffffff;
-    padding: 30px 20px;
-    border-radius: 15px;
-    /*3DShadows:;
-    Onefordepth(dark),oneforhighlight(light)*/box-shadow:        20px 20px 60px #d9d9d9,        -5px -5px 20px #ffffff,        inset 0 0 0 1px rgba(0,0,0,0.05);
-    /*Slighttiltfor3Dperspective*/transform: perspective(1000px) rotateY(0deg);
-    transition: transform 0.5s ease, box-shadow 0.5s ease;
-    z-index: 10;
-    -webkit-transform: perspective(1000px) rotateY(0deg);
-    -moz-transform: perspective(1000px) rotateY(0deg);
-    -ms-transform: perspective(1000px) rotateY(0deg);
-    -o-transform: perspective(1000px) rotateY(0deg);
-    -webkit-transition: transform 0.5s ease, box-shadow 0.5s ease;
-    -moz-transition: transform 0.5s ease, box-shadow 0.5s ease;
-    -ms-transition: transform 0.5s ease, box-shadow 0.5s ease;
-    -o-transition: transform 0.5s ease, box-shadow 0.5s ease;
+  /* Changed from 25% to fixed width to prevent it being too wide on large screens */
+  flex: 0 0 280px;
+  min-height: calc(100vh - 40px);
+  margin: 0;
+  background: #ffffff;
+  padding: 30px 20px;
+  border-radius: 15px;
+  box-shadow: 20px 20px 60px #d9d9d9, -5px -5px 20px #ffffff, inset 0 0 0 1px rgba(0,0,0,0.05);
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+  z-index: 10;
 }
 
-/* Make it straighten up when you interact with it */
 .sidebar:hover {
-    transform: perspective(1000px) rotateY(0deg);
-    box-shadow:
-        30px 30px 70px #cecece,
-        -5px -5px 25px #ffffff;
+  transform: perspective(1000px) rotateY(0deg);
+  box-shadow: 30px 30px 70px #cecece, -5px -5px 25px #ffffff;
 }
 
-/* SIDEBAR LIST ITEMS */
 .sidebar ul {
-    padding: 0;
-    list-style: none;
-    perspective: 500px; /* Depth for children */
+  padding: 0;
+  list-style: none;
+  perspective: 500px;
 }
 
 .sidebar li {
-    padding: 15px 20px;
-    margin-bottom: 12px;
-    border-radius: 10px;
-    border: none; /* Removed the old flat border */
-    background: transparent;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    transform-style: preserve-3d;
+  padding: 15px 20px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  background: transparent;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform-style: preserve-3d;
 }
 
-/* 3D Hover Effect for Links */
 .sidebar li:hover {
-    background: #f8f9fa;
-    color:var(--secondary-color);
-    transform: translateZ(20px) translateX(-5px); /* Pops out toward the user */
-    box-shadow: 10px 10px 20px rgba(0,0,0,0.05);
-}
-.sidebar li:hover a{
-  color:var(--secondary-color);
+  background: #f8f9fa;
+  color: var(--secondary-color);
+  transform: translateZ(20px) translateX(-5px);
+  box-shadow: 10px 10px 20px rgba(0,0,0,0.05);
 }
 
-.sidebar li a {
-    display: block;
-    width: 100%;
-
-
+.sidebar li:hover a {
+  color: var(--secondary-color);
 }
 
-/* ACTIVE STATE - Looks "Pressed In" or "Carved" */
 .sidebar li.active {
-    background: #f0f4f8;
-    color: var(--primary-color);
-    font-weight: bold;
-    border-left: none; /* Removed flat border */
-
-    /* Inner shadow creates a "carved into the wood" look */
-    box-shadow:
-        inset 6px 6px 12px #d1d9e6,
-        inset -6px -6px 12px #ffffff;
-    transform: translateZ(-5px); /* Sinks slightly into the sidebar */
+  background: #f0f4f8;
+  color: var(--primary-color);
+  font-weight: bold;
+  box-shadow: inset 6px 6px 12px #d1d9e6, inset -6px -6px 12px #ffffff;
+  transform: translateZ(-5px);
+  position: relative;
 }
-
 
 .sidebar li.active::before {
-    content: "";
-    position: absolute;
-    right: -10px; /* Positions it on the edge */
-    top: 20%;
-    height: 60%;
-    width: 4px;
-    background: var(--primary-color);
-    border-radius: 10px;
-    box-shadow: 0 0 10px var(--primary-color);
+  content: "";
+  position: absolute;
+  right: -5px;
+  top: 20%;
+  height: 60%;
+  width: 4px;
+  background: var(--primary-color);
+  border-radius: 10px;
+  box-shadow: 0 0 10px var(--primary-color);
 }
+
 
 /* --- FORM WRAPPER --- */
 form {
@@ -187,4 +162,147 @@ td {
 
 tr:hover td {
     background-color: rgba(0, 123, 255, 0.05);
+}
+
+
+
+
+
+/* For Tablets and Small Laptops (Side-by-side but thinner) */
+
+/* --- RESPONSIVE MEDIA QUERIES --- */
+@media (max-width: 1100px) {
+  .content.d-flex.flex-row {
+    flex-direction: column !important;
+    padding: 10px;
+  }
+
+  .sidebar {
+    flex: none;
+    width: 100%;
+    min-height: auto;
+    margin-bottom: 20px;
+  }
+
+  .table-section {
+    transform: none; /* Remove tilt on mobile/small laptops */
+    padding: 20px !important;
+  }
+}
+
+/* --- ANIMATIONS --- */
+@keyframes paperFadeUp {
+  from { opacity: 0; transform: translateY(40px) rotateY(-5deg); }
+  to { opacity: 1; transform: translateY(0) rotateY(-1deg); }
+}
+
+@keyframes pulseReady {
+  0% { box-shadow: 0 0 0 0 rgba(10, 58, 99, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(10, 58, 99, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(10, 58, 99, 0); }
+}
+
+
+/* Custom Scrollbar for the table */
+.custom-scrollbar::-webkit-scrollbar {
+    height: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+}
+
+
+/* --- RESPONSIVE MEDIA QUERIES --- */
+
+/* --- ENHANCED RESPONSIVENESS --- */
+
+/* For Small Laptops / Tablets (Standard Landscape) */
+@media (max-width: 1200px) {
+    .sidebar {
+        flex: 0 0 240px; /* Slimmer sidebar */
+        padding: 20px 15px;
+    }
+
+    .log-container {
+        padding: 25px; /* Reduce padding to save space */
+    }
+}
+
+/* For Tablets and Large Phones (Stacking Sidebar) */
+@media (max-width: 991px) {
+    .content.d-flex.flex-row {
+        flex-direction: column !important; /* Stack sidebar on top */
+        padding: 10px;
+    }
+
+    .sidebar {
+        flex: none;
+        width: 100%;
+        min-height: auto;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05); /* Simpler shadow for mobile */
+    }
+
+    .sidebar ul {
+        display: flex;
+        flex-wrap: wrap; /* Allow menu items to wrap */
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .sidebar li {
+        margin-bottom: 0;
+        flex: 1 1 auto;
+        text-align: center;
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+
+
+    form {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* For Small Mobile Phones */
+@media (max-width: 576px) {
+    .log-container {
+        padding: 15px;
+        border-radius: 10px;
+    }
+
+    /* Disable 3D tilts on mobile to prevent clipping and weird touch behavior */
+    .log-container, .sidebar, .sidebar li {
+        transform: none !important;
+        transition: none !important;
+    }
+
+    .log-header h2 {
+        font-size: 1.4rem;
+    }
+
+    .storehouse-field {
+        font-size: 1rem;
+    }
+
+    /* Important: Force the table to be scrollable */
+    .table-section {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+        min-width: 600px; /* Ensures table doesn't squish too much */
+    }
+
+    th, td {
+        padding: 8px 4px;
+        font-size: 0.8rem;
+    }
+
+    .form-select {
+        width: 100% !important; /* Full width date picker on mobile */
+    }
 }
