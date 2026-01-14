@@ -15,116 +15,97 @@
   </aside>
 
   <div class="big-container mx-auto my-3">
+    <form dir="rtl" class="m-auto">
+      <!-- ⏳ تحميل -->
+      <div *ngIf="isLoading">جاري تحميل المذكرات...</div>
 
-  <form dir="rtl" class="m-auto">
+      <!-- ❌ لا يوجد -->
+      <div *ngIf="!isLoading && filteredNotes.length === 0">
+        {{ noNotesMessage }}
+      </div>
 
-    <!-- ⏳ تحميل -->
-    <div *ngIf="isLoading">جاري تحميل المذكرات...</div>
-
-    <!-- ❌ لا يوجد -->
-    <div *ngIf="!isLoading && filteredNotes.length === 0">
-      {{ noNotesMessage }}
-    </div>
-
-    <!-- 📄 عرض البيانات -->
-    <div *ngIf="!isLoading && filteredNotes.length > 0">
-
-      <div *ngFor="let note of filteredNotes" class="paper mb-0">
-
-        <div class="d-flex justify-content-center align-items-center">
-          <img src="assets/images/Hurghada-University.png" class="paper-logo" alt="logo">
-          <h2 class="title m-auto">مكتب أمين الكلية</h2>
-        </div>
-
-        <div class="paper-box">
-          <p>السيد الأستاذ/ أمين عام الجامعة المساعد</p>
-          <p>تحية طيبة وبعد،،،</p>
-          <p class="mt">الرجاء من سيادتكم بالموافقة على صرف:</p>
-
-          <!-- 🧾 الصنف -->
-          <div class="item-lines-container">
-            <div class="row item-line d-flex">
-
-              <div class="field d-flex">
-                <label>الفئة:</label>
-                <span>{{ note.category || 'غير محدد' }}</span>
-              </div>
-
-              <div class="field d-flex">
-                <label>الصنف:</label>
-                <span>{{ note.itemName || 'غير محدد' }}</span>
-              </div>
-
-              <div class="field d-flex">
-                <label>العدد:</label>
-                <span>{{ note.quantity || 0 }}</span>
-              </div>
-
-
-            </div>
+      <!-- 📄 عرض البيانات -->
+      <div *ngIf="!isLoading && filteredNotes.length > 0">
+        <div *ngFor="let note of filteredNotes" class="paper mb-0">
+          <div class="d-flex justify-content-center align-items-center">
+            <img
+              src="assets/images/Hurghada-University.png"
+              class="paper-logo"
+              alt="logo"
+            />
+            <h2 class="title m-auto">مكتب أمين الكلية</h2>
           </div>
 
-          <p>وتفضلوا سيادتكم بقبول فائق التقدير و الاحترام،،،</p>
+          <div class="paper-box">
+            <p>السيد الأستاذ/ أمين عام الجامعة المساعد</p>
+            <p>تحية طيبة وبعد،،،</p>
+            <p class="mt">الرجاء من سيادتكم بالموافقة على صرف:</p>
 
-    <div class="signature-section mt-3 d-flex justify-content-between">
-  <div>
-    <strong>توقيع الموظف</strong><br>
+            <!-- 🧾 الصنف -->
+            <div class="item-lines-container">
+              <div class="row item-line d-flex">
+                <div class="field d-flex">
+                  <label>الفئة:</label>
+                  <span>{{ note.category || "غير محدد" }}</span>
+                </div>
 
-    {{ note.userSignature }}
-  </div>
+                <div class="field d-flex">
+                  <label>الصنف:</label>
+                  <span>{{ note.itemName || "غير محدد" }}</span>
+                </div>
 
-  <div>
-    <strong>الكلية</strong><br>
-    {{ note.college }}
-  </div>
+                <div class="field d-flex">
+                  <label>العدد:</label>
+                  <span>{{ note.quantity || 0 }}</span>
+                </div>
+              </div>
+            </div>
 
-  <div>
-    <strong>تاريخ الطلب</strong><br>
-    {{ note.requestDate | date:'yyyy-MM-dd' }}
-  </div>
+            <p>وتفضلوا سيادتكم بقبول فائق التقدير و الاحترام،،،</p>
 
-  <div>
-    <strong>أمين الكلية</strong><br>
-    {{ note.collageKeeper }}
-  </div>
+            <div class="signature-section mt-3 d-flex justify-content-between">
+              <div>
+                <strong>توقيع الموظف</strong><br />
 
+                {{ note.userSignature }}
+              </div>
 
-</div>
-<!-- بطن الحالة -->
+              <div>
+                <strong>الكلية</strong><br />
+                {{ note.college }}
+              </div>
 
+              <div>
+                <strong>تاريخ الطلب</strong><br />
+                {{ note.requestDate | date : "yyyy-MM-dd" }}
+              </div>
 
+              <div>
+                <strong>أمين الكلية</strong><br />
+                {{ note.collageKeeper }}
+              </div>
+            </div>
+            <!-- بطن الحالة -->
+          </div>
+          <div class="status-belly">
+            <span
+              [ngClass]="{
+                pending: isPending(note),
+                approved: isApproved(note),
+                rejected: isRejected(note)
+              }"
+            >
+              {{ getStatusText(note) }}
+            </span>
 
-
-
-
-
-
-
+            <!-- سبب الرفض -->
+            <div *ngIf="isRejected(note)" class="rejection-reason mt-1">
+              <strong>سبب الرفض:</strong>
+              {{ note.rejectionReason || "غير محدد" }}
+            </div>
+          </div>
         </div>
-       <div class="status-belly">
-  <span
-    [ngClass]="{
-      'pending': isPending(note),
-      'approved': isApproved(note),
-      'rejected': isRejected(note)
-    }"
-  >
-    {{ getStatusText(note) }}
-  </span>
-
-  <!-- سبب الرفض -->
-  <div *ngIf="isRejected(note)" class="rejection-reason mt-1">
-    <strong>سبب الرفض:</strong> {{ note.rejectionReason || 'غير محدد' }}
-  </div>
-</div>
-
-
       </div>
-    </div>
-
-
-
-</form>
+    </form>
   </div>
 </div>
-

@@ -1,208 +1,261 @@
-import { Component ,OnDestroy,OnInit, inject, signal} from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, HostListener, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '../../../components/header/header.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
-import { FormsModule, FormBuilder, ReactiveFormsModule, FormGroup, Validators, FormArray } from '@angular/forms';
-import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
-// Assuming you have an ApiService to handle HTTP requests
-// import { ApiService } from '../services/api.service';
+import { Subscription } from 'rxjs';
+import {
+  FormsModule,
+  FormBuilder,
+  ReactiveFormsModule,
+  FormGroup,
+  Validators,
+  FormArray
+} from '@angular/forms';
 
-
-
-
-interface SimpleRow {
-  item: string;      // الصنف
-  category: string;  // الفئة
-  // date: string;      // الكود
-  count: string;     // العدد
-  unit:string;
-}
+import { StoreKeeperStockService } from '../../../services/store-keeper-stock.service';
+import { CentralStoreService } from '../../../services/central-store.service';
+import { LedgerService } from '../../../services/ledger.service';
 
 interface CategoryItemMap {
   [key: string]: string[];
 }
 
-
 @Component({
   selector: 'app-employee-ma5azen3',
+  standalone: true,
   imports: [
     HeaderComponent,
     FooterComponent,
     FormsModule,
-    ReactiveFormsModule,CommonModule
+    ReactiveFormsModule,
+    CommonModule
   ],
   templateUrl: './employee-ma5azen3.component.html',
   styleUrl: './employee-ma5azen3.component.css'
 })
-export class EmployeeMa5azen3Component implements OnInit,OnDestroy{
- userName: string = '';
- displayName: string = '';
+export class EmployeeMa5azen3Component implements OnInit, OnDestroy {
 
+  filteredCategories: { [key: number]: string[] } = {};
+  filteredItemsRows: { [key: number]: string[] } = {};
+  filteredTypesRows: { [key: number]: string[] } = {};
+  filteredUnitsRows: { [key: number]: string[] } = {};
 
-getFirstTwoNames(fullName: string): string {
-  if (!fullName) return '';
-
-  return fullName
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .join(' ');
-}
-
- 
-    categoryItemMap: CategoryItemMap = {
+  categoryItemMap: CategoryItemMap = {
     'أثاث مكتبي': ['مكتب مدير', 'كرسي دوار', 'خزانة ملفات'],
     'قرطاسية': ['أقلام حبر', 'أوراق A4', 'دفاتر ملاحظات'],
     'إلكترونيات': ['حاسوب محمول', 'طابعة ليزر', 'شاشة عرض'],
     'أدوات نظافة': ['مطهرات', 'مكانس', 'مناشف ورقية']
   };
 
+  units: string[] = ['قطعة', 'متر', 'كيلو جرام', 'علبة', 'لفة', 'كرتونة'];
   categories: string[] = Object.keys(this.categoryItemMap);
-
-  // NEW: Array to hold available items for each *specific* row
-  availableItemsByRow: string[][] = [];
-
-  // NEW: Array to hold subscriptions for cleaning up when the component is destroyed
-  private subscriptions: Subscription[] = [];
-
   itemTypes: string[] = ['مستهلك', 'مستديم'];
-
+  availableItemsByRow: string[][] = [];
 
   simpleForm!: FormGroup;
   isSubmitting = signal(false);
+  userName = '';
+  displayName = '';
+  statusMessage: string | null = null;
+  statusType: 'success' | 'error' | null = null;
+  isManualItemMode: { [key: number]: boolean } = {};
+  private subscriptions: Subscription[] = [];
 
-  // Dependency Injection
   private fb = inject(FormBuilder);
-  private router = inject(Router);
+  private stockService = inject(StoreKeeperStockService);
+  private centralStoreService = inject(CentralStoreService);
+  private ledgerService = inject(LedgerService);
+  private eRef = inject(ElementRef);
 
   constructor() {
     this.simpleForm = this.fb.group({
-      // The only control is the FormArray for the table data
-
-
       tableData: this.fb.array([])
     });
-
-
-
   }
-ngOnInit(): void {
-  this.userName = localStorage.getItem('name') || '';
-  this.displayName = this.getFirstTwoNames(this.userName);
-    // 1. Create the single instance of the first row
-    const initialRowGroup = this.createTableRowFormGroup();
 
-    // 2. Push this instance into the FormArray
-    this.tableData.push(initialRowGroup);
-
-    // 3. Initialize available items for index 0
-    this.availableItemsByRow.push([]);
-
-    // 4. Attach the listener to the correct instance (initialRowGroup) at the correct index (0)
-    this.addCategoryListener(initialRowGroup, 0);
+  ngOnInit(): void {
+    this.userName = localStorage.getItem('name') || '';
+    this.displayName = this.getFirstTwoNames(this.userName);
+    this.addRow();
   }
 
   ngOnDestroy(): void {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.subscriptions.forEach(s => s.unsubscribe());
   }
 
-  // Helper getter to easily access the FormArray
   get tableData(): FormArray {
     return this.simpleForm.get('tableData') as FormArray;
   }
 
-
-  // Add this helper method to get today's date in YYYY-MM-DD format
-private getTodayDate(): string {
-  return new Date().toISOString().split('T')[0];
-}
-
-  // Helper function to create the form group for a single table row (4 columns)
-  private createTableRowFormGroup(): FormGroup {
-    return this.fb.group({
-      item: [null,Validators.required],
-      category: ['',Validators.required],
-
-
-      count: ['', Validators.required],
-      itemType: ['', Validators.required], // نوع الصنف
-      unit:[ '',Validators.required],
-      entryDate: ['' ,Validators.required]
-    });
+  private getFirstTwoNames(fullName: string): string {
+    return fullName?.trim().split(/\s+/).slice(0, 2).join(' ') || '';
   }
 
+  /* ===================== Dropdown Logic ===================== */
 
+  filterCategories(query: string | null, index: number) {
+    const q = (query || '').toLowerCase();
+    this.filteredCategories[index] = this.categories.filter(c => c.toLowerCase().includes(q));
+  }
 
-  // Helper function to handle the cascading logic
-  private addCategoryListener(rowGroup: FormGroup, index: number): void {
-    const sub = rowGroup.get('category')?.valueChanges.subscribe(selectedCategory => {
-      // 1. Get the list of items for the selected category
-      const items = this.categoryItemMap[selectedCategory] || [];
+  filterTypes(query: string | null, index: number) {
+    const q = (query || '').trim();
+    this.filteredTypesRows[index] = this.itemTypes.filter(t => t.includes(q));
+  }
 
-      // 2. Update the available items list for this specific row index
-      this.availableItemsByRow[index] = items;
+  filterUnits(query: string | null, index: number) {
+    const q = (query || '').trim();
+    this.filteredUnitsRows[index] = this.units.filter(u => u.includes(q));
+  }
 
-      // 3. Reset the itemName dropdown for this row, forcing the user to select a new item
-      rowGroup.get('item')?.reset(null, { emitEvent: false });
-    });
+  filterAvailableItems(query: string | null, index: number) {
+    if (this.isManualItemMode[index]) {
+      this.filteredItemsRows[index] = [];
+      return;
+    }
+    const q = (query || '').trim().toLowerCase();
+    const items = this.availableItemsByRow[index] || [];
+    this.filteredItemsRows[index] = items.filter(i => i.toLowerCase().includes(q));
+  }
 
-    if (sub) {
-        this.subscriptions.push(sub);
+  selectCategory(val: string, index: number) {
+    this.tableData.at(index).get('category')?.setValue(val);
+    this.closeAllDropdowns();
+  }
+
+  selectItem(item: string, index: number) {
+    this.tableData.at(index).get('item')?.setValue(item);
+    this.closeAllDropdowns();
+  }
+
+  selectType(type: string, index: number) {
+    this.tableData.at(index).get('itemType')?.setValue(type);
+    this.closeAllDropdowns();
+  }
+
+  selectUnit(unit: string, index: number) {
+    this.tableData.at(index).get('unit')?.setValue(unit);
+    this.closeAllDropdowns();
+  }
+
+  selectOtherItem(index: number): void {
+    this.isManualItemMode[index] = true;
+    this.filteredItemsRows[index] = [];
+    const row = this.tableData.at(index);
+    row.get('item')?.setValue('', { emitEvent: false });
+    row.get('item')?.updateValueAndValidity();
+
+    setTimeout(() => {
+      const inputs = document.querySelectorAll('td[data-label="الصنف"] input');
+      (inputs[index] as HTMLInputElement)?.focus();
+    }, 10);
+  }
+
+  resetManualMode(index: number): void {
+    this.isManualItemMode[index] = false;
+    const row = this.tableData.at(index);
+    row.get('item')?.setValue('');
+    row.get('item')?.updateValueAndValidity();
+    // Trigger the dropdown to show again
+    this.filterAvailableItems('', index);
+  }
+
+  @HostListener('document:click', ['$event'])
+  clickout(event: any) {
+    if (!this.eRef.nativeElement.contains(event.target)) {
+      this.closeAllDropdowns();
     }
   }
 
-  // ➕ Method to add a new row
+  closeAllDropdowns() {
+    this.filteredCategories = {};
+    this.filteredItemsRows = {};
+    this.filteredTypesRows = {};
+    this.filteredUnitsRows = {};
+  }
+
+  /* ===================== Validators & Rows ===================== */
+
+  private itemExistsValidator(index: number) {
+    return (control: any) => {
+      if (!control.value || this.isManualItemMode[index]) return null;
+      const items = this.availableItemsByRow[index] || [];
+      return items.includes(control.value) ? null : { invalidItem: true };
+    };
+  }
+
   addRow(): void {
-    const newRowGroup = this.createTableRowFormGroup();
-    const newIndex = this.tableData.length; // Get the index BEFORE pushing
+    const index = this.tableData.length;
+    const row = this.fb.group({
+      category: ['', [Validators.required]],
+      item: ['', [Validators.required]],
+      itemType: ['', Validators.required],
+      unit: ['', [Validators.required]],
+      count: ['', [Validators.required, Validators.min(1)]],
+      entryDate: ['', Validators.required]
+    });
 
-    this.tableData.push(newRowGroup);
-
-    //  Initialize new slot for items
-    this.availableItemsByRow.push([]);
-
-    // Attach listener to the new row
-    this.addCategoryListener(newRowGroup, newIndex);
+    this.tableData.push(row);
+    this.isManualItemMode[index] = false;
+    this.addCategoryListener(row, index);
   }
 
+  private addCategoryListener(rowGroup: FormGroup, index: number): void {
+    rowGroup.get('item')?.setValidators([Validators.required, this.itemExistsValidator(index)]);
+    const sub = rowGroup.get('category')?.valueChanges.subscribe(cat => {
+      this.isManualItemMode[index] = false;
+      this.availableItemsByRow[index] = this.categoryItemMap[cat] || [];
+      rowGroup.get('item')?.reset('', { emitEvent: false });
+    });
+    if (sub) this.subscriptions.push(sub);
+  }
 
-// ➖ Method to remove the last row
-    removeRow(): void {
-      if (this.tableData.length > 1) {
-        const lastIndex = this.tableData.length - 1;
-
-        // Clean up the subscription
-        if (this.subscriptions.length > 0) {
-          this.subscriptions.pop()?.unsubscribe();
-        }
-
-        // Remove the available items array slot
-        this.availableItemsByRow.pop();
-
-        this.tableData.removeAt(lastIndex);
-      } else if (this.tableData.length === 1) {
-        this.tableData.at(0).reset();
-      }
+  removeRow(): void {
+    if (this.tableData.length > 1) {
+      const idx = this.tableData.length - 1;
+      this.tableData.removeAt(idx);
+      delete this.isManualItemMode[idx];
     }
+  }
 
-  // --- SAVE BUTTON LOGIC ---
+  /* ===================== Submission ===================== */
 
-onSubmit(): void {
-      if (this.simpleForm.invalid) {
-        this.simpleForm.markAllAsTouched();
-        console.warn('Form is invalid. Cannot submit.');
-        return;
-      }
-
-      this.isSubmitting.set(true);
-      const formData = this.simpleForm.getRawValue();
-      console.log('Sending Form Data:', formData);
-
-      setTimeout(() => {
-        console.log('Request submitted successfully!');
-        this.isSubmitting.set(false);
-        // router navigation logic here
-      }, 2000);
+  onSubmit(): void {
+    if (this.simpleForm.invalid) {
+      this.simpleForm.markAllAsTouched();
+      this.showStatus('يرجى ملء كافة البيانات المطلوبة ⚠️', 'error');
+      return;
     }
+    this.isSubmitting.set(true);
+    const rawRows = this.simpleForm.getRawValue().tableData;
+    let completed = 0;
+    const total = rawRows.length;
+
+    rawRows.forEach((row: any) => {
+        // Your Service Logic Here...
+        this.handleComplete(++completed, total);
+    });
+  }
+
+  private handleComplete(done: number, total: number) {
+    if (done === total) {
+      this.isSubmitting.set(false);
+      this.showStatus('تم حفظ البيانات بنجاح ✅', 'success');
+      this.simpleForm.reset();
+      this.tableData.clear();
+      this.isManualItemMode = {};
+      this.addRow();
+    }
+  }
+
+  showStatus(msg: string, type: 'success' | 'error') {
+    this.statusMessage = msg;
+    this.statusType = type;
+  }
+
+  closeStatusMessage() {
+    this.statusMessage = null;
+    this.statusType = null;
+  }
 }

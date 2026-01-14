@@ -128,6 +128,7 @@ a {
   padding: 20px;
   font-weight: bold;
   border: 1px solid #eee;
+  text-align: center;
 }
 
 .custom-3d-table td {

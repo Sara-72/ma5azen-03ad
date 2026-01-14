@@ -279,7 +279,7 @@ input[type="text"] {
   border-radius: 12px;
   font-weight: bold;
   font-size: 14px;
-  background-color: var(--primary-color);
+  background-color: var(--secondary-color);
   color: white; /* نص أبيض عشان يظهر على الخلفية */
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);
   min-width: 120px;

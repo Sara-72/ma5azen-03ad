@@ -1,12 +1,21 @@
 <app-header></app-header>
 
+<div *ngIf="statusMessage" class="modal-overlay">
+  <div class="modal-box" [ngClass]="statusType">
+    <div class="icon">{{ statusType === "success" ? "✅" : "❌" }}</div>
+    <h3 [style.color]="statusType === 'success' ? '#28a745' : '#dc3545'">
+      {{ statusType === "success" ? "تمت العملية" : "تنبيه" }}
+    </h3>
+    <p>{{ statusMessage }}</p>
+    <button class="confirm-btn" (click)="closeStatusMessage()">موافق</button>
+  </div>
+</div>
+
 <div class="content d-flex flex-row">
   <aside class="sidebar">
     <h5>
-  مرحبًا بك
-      <span *ngIf="displayName">، {{ displayName }}</span>
+      مرحبًا بك <span *ngIf="displayName">، {{ displayName }}</span>
     </h5>
-
     <ul class="mt-5">
       <li class="active"><a>دفتر المالية</a></li>
       <li><a href="/employee_ma5azen2">كاتب الشطب</a></li>
@@ -17,8 +26,12 @@
   </aside>
 
   <main class="flex-grow-1">
-    <form [formGroup]="inventoryLogForm" (ngSubmit)="onSubmit()" dir="rtl" class="my-5 mx-4">
-
+    <form
+      [formGroup]="inventoryLogForm"
+      (ngSubmit)="onSubmit()"
+      dir="rtl"
+      class="my-5 mx-4"
+    >
       <div class="table-section">
         <h2 class="text-center">دفتر المالية</h2>
 
@@ -37,44 +50,159 @@
             </thead>
 
             <tbody formArrayName="tableData">
-              @for (rowGroup of tableData.controls; track $index) {
-                <tr [formGroupName]="$index">
-                  <td><input type="number" formControlName="additionNumber" class="form-control text-center"></td>
-                  <td>
-                    <select formControlName="itemName" class="form-select text-center">
-                      <option value="" disabled selected>--- اختر ---</option>
-                      @for (item of ma5azenItemOptions; track item) {
-                        <option [value]="item">{{ item }}</option>
-                      }
-                    </select>
-                  </td>
-                  <td><input type="text" formControlName="unit" class="form-control text-center"></td>
-                  <td><input type="number" formControlName="quantity" class="form-control text-center"></td>
-                  <td><input type="number" formControlName="unitPrice" class="form-control text-center"></td>
-                  <td><input type="number" formControlName="value" class="form-control text-center"></td>
-                  <td>
-                    <select formControlName="itemCondition" class="form-select text-center">
-                      <option value="" disabled selected>اختر</option>
-                      <option value="مستهلك">مستهلك</option>
-                      <option value="مستديم">مستديم</option>
-                    </select>
-                  </td>
-                </tr>
-              }
+              <tr
+                *ngFor="let rowGroup of tableData.controls; let i = index"
+                [formGroupName]="i"
+              >
+                <td data-label="رقم الإضافة">
+                  <input
+                    type="number"
+                    min="1"
+                    formControlName="additionNumber"
+                    class="form-control text-center"
+                  />
+                </td>
+
+                <td class="dropdown-cell position-relative d-flex align-items-center justify-content-between">
+                  <input
+                    type="text"
+                    formControlName="itemName"
+                    class="form-control"
+                    [placeholder]="
+                      isManualItemMode[i] ? 'اكتب صنفاً جديداً...' : 'ابحث...'
+                    "
+                    (input)="filterItems($any($event.target).value, i)"
+                    (focus)="filterItems($any($event.target).value, i)"
+                  />
+
+                  <span
+                    *ngIf="isManualItemMode[i]"
+                    class="reset-btn fw-bold me-1"
+                    style="cursor:pointer ;color:red;"
+                    (click)="resetManualMode(i)"
+                    >↩</span>
+
+                  <ul
+                    *ngIf="!isManualItemMode[i] && filteredItems[i]?.length"
+                    class="floating-dropdown"
+                  >
+                    <li
+                      class="list-group-item"
+                      *ngFor="let itm of filteredItems[i]"
+                      (mousedown)="selectItem(itm, i)"
+                    >
+                      {{ itm }}
+                    </li>
+                    <li
+                      class="other-option list-group-item fw-bold border-top"
+                      style="background-color: #f0f7ff; color:var(--primary-color)"
+                      (mousedown)="selectOther(i); $event.preventDefault()"
+                    >
+                     <span class="fw-bold">+</span>أخرى
+                    </li>
+                  </ul>
+                </td>
+                <td data-label="الوحدة" class="dropdown-cell">
+                  <input
+                    type="text"
+                    class="form-control text-center"
+                    formControlName="unit"
+                    placeholder="اختر الوحدة"
+                    (click)="$event.stopPropagation()"
+                    (focus)="filterUnits('', i)"
+                    (input)="filterUnits(tableData.at(i).get('unit')?.value, i)"
+                  />
+                  <ul
+                    *ngIf="filteredUnits[i]?.length"
+                    class="floating-dropdown"
+                  >
+                    <li
+                      class="list-group-item"
+                      *ngFor="let u of filteredUnits[i]"
+                      (mousedown)="selectUnit(u, i)"
+                    >
+                      {{ u }}
+                    </li>
+                  </ul>
+                </td>
+
+                <td data-label="الكمية">
+                  <input
+                    type="number"
+                    formControlName="quantity"
+                    min="1"
+                    class="form-control text-center"
+                  />
+                </td>
+
+                <td data-label="سعر الوحدة">
+                  <input
+                    type="number"
+                    min="1"
+                    formControlName="unitPrice"
+                    class="form-control text-center"
+                  />
+                </td>
+
+                <td data-label="القيمة">
+                  <input
+                    type="number"
+                    min="1"
+                    formControlName="value"
+                    class="form-control text-center"
+                  />
+                </td>
+
+                <td data-label="حالة الصنف" class="dropdown-cell">
+                  <input
+                    type="text"
+                    class="form-control text-center"
+                    formControlName="itemCondition"
+                    placeholder="الحالة"
+                    (click)="$event.stopPropagation()"
+                    (focus)="filterConditions('', i)"
+                    (input)="
+                      filterConditions(
+                        tableData.at(i).get('itemCondition')?.value,
+                        i
+                      )
+                    "
+                  />
+                  <ul
+                    *ngIf="filteredConditions[i]?.length"
+                    class="floating-dropdown"
+                  >
+                    <li
+                      class="list-group-item"
+                      *ngFor="let c of filteredConditions[i]"
+                      (mousedown)="selectCondition(c, i)"
+                    >
+                      {{ c }}
+                    </li>
+                  </ul>
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
 
-        <button type="button" class="remove-row-button" (click)="removeRow()">-</button>
-        <button type="button" class="add-row-button" (click)="addRow()">+</button>
+        <button type="button" class="remove-row-button" (click)="removeRow()">
+          -
+        </button>
+        <button type="button" class="add-row-button" (click)="addRow()">
+          +
+        </button>
       </div>
 
       <div class="button-section text-center">
-        <button type="submit" [disabled]="isSubmitting() || inventoryLogForm.invalid" class="submit-btn mt-5">
-          @if (isSubmitting()) { جاري الحفظ... } @else { حفظ البيانات }
+        <button
+          type="submit"
+          [disabled]="isSubmitting()"
+          class="submit-btn mt-5"
+        >
+          {{ isSubmitting() ? "جاري الحفظ..." : "حفظ البيانات" }}
         </button>
       </div>
     </form>
   </main>
 </div>
-

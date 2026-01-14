@@ -419,7 +419,7 @@ input[type="date"] {
         font-size: 0.9rem;
     }
 
-  
+
     .big-container {
         margin: 0 !important;
         width: 100%;
@@ -493,4 +493,18 @@ input[type="date"] {
 .custom-scrollbar::-webkit-scrollbar {
     height: 8px;
     display: block;
+}
+
+
+
+
+.floating-dropdown .list-group-item.text-primary {
+  background-color: #f8f9ff;
+  color: var(--primary-color) !important;
+  font-weight: 600;
+  text-align: center;
+}
+
+.floating-dropdown .list-group-item.text-primary:hover {
+  background-color: #eef2ff;
 }

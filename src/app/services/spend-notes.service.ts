@@ -8,7 +8,8 @@ import { Observable } from 'rxjs';
 export class SpendNotesService {
 
   // 👇 خليها relative علشان تعدي من الـ proxy
-  private baseUrl = '/api/SpendNotes';
+ private baseUrl = 'https://newwinventoryapi.runasp.net/api/SpendNotes';
+
 
   constructor(private http: HttpClient) {}
 
