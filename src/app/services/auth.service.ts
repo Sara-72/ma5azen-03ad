@@ -128,6 +128,30 @@ inventoryManagerLogin(data: any) {
     return this.http.put(`${this.api}/${endpoint}/${id}`, data);
   }
 
+checkNameExists(name: string) {
+  return forkJoin({
+    users: this.http.get<any[]>(`${this.api}/Users`),
+    employees: this.http.get<any[]>(`${this.api}/Employees`),
+    keepers: this.http.get<any[]>(`${this.api}/StoreKeepers`),
+    managers: this.http.get<any[]>(`${this.api}/InventoryManagers`)
+  }).pipe(
+    map(res => {
+      const allNames = [
+        ...res.users,
+        ...res.employees,
+        ...res.keepers,
+        ...res.managers
+      ].map(x => x.name?.trim().toLowerCase());
+
+      return allNames.includes(name.trim().toLowerCase());
+    })
+  );
+}
+checkEmailExistsAllRoles(email: string) {
+  return this.getAllAccounts().pipe(
+    map(accounts => accounts.some(acc => acc.email?.toLowerCase() === email.toLowerCase()))
+  );
+}
 
 
 }

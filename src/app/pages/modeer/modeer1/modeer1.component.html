@@ -1,8 +1,9 @@
 <app-header></app-header>
 
-<div class="page-container"> <aside class="sidebar">
+<div class="content d-flex flex-row">
+  <aside class="sidebar">
     <h5>
-  مرحبًا بك
+      مرحبًا بك
       <span *ngIf="displayName">، {{ displayName }}</span>
     </h5>
 
@@ -15,19 +16,30 @@
     </ul>
   </aside>
 
-  <main class="content"> <div class="table-container"> <div class="filter-section mb-4">
-
-      <h2 class="mb-4 fw-bold text-center" style="color: var(--primary-color);">
-        عرض المخزن
-      </h2>
+  <main class="content">
+    <div class="table-container">
+      <div class="filter-section mb-4">
+        <h2
+          class="mb-4 fw-bold text-center"
+          style="color: var(--primary-color)"
+        >
+          عرض المخزن
+        </h2>
         <label for="categorySelect" class="form-label">اختر الفئة:</label>
-        <select id="categorySelect" class="form-select custom-select" [(ngModel)]="selectedCategory" (change)="filterByCategory()">
+        <select
+          id="categorySelect"
+          class="form-select custom-select"
+          [(ngModel)]="selectedCategory"
+          (change)="filterByCategory()"
+        >
           <option value="">الكل</option>
-          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+          <option *ngFor="let cat of categories" [value]="cat">
+            {{ cat }}
+          </option>
         </select>
       </div>
 
-      <div class="table-responsive-rtl">
+      <div class="table-responsive-rtl custom-scrollbar">
         <table class="custom-3d-table text-center" dir="rtl">
           <thead>
             <tr>
@@ -56,7 +68,9 @@
           </tbody>
         </table>
       </div>
+      <p class="text-muted d-md-none text-center mt-3 small">
+      <i class="fas fa-arrows-alt-h me-1"></i> اسحب الجدول لليسار أو اليمين لمشاهدة كافة البيانات
+    </p>
     </div>
   </main>
 </div>
-

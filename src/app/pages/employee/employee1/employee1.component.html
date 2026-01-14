@@ -45,19 +45,20 @@
                   </option>
                 </select>
 
-
+                <!-- حقل اسم الفئة الجديدة لو اخترنا "أخرى" -->
                 <div class="field mt-2" *ngIf="memoGroup.get('category')?.value === 'OTHER'">
-  <label>اسم الفئة الجديدة:</label>
-  <input
-    type="text"
-    formControlName="customCategory"
-    class="table-input"
-    placeholder="مثلاً: أدوات نظافة، قطع غيار..."
-  />
-  <div *ngIf="memoGroup.get('customCategory')?.touched && memoGroup.get('customCategory')?.invalid" class="text-danger small">
-    اسم الفئة مطلوب
-  </div>
-</div>
+                  <label>اسم الفئة الجديدة:</label>
+                  <input
+                    type="text"
+                    formControlName="customCategory"
+                    class="table-input"
+                    placeholder="مثلاً: أدوات نظافة، قطع غيار..."
+                  />
+                  <div *ngIf="memoGroup.get('customCategory')?.touched && memoGroup.get('customCategory')?.invalid" class="text-danger small">
+                    اسم الفئة مطلوب
+                  </div>
+                </div>
+
                 <div *ngIf="memoGroup.get('category')?.touched && memoGroup.get('category')?.invalid" class="text-danger small mt-1">
                   الرجاء اختيار الفئة
                 </div>
@@ -68,21 +69,38 @@
               <div *ngFor="let itemLine of getItemLines($index).controls; let i = index" [formGroupName]="i" class="row item-line">
                 @let line = asGroup(itemLine);
 
+                <!-- حقل اختيار الصنف للفئات العادية -->
                 <div class="field" *ngIf="memoGroup.get('category')?.value !== 'OTHER'">
                   <label>الصنف {{ i + 1 }}:</label>
                   <select formControlName="itemName" class="table-input form-select">
                     <option [value]="null" disabled hidden>اختر الصنف</option>
-                    <option *ngFor="let item of getAvailableItems($index, i)" [value]="item">
-                      {{ item === "OTHER" ? "أخرى" : item }}
+                    <option *ngFor="let item of getAvailableItems($index, i)" [ngValue]="item">
+                      {{ item.itemName === 'OTHER' ? 'أخرى' : item.itemName + ' (' + item.unit + ')' }}
                     </option>
                   </select>
                 </div>
 
-                <div class="field" *ngIf="memoGroup.get('category')?.value === 'OTHER' || line.get('itemName')?.value === 'OTHER'">
-                  <label>اسم الصنف:</label>
-                  <input type="text" [formControlName]="memoGroup.get('category')?.value === 'OTHER' ? 'itemName' : 'customItemName'" class="table-input" placeholder="اكتب اسم الصنف" />
-                  <div *ngIf="line.invalid && line.touched" class="text-danger small mt-1">اسم الصنف مطلوب</div>
-                </div>
+               <!-- حقل اسم الصنف والوحدة لو اخترنا "أخرى" للفئة أو الصنف -->
+<div class="field"
+ *ngIf="memoGroup.get('category')?.value === 'OTHER' ||
+        (line.get('itemName')?.value && line.get('itemName')?.value.itemName === 'OTHER')">
+
+  <label>اسم الصنف:</label>
+  <input type="text"
+         formControlName="customItemName"
+         class="table-input"
+         placeholder="مثال: شاشة عرض" />
+
+  <label class="mt-2">الوحدة:</label>
+  <input type="text"
+         formControlName="customUnit"
+         class="table-input"
+         placeholder="مثال: متر" />
+</div>
+
+
+
+
 
                 <div class="field count-input">
                   <label>العدد:</label>
@@ -139,12 +157,8 @@
     </form>
 
     <div class="row-controls align-items-center my-3">
-    <button type="button" class="remove-row-button" (click)="removeRow()">-</button>
-    <button type="button" class="add-row-button" (click)="addRow()">+</button>
+      <button type="button" class="remove-row-button" (click)="removeRow()">-</button>
+      <button type="button" class="add-row-button" (click)="addRow()">+</button>
+    </div>
   </div>
-  </div>
-
-
 </div>
-
-

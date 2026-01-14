@@ -17,7 +17,9 @@ interface SpendNote {
   requestDate: string;
   collageKeeper: string;
   rejectionReason?: string;
+  confirmationStatus?: string; // ← هنا أضفنا الخاصية الجديدة
 }
+
 
 @Component({
   selector: 'app-employee3',
@@ -112,49 +114,63 @@ getFirstTwoNames(fullName: string): string {
     .join(' ');
 }
 
-isPending(status: string): boolean {
-  if (!status) return true;
-  const s = status.toLowerCase().trim();
+isApproved(note: SpendNote): boolean {
+  if (!note.permissinStatus) return false;
 
-  return s.includes('قيد') || s === 'pending';
+  const permStatus = note.permissinStatus.toLowerCase().trim();
+  const confStatus = note.confirmationStatus?.toLowerCase().trim();
+
+  return (permStatus === 'approved' || permStatus.includes('الطلب مقبول')) && confStatus === 'مؤكد';
 }
 
-isApproved(status: string): boolean {
-  if (!status) return false;
-  const s = status.toLowerCase().trim();
+isPending(note: SpendNote): boolean {
+  if (!note.permissinStatus) return true;
+  const permStatus = note.permissinStatus.toLowerCase().trim();
+  const confStatus = note.confirmationStatus?.toLowerCase().trim();
 
-  return (
-    s === 'approved' ||
-    s.includes('الطلب مقبول')
-  );
+  return (permStatus.includes('قيد') || permStatus === 'pending') || confStatus !== 'مؤكد';
 }
 
-isRejected(status: string): boolean {
-  if (!status) return false;
-  const s = status.toLowerCase().trim();
+isRejected(note: SpendNote): boolean {
+  if (!note.permissinStatus) return false;
 
-  return (
-    s === 'rejected' ||
-    s.includes('الطلب مرفوض')
-  );
+  const permStatus = note.permissinStatus.toLowerCase().trim();
+  return permStatus === 'rejected' || permStatus.includes('الطلب مرفوض');
 }
 
 
 
-  getStatusText(status: string): string {
-    if (!status) return 'قيد المراجعة';
 
-    const value = status.toLowerCase();
+getStatusText(note: SpendNote): string {
+  if (!note.permissinStatus) return 'قيد المراجعة';
 
-    if (value.includes('قيد') || value === 'pending')
-      return 'قيد المراجعة';
+  const permStatus = note.permissinStatus.toLowerCase().trim();
+  const confStatus = note.confirmationStatus?.toLowerCase().trim();
 
-    if (value === 'approved')
-      return 'تم الطلب مقبول';
-
-    if (value === 'rejected')
-      return 'تم الطلب مرفوض';
-
-    return status;
+  // 🟢 تم الصرف ومؤكد
+  if (
+    (permStatus.includes('تم الصرف') || permStatus === 'spent')
+    && confStatus === 'مؤكد'
+  ) {
+    return 'تم الصرف';
   }
+
+  // ✅ مقبول لكن لسه ما اتصرفش
+  if (
+    (permStatus === 'approved' || permStatus.includes('الطلب مقبول'))
+    && confStatus === 'مؤكد'
+  ) {
+    return 'الطلب مقبول';
+  }
+
+  // ❌ مرفوض
+  if (permStatus === 'rejected' || permStatus.includes('الطلب مرفوض')) {
+    return 'الطلب مرفوض';
+  }
+
+  // ⏳ باقي الحالات
+  return 'قيد المراجعة';
+}
+
+
 }

@@ -165,6 +165,17 @@ tbody tr:nth-child(4) { animation-delay: 0.4s; }
 
 
 
+/* Custom Scrollbar for the table */
+.custom-scrollbar::-webkit-scrollbar {
+    height: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+}
+
+
+
 
 
 /* --- RESPONSIVE LOGIC (Added without changing your existing styles) --- */

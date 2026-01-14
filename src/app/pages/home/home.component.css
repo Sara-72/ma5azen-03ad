@@ -4,16 +4,16 @@
   width: 100%;
 }
 
-/* Ensure the parent is the anchor */
 .home-page-container {
     position: relative;
     min-height: 100vh;
     width: 100%;
-    background-color: var(--bg-light); /* Or any base color */
+    background-color: var(--bg-light);
     overflow: hidden;
     z-index: 1;
+    /* This creates the 3D depth for the whole page */
+    perspective: 2000px;
 }
-
 /* --- WATERMARK BACKGROUND --- */
 .home-page-container::before {
     content: "";
@@ -197,3 +197,6 @@ p { color: var(--primary-color); }
     margin-top: 0 !important;
   }
 }
+
+
+/**********************************************************/

@@ -1,6 +1,6 @@
 <app-header> </app-header>
 
-<div class="page-container">
+<div class="content d-flex flex-row">
   <aside class="sidebar">
     <h5>
       مرحبًا بك
@@ -36,13 +36,13 @@
       </div>
 
     <div class="summary-badge-container mb-5 fade-in mt-3">
-  <div class="summary-badge blue">
+  <!-- <div class="summary-badge blue">
     <div class="badge-icon"><i class="fas fa-clock"></i></div>
     <div class="badge-content">
       <span class="count">{{ getStatusCount('pending') }}</span>
       <span class="label">ف انتظار تحديث الحالة</span>
     </div>
-  </div>
+  </div> -->
 
   <div class="summary-badge green">
     <div class="badge-icon"><i class="fas fa-check-double"></i></div>
@@ -66,7 +66,7 @@
       class="table-card shadow-3d mb-5"
       *ngIf="filteredCustody().length > 0; else noData"
     >
-      <div class="table-responsive">
+      <div class="table-responsive custom-scrollbar">
         <table class="custom-table align-middle mb-0">
           <thead>
             <tr>
@@ -106,16 +106,13 @@
                   <i
                     class="fas"
                     [ngClass]="{
-                      'fa-clock': item.status === 'pending',
                       'fa-check-double': item.status === 'received',
                       'fa-undo-alt': item.status === 'returned'
                     }"
                   ></i>
                   <span class="ms-2">
                     {{
-                      item.status === "pending"
-                        ? "حدث الحالة"
-                        : item.status === "received"
+                      item.status === "received"
                         ? "تم الاستلام"
                         : "تم الاسترجاع"
                     }}
@@ -125,6 +122,9 @@
             </tr>
           </tbody>
         </table>
+      </div>
+      <div class="text-center d-md-none mt-2 text-muted small">
+        <i class="fas fa-arrows-alt-h"></i> اسحب الجدول لليمين أو اليسار
       </div>
     </div>
 
@@ -152,14 +152,14 @@
     </div>
 
     <div class="status-selector-grid">
-      <div
+      <!-- <div
         class="status-option blue"
         [class.active]="tempStatus === 'pending'"
         (click)="tempStatus = 'pending'"
       >
         <i class="fas fa-clock"></i>
         <span>قيد الانتظار</span>
-      </div>
+      </div> -->
 
       <div
         class="status-option green"

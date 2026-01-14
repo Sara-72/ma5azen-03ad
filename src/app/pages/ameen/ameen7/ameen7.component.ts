@@ -1,28 +1,22 @@
-import { Component ,OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { HeaderComponent } from '../../../components/header/header.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
-import { CommonModule } from '@angular/common'; // 1. Import this
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ModeerSercive } from '../../../services/modeer.service';
+import { SpendPermissionService } from '../../../services/spend-permission.service';
+import { LedgerEntry, LedgerService } from '../../../services/ledger.service';
 
 export type CustodyStatus = 'pending' | 'received' | 'returned';
+
 @Component({
   selector: 'app-ameen7',
   standalone: true,
-  imports: [
-    HeaderComponent, FooterComponent,
-    CommonModule,FormsModule
-
-  ],
+  imports: [HeaderComponent, FooterComponent, CommonModule, FormsModule],
   templateUrl: './ameen7.component.html',
   styleUrl: './ameen7.component.css'
 })
-
-
 export class Ameen7Component implements OnInit {
-
-  constructor(private stockService: ModeerSercive) {}
-
 
   custodyData: any[] = [];
   searchTerm: string = '';
@@ -30,57 +24,107 @@ export class Ameen7Component implements OnInit {
   selectedItem: any = null;
   tempStatus: CustodyStatus = 'pending';
 
-
-  // Helper to count statuses for the summary cards
-  getStatusCount(status: CustodyStatus): number {
-    return this.custodyData.filter(item => item.status === status).length;
-  }
-
+  constructor(
+    private stockService: ModeerSercive,
+    private spendPermissionService: SpendPermissionService,
+    private ledgerService: LedgerService
+  ) {}
 
   ngOnInit(): void {
     this.loadCustodyData();
   }
 
-loadCustodyData() {
-  this.custodyData = [
-    { employeeName: 'أحمد محمد علي', itemName: 'لاب توب', quantity: 1, receivedDate: '2023-10-01', status: 'pending' },
-    { employeeName: 'سارة إبراهيم', itemName: 'طابعة', quantity: 1, receivedDate: '2023-11-15', status: 'received' },
-    { employeeName: 'خالد حسن', itemName: 'شاشة', quantity: 1, receivedDate: '2023-12-01', status: 'returned' }
-  ];
+  loadCustodyData() {
+  this.spendPermissionService.getAll().subscribe(res => {
+    // فلتر حسب permissionStatus و storeHouse
+    this.custodyData = res
+      .filter(sp => sp.permissionStatus === 'تم الصرف' && sp.storeHouse === 'مستديم')
+      .map(sp => ({
+        id: sp.id,
+        employeeName: sp.requestorName,
+        itemName: sp.itemName,
+        quantity: sp.issuedQuantity,
+        unit: sp.unit,
+        receivedDate: sp.issueDate?.split('T')[0] || '',
+        status: 'received'
+      }));
+  });
 }
 
-filteredCustody() {
-  if (!this.searchTerm) return this.custodyData;
-  const search = this.searchTerm.toLowerCase();
 
-  return this.custodyData.filter(item =>
-    item.employeeName.toLowerCase().includes(search) ||
-    item.itemName.toLowerCase().includes(search) ||
-    item.status.toLowerCase().includes(search) // Now searches by status too!
-  );
-}
+  filteredCustody() {
+    if (!this.searchTerm) return this.custodyData;
+    const search = this.searchTerm.toLowerCase();
+    return this.custodyData.filter(item =>
+      item.employeeName.toLowerCase().includes(search) ||
+      item.itemName.toLowerCase().includes(search) ||
+      item.status.toLowerCase().includes(search)
+    );
+  }
+
+  getStatusCount(status: CustodyStatus): number {
+    return this.custodyData.filter(item => item.status === status).length;
+  }
 
   openDetailModal(item: any) {
-    // Logic for viewing item details
     console.log('Viewing details for:', item);
   }
 
-
-onStatusClick(item: any) {
+  onStatusClick(item: any) {
     this.selectedItem = item;
     this.tempStatus = item.status;
-    this.showModal = true;
+    this.showModal = true; // ممكن تسيبي showModal false لو مش هتستخدمي modal
   }
- // Updated confirm logic to handle any change
+
   confirmStatus() {
+  if (!this.selectedItem) return;
 
-    if (this.selectedItem) {
-      this.selectedItem.status = this.tempStatus;
-    }
-    this.closeModal();
-  }
+  const newStatus = this.tempStatus;
+  const selectedId = this.selectedItem.id;
 
-closeModal() {
+  this.spendPermissionService.getAll().subscribe(allPermissions => {
+    const permission = allPermissions.find(p => p.id === selectedId);
+    if (!permission) return;
+
+    const updatedPermission = {
+      ...permission,
+      permissionStatus: newStatus === 'returned' ? 'تم الاسترجاع' : permission.permissionStatus
+    };
+
+    this.spendPermissionService.update(selectedId, updatedPermission).subscribe(() => {
+
+      if (newStatus === 'returned') {
+        // إنشاء سجل العهدة الجديد
+        const ledgerEntry: LedgerEntry = {
+          date: new Date().toISOString(),
+          itemName: permission.itemName,
+          unit: permission.unit,
+          documentReference: 'وارد من', // ثابت دايمًا
+          itemsValue: permission.issuedQuantity,
+          storeType: 1,
+          status: 'لم يؤكد',
+          spendPermissionId: permission.id
+        };
+
+        this.ledgerService.addLedgerEntry(ledgerEntry).subscribe(() => {
+          console.log('تم إضافة العهدة للدفتر');
+
+          // ❌ إزالة العنصر مباشرة من custodyData بدون ما نغير status
+          this.custodyData = this.custodyData.filter(item => item.id !== selectedId);
+
+          this.closeModal();
+        });
+      } else {
+        // لو لم ترجع، فقط تحديث الحالة محلياً
+        this.selectedItem.status = newStatus;
+        this.closeModal();
+      }
+    });
+  });
+}
+
+
+  closeModal() {
     this.showModal = false;
     this.selectedItem = null;
   }

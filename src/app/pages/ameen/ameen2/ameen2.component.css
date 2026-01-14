@@ -8,12 +8,16 @@ a{
   -o-transition: 0.3s;
 }
 
-.page-container {
-    display: flex;
-    background-color: #f4f7f6; /* Subtle grey-green makes the paper look whiter */
-    perspective: 2000px; /* Crucial: sets the 3D stage for the whole page */
-    padding: 20px;
-    gap: 30px;
+
+/* Updated parent container to manage space better */
+.content.d-flex.flex-row {
+  background-color: var(--bg-light);
+  min-height: 100vh;
+  perspective: 2000px; /* Crucial for the 3D depth */
+  padding: 20px;
+  gap: 20px;
+  width: 100%;
+  overflow-x: hidden; /* Prevents 3D tilt from creating scrollbars */
 }
 
 /* SIDEBAR - 3D Floating Slab Effect */
@@ -242,6 +246,85 @@ a{
 
 
 
+/* --- STATUS MODAL STYLES --- */
+.status-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.status-box {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    min-width: 350px;
+    animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.status-box.success { border-top: 10px solid #28a745; }
+.status-box.error { border-top: 10px solid #dc3545; }
+
+.close-btn {
+    margin-top: 20px;
+    padding: 10px 30px;
+    border: none;
+    border-radius: 8px;
+    background: var(--primary-color);
+    color: white;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.close-btn:hover {
+    background: var(--secondary-color);
+    transform: translateY(-2px);
+}
+
+@keyframes modalPop {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+
+
+/* Vertical and Horizontal Centering */
+.no-data-wrapper {
+    display: flex;
+    justify-content: center;   /* Center horizontally */
+    align-items: center;       /* Center vertically */
+    min-height: 60vh;          /* Ensures it's in the middle of the page area */
+    width: 100%;
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+/* The 3D/Modern Gray Icon */
+.empty-icon {
+    font-size: 4rem;
+    color: var(--primary-color); /* Matches the "No Data" icon color */
+    filter: drop-shadow(5px 5px 10px rgba(0,0,0,0.05));
+}
+
+/* Floating animation similar to the boxes wave */
+@keyframes boxFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(5deg);
+  }
+}
+
+
 @keyframes pulseReady {
   0% { box-shadow: 0 0 0 0 rgba(10, 58, 99, 0.4); }
   70% { box-shadow: 0 0 0 10px rgba(10, 58, 99, 0); }
@@ -254,13 +337,147 @@ a{
   to { opacity: 1; transform: translateY(0) rotateY(-2deg); }
 }
 
-/* Mobile Fix */
-@media (max-width: 768px) {
-  .page-wrapper { flex-direction: column; }
-  .sidebar { width: 100% !important; margin: 0; transform: none !important; }
-  .table-container-3d { transform: none !important; width: 100%; }
-  .custom-select { width: 100%; }
+
+/* --- DATE BADGE STYLING --- */
+.date-badge-wrapper {
+  margin-top: -10px;
+  margin-bottom: 25px;
+}
+
+.date-badge {
+  display: inline-block;
+  background: var(--primary-color); /* Soft blue-grey */
+  color: var(--white-color);
+  padding: 8px 20px;
+  border-radius: 50px; /* Capsule shape */
+  font-weight: 700;
+  font-size: 0.95rem;
+box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+  cursor: default;
+}
+
+.date-badge:hover {
+  transform: translateY(-3px) scale(1.02);
+  background: var(--white-color);
+color:var(--secondary-color);
+
+}
+
+/* --- RESPONSIVE BADGE --- */
+@media (max-width: 991px) {
+  .date-badge-wrapper {
+    text-align: center !important; /* Centers badge on mobile */
+    margin-top: 5px;
+  }
+
+  .date-badge {
+    font-size: 0.85rem;
+    padding: 6px 15px;
+  }
+}
+
+/* --- RESPONSIVE LOGIC --- */
+
+/* For Tablets and Small Laptops (Side-by-side but thinner) */
+
+/* --- RESPONSIVE MEDIA QUERIES --- */
+@media (max-width: 1100px) {
+  .content.d-flex.flex-row {
+    flex-direction: column !important;
+    padding: 10px;
+  }
+
+  .sidebar {
+    flex: none;
+    width: 100%;
+    min-height: auto;
+    margin-bottom: 20px;
+  }
+
+  .table-section {
+    transform: none; /* Remove tilt on mobile/small laptops */
+    padding: 20px !important;
+  }
+}
+
+/* --- ANIMATIONS --- */
+@keyframes paperFadeUp {
+  from { opacity: 0; transform: translateY(40px) rotateY(-5deg); }
+  to { opacity: 1; transform: translateY(0) rotateY(-1deg); }
+}
+
+@keyframes pulseReady {
+  0% { box-shadow: 0 0 0 0 rgba(10, 58, 99, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(10, 58, 99, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(10, 58, 99, 0); }
 }
 
 
 
+
+/* --- RESPONSIVE MEDIA QUERIES --- */
+
+/* For smaller laptops and large tablets */
+@media (max-width: 1200px) {
+    .content.d-flex.flex-row {
+        flex-direction: column !important; /* Stacks sidebar and main */
+        padding: 15px;
+        gap: 15px;
+    }
+
+    .sidebar {
+        flex: none;
+        width: 100%;
+        min-height: auto;
+        margin: 0 0 10px 0;
+        padding: 20px;
+    }
+
+    .sidebar ul {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 1.5rem !important;
+    }
+
+    .sidebar li {
+        margin-bottom: 0;
+        flex: 1 1 auto; /* Allows menu items to sit side-by-side */
+        text-align: center;
+    }
+
+    .table-section {
+        width: 100%;
+        transform: none !important; /* Remove 3D tilt for better space usage */
+        padding: 20px !important;
+    }
+}
+
+/* For mobile phones */
+@media (max-width: 768px) {
+    .sidebar h5 {
+        text-align: center;
+        font-size: 1.2rem;
+    }
+
+    .sidebar ul {
+        flex-direction: column; /* Back to vertical on very small screens */
+    }
+
+    .table-section h2 {
+        font-size: 1.4rem;
+        margin-bottom: 20px;
+    }
+
+    /* Make table inputs easier to tap on mobile */
+    .form-control, .form-select {
+        min-width: 120px;
+        padding: 8px;
+    }
+
+    .submit-btn {
+        width: 100%; /* Full width button for thumbs */
+    }
+}

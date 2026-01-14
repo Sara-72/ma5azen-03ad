@@ -14,6 +14,10 @@
         <div *ngIf="adminForm.get('name')?.touched && adminForm.get('name')?.invalid" class="text-danger mt-1 text-end small">
           <span *ngIf="adminForm.get('name')?.errors?.['required']">من فضلك أدخل الاسم.</span>
           <span *ngIf="adminForm.get('name')?.errors?.['fourStrings']">يجب إدخال الاسم رباعي (أربع كلمات بالضبط).</span>
+          <span *ngIf="adminForm.get('name')?.errors?.['nameExists']">
+  هذا الاسم موجود بالفعل.
+</span>
+
         </div>
       </div>
 
@@ -32,7 +36,23 @@
     >
     <span class="input-group-text"><i class="fas fa-envelope"></i></span>
   </div>
+
+  <!-- رسالة الخطأ تظهر فورًا -->
+  <div *ngIf="adminForm.get('email')?.touched && adminForm.get('email')?.invalid"
+       class="text-danger mt-1 text-end small">
+    <span *ngIf="adminForm.get('email')?.errors?.['required']">
+      من فضلك أدخل الإيميل.
+    </span>
+    <span *ngIf="adminForm.get('email')?.errors?.['email']">
+      من فضلك أدخل إيميل صالح.
+    </span>
+    <span *ngIf="adminForm.get('email')?.errors?.['emailExists']">
+      هذا الإيميل موجود بالفعل.
+    </span>
+  </div>
 </div>
+
+
 
 
 

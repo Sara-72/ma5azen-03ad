@@ -1,5 +1,3 @@
-
-
 /* --- GLOBAL --- */
 a {
   text-decoration: none;
@@ -7,81 +5,83 @@ a {
   transition: 0.3s;
 }
 
-.page-container {
-  display: flex;
-  background-color: #f4f7f6;
-  perspective: 2000px;
-  padding: 20px;
-  gap: 30px;
+/* Updated parent container to manage space better */
+.content.d-flex.flex-row {
+  background-color: var(--bg-light);
   min-height: 100vh;
+  perspective: 2000px; /* Crucial for the 3D depth */
+  padding: 20px;
+  gap: 20px;
+  width: 100%;
+  overflow-x: hidden; /* Prevents 3D tilt from creating scrollbars */
 }
 
-/* --- SIDEBAR --- */
-/* SIDEBAR - 3D Floating Slab Effect */
+/* --- SIDEBAR - Balanced Fixed Width --- */
 .sidebar {
-    width: 25%;
-    min-height: calc(100vh - 40px);
-    /*Leavespaceattop/bottom*/margin: 20px;
-    background: #ffffff;
-    padding: 30px 20px;
-    border-radius: 15px;
-    /*3DShadows:;
-    Onefordepth(dark),oneforhighlight(light)*/box-shadow:        20px 20px 60px #d9d9d9,        -5px -5px 20px #ffffff,        inset 0 0 0 1px rgba(0,0,0,0.05);
-    /*Slighttiltfor3Dperspective*/transform: perspective(1000px) rotateY(0deg);
-    transition: transform 0.5s ease, box-shadow 0.5s ease;
-    z-index: 10;
-    -webkit-transform: perspective(1000px) rotateY(0deg);
-    -moz-transform: perspective(1000px) rotateY(0deg);
-    -ms-transform: perspective(1000px) rotateY(0deg);
-    -o-transform: perspective(1000px) rotateY(0deg);
-    -webkit-transition: transform 0.5s ease, box-shadow 0.5s ease;
-    -moz-transition: transform 0.5s ease, box-shadow 0.5s ease;
-    -ms-transition: transform 0.5s ease, box-shadow 0.5s ease;
-    -o-transition: transform 0.5s ease, box-shadow 0.5s ease;
+  /* Changed from 25% to fixed width to prevent it being too wide on large screens */
+  flex: 0 0 280px;
+  min-height: calc(100vh - 40px);
+  margin: 0;
+  background: #ffffff;
+  padding: 30px 20px;
+  border-radius: 15px;
+  box-shadow: 20px 20px 60px #d9d9d9, -5px -5px 20px #ffffff, inset 0 0 0 1px rgba(0,0,0,0.05);
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+  z-index: 10;
 }
 
-/* Make it straighten up when you interact with it */
 .sidebar:hover {
-    transform: perspective(1000px) rotateY(0deg);
-    box-shadow:
-        30px 30px 70px #cecece,
-        -5px -5px 25px #ffffff;
+  transform: perspective(1000px) rotateY(0deg);
+  box-shadow: 30px 30px 70px #cecece, -5px -5px 25px #ffffff;
 }
 
-/* SIDEBAR LIST ITEMS */
 .sidebar ul {
-    padding: 0;
-    list-style: none;
-    perspective: 500px; /* Depth for children */
+  padding: 0;
+  list-style: none;
+  perspective: 500px;
 }
 
 .sidebar li {
-    padding: 15px 20px;
-    margin-bottom: 12px;
-    border-radius: 10px;
-    border: none; /* Removed the old flat border */
-    background: transparent;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    transform-style: preserve-3d;
+  padding: 15px 20px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  background: transparent;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform-style: preserve-3d;
 }
 
-/* 3D Hover Effect for Links */
 .sidebar li:hover {
-    background: #f8f9fa;
-    color:var(--secondary-color);
-    transform: translateZ(20px) translateX(-5px); /* Pops out toward the user */
-    box-shadow: 10px 10px 20px rgba(0,0,0,0.05);
-}
-.sidebar li:hover a{
-  color:var(--secondary-color);
+  background: #f8f9fa;
+  color: var(--secondary-color);
+  transform: translateZ(20px) translateX(-5px);
+  box-shadow: 10px 10px 20px rgba(0,0,0,0.05);
 }
 
-.sidebar li a {
-    display: block;
-    width: 100%;
-
-
+.sidebar li:hover a {
+  color: var(--secondary-color);
 }
+
+.sidebar li.active {
+  background: #f0f4f8;
+  color: var(--primary-color);
+  font-weight: bold;
+  box-shadow: inset 6px 6px 12px #d1d9e6, inset -6px -6px 12px #ffffff;
+  transform: translateZ(-5px);
+  position: relative;
+}
+
+.sidebar li.active::before {
+  content: "";
+  position: absolute;
+  right: -5px;
+  top: 20%;
+  height: 60%;
+  width: 4px;
+  background: var(--primary-color);
+  border-radius: 10px;
+  box-shadow: 0 0 10px var(--primary-color);
+}
+
 
 /* ACTIVE STATE - Looks "Pressed In" or "Carved" */
 .sidebar li.active {
@@ -202,9 +202,92 @@ tbody tr:nth-child(2) { animation-delay: 0.2s; }
 tbody tr:nth-child(3) { animation-delay: 0.3s; }
 tbody tr:nth-child(4) { animation-delay: 0.4s; }
 
-/* Responsive */
+
+
+
+
+/* --- ENHANCED RESPONSIVE LOGIC --- */
+
+
+/* --- ENHANCED RESPONSIVE LOGIC --- */
+
+/* 1. Tablet & Small Laptops (Side-to-Top transition) */
+@media (max-width: 991px) {
+    .content.d-flex.flex-row {
+        flex-direction: column !important;
+        padding: 10px;
+    }
+
+    .sidebar {
+        flex: none;
+        width: 100% !important;
+        min-height: auto;
+        margin-bottom: 20px;
+        padding: 15px;
+    }
+
+    .sidebar ul {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 15px !important;
+    }
+
+    .sidebar li {
+        margin-bottom: 0;
+        flex: 1 1 auto;
+        text-align: center;
+        padding: 10px;
+    }
+
+ 
+}
+
+/* 2. Mobile Phones (Fixing the Scroll Issue) */
 @media (max-width: 768px) {
-    .page-container { flex-direction: column; }
-    .sidebar { width: 100% !important; margin: 0 0 20px 0; transform: none !important; }
-    .table-container { transform: none !important; padding: 15px; }
+    /* Disable 3D tilt on mobile to prevent clipping scroll areas */
+    .table-container, .sidebar, .sidebar li {
+        transform: none !important;
+        perspective: none !important;
+    }
+
+    .table-container {
+        padding: 15px;
+    }
+
+    .table-responsive-rtl {
+        display: block;
+        width: 100%;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 15px;
+    }
+
+    /* Crucial: Change table-layout from 'fixed' to 'auto' so columns can expand */
+    .custom-3d-table {
+        table-layout: auto !important;
+        min-width: 600px; /* Forces horizontal overflow */
+    }
+
+    .custom-3d-table th, .custom-3d-table td {
+        width: auto !important; /* Overrides the 20% width */
+        white-space: nowrap;    /* Keeps text on one line to force width */
+    }
+}
+
+/* 3. Small Phones (RTL Typography & Padding) */
+@media (max-width: 480px) {
+    .sidebar li a {
+        font-size: 0.8rem;
+    }
+
+    .custom-3d-table th, .custom-3d-table td {
+        padding: 10px 8px !important;
+        font-size: 0.8rem !important;
+    }
+
+    .custom-select {
+        max-width: 100%; /* Full width dropdown on small screens */
+    }
 }

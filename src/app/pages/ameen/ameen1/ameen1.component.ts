@@ -17,6 +17,7 @@ import {
   StoreKeeperStockService
 } from '../../../services/store-keeper-stock.service';
 import { CentralStoreService } from '../../../services/central-store.service';
+import { LedgerService } from '../../../services/ledger.service';
 
 interface CategoryItemMap {
   [key: string]: string[];
@@ -45,6 +46,8 @@ export class Ameen1Component implements OnInit, OnDestroy {
     'أدوات نظافة': ['مطهرات', 'مكانس', 'مناشف ورقية']
   };
 
+  units: string[] = ['قطعة', 'متر', 'كيلو جرام', 'علبة', 'لفة', 'كرتونة'];
+
   categories: string[] = Object.keys(this.categoryItemMap);
   itemTypes: string[] = ['مستهلك', 'مستديم'];
   availableItemsByRow: string[][] = [];
@@ -66,6 +69,8 @@ export class Ameen1Component implements OnInit, OnDestroy {
   private router = inject(Router);
   private stockService = inject(StoreKeeperStockService);
   private centralStoreService = inject(CentralStoreService);
+  private ledgerService = inject(LedgerService);
+
 
   constructor() {
     this.simpleForm = this.fb.group({
@@ -102,27 +107,52 @@ export class Ameen1Component implements OnInit, OnDestroy {
   const day2 = d2.split('T')[0];
   return day1 === day2;
 }
+private mapStoreType(type: string): number {
+  return type === 'مستهلك' ? 0 : 1;
+}
 
 
-  private createTableRowFormGroup(): FormGroup {
-    return this.fb.group({
-      category: ['', Validators.required],
-      item: [null, Validators.required],
-      itemType: ['', Validators.required],
-      unit: ['', Validators.required],
-      count: ['', Validators.required],
-      entryDate: ['', Validators.required]
-    });
-  }
+private unitExistsValidator() {
+  return (control: any) => {
+    const value = control.value;
+    if (!value) return null; // Let 'required' handle empty
+    return this.units.includes(value) ? null : { invalidUnit: true };
+  };
+}
 
-  private addCategoryListener(rowGroup: FormGroup, index: number): void {
-    const sub = rowGroup.get('category')?.valueChanges.subscribe(cat => {
-      this.availableItemsByRow[index] = this.categoryItemMap[cat] || [];
-      rowGroup.get('item')?.reset(null, { emitEvent: false });
-    });
-    if (sub) this.subscriptions.push(sub);
-  }
 
+private createTableRowFormGroup(): FormGroup {
+  return this.fb.group({
+    category: ['', [Validators.required, this.categoryExistsValidator()]],
+    item: ['', [Validators.required]],
+    itemType: ['', Validators.required],
+    // ADDED: unitExistsValidator here
+    unit: ['', [Validators.required, this.unitExistsValidator()]],
+    count: ['', [Validators.required, Validators.min(1)]],
+    entryDate: ['', Validators.required]
+  });
+}
+
+
+
+
+private addCategoryListener(rowGroup: FormGroup, index: number): void {
+  rowGroup.get('item')?.setValidators([Validators.required, this.itemExistsValidator(index)]);
+
+  const sub = rowGroup.get('category')?.valueChanges.subscribe(cat => {
+    this.availableItemsByRow[index] = this.categoryItemMap[cat] || [];
+
+    // Resetting the item ensures the user must pick a new item
+    // that matches the new category's list.
+    rowGroup.get('item')?.reset('', { emitEvent: false });
+
+    // Force the validators to run immediately
+    rowGroup.get('category')?.updateValueAndValidity({ emitEvent: false });
+    rowGroup.get('item')?.updateValueAndValidity({ emitEvent: false });
+  });
+
+  if (sub) this.subscriptions.push(sub);
+}
   /* ===================== Rows ===================== */
   addRow(): void {
     const row = this.createTableRowFormGroup();
@@ -199,42 +229,87 @@ export class Ameen1Component implements OnInit, OnDestroy {
       );
 
       const afterStore = () => {
-        /* ========== CentralStore ========== */
-        this.centralStoreService.getAll().pipe(
-          catchError(() => of([]))
-        ).subscribe(centralStocks => {
+  this.centralStoreService.getAll().pipe(
+    catchError(() => of([]))
+  ).subscribe(centralStocks => {
 
-          const existingCentral = centralStocks.find((c: any) =>
-            c.itemName === item &&
-            c.category === category &&
-            c.storeType === itemType &&
-            c.unit === unit &&
-            this.sameDay(c.date, entryDate)
-          );
+    const existingCentral = centralStocks.find((c: any) =>
+      c.itemName === item &&
+      c.category === category &&
+      c.storeType === itemType &&
+      c.unit === unit &&
+      this.sameDay(c.date, entryDate)
+    );
 
-          if (existingCentral) {
-            this.centralStoreService.update(existingCentral.id, {
-              itemName: item,
-              category,
-              storeType: itemType,
-              unit,
-              quantity: existingCentral.quantity + newQuantity,
-              date: entryDate,
-              storeKeeperSignature: this.displayName
-            }).subscribe(() => this.handleComplete(++completed, total));
-          } else {
-            this.centralStoreService.add({
-              itemName: item,
-              category,
-              storeType: itemType,
-              unit,
-              quantity: newQuantity,
-              date: entryDate,
-              storeKeeperSignature: this.displayName
-            }).subscribe(() => this.handleComplete(++completed, total));
-          }
-        });
-      };
+    const afterCentral = () => {
+      /* ========== LedgerEntries (وارد) ========== */
+      this.ledgerService.getLedgerEntries().pipe(
+  catchError(() => of([]))
+).subscribe(ledgerEntries => {
+
+  const existingLedger = ledgerEntries.find((l: any) =>
+    l.itemName === item &&
+    l.unit === unit &&
+    l.storeType === this.mapStoreType(itemType) &&
+    l.documentReference === 'وارد من ' &&
+    this.sameDay(l.date, entryDate)
+  );
+
+  if (existingLedger) {
+    // ✅ UPDATE (تجميع)
+    this.ledgerService.updateLedgerEntry(existingLedger.id!, {
+      ...existingLedger,
+      itemsValue: existingLedger.itemsValue + newQuantity
+    }).subscribe(() => {
+      this.handleComplete(++completed, total);
+    });
+
+  } else {
+    // ➕ ADD جديد
+    this.ledgerService.addLedgerEntry({
+      date: entryDate,
+      itemName: item,
+      unit: unit,
+      status: ' لم يؤكد',
+      documentReference: 'وارد من ',
+      itemsValue: newQuantity,
+      storeType: this.mapStoreType(itemType),
+      spendPermissionId: null
+    }).subscribe(() => {
+      this.handleComplete(++completed, total);
+    });
+  }
+
+});
+
+    };
+
+    if (existingCentral) {
+      this.centralStoreService.update(existingCentral.id, {
+        itemName: item,
+        category,
+        storeType: itemType,
+        unit,
+        quantity: existingCentral.quantity + newQuantity,
+        date: entryDate,
+        storeKeeperSignature: this.displayName,
+        ledgerEntriesStatus: 'تم التسجيل'
+      }).subscribe(afterCentral);
+    } else {
+      this.centralStoreService.add({
+        itemName: item,
+        category,
+        storeType: itemType,
+        unit,
+        quantity: newQuantity,
+        date: entryDate,
+        storeKeeperSignature: this.displayName,
+        ledgerEntriesStatus: 'تم التسجيل'
+      }).subscribe(afterCentral);
+    }
+  });
+};
+
 
       if (existingStore) {
         this.stockService.updateStock(existingStore.id, {
@@ -267,16 +342,21 @@ export class Ameen1Component implements OnInit, OnDestroy {
 
 
   /* ===================== UI ===================== */
-  private handleComplete(done: number, total: number) {
-    if (done === total) {
-      this.isSubmitting.set(false);
-      this.showStatus('تم حفظ البيانات بنجاح وتحديث أرصدة المخازن', 'success');
-      this.simpleForm.reset();
-      this.tableData.clear();
-      this.addRow();
-    }
-  }
+private handleComplete(done: number, total: number) {
+  if (done === total) {
+    this.isSubmitting.set(false);
+    this.showStatus('تم حفظ البيانات بنجاح وتحديث أرصدة المخازن', 'success');
 
+    // Reset Data
+    this.simpleForm.reset();
+    this.tableData.clear();
+    this.availableItemsByRow = []; // Clear the suggestions array
+    this.subscriptions.forEach(s => s.unsubscribe()); // Clear old listeners
+    this.subscriptions = [];
+
+    this.addRow(); // Start fresh
+  }
+}
   showStatus(msg: string, type: 'success' | 'error') {
     this.statusMessage = msg;
     this.statusType = type;
@@ -286,4 +366,44 @@ export class Ameen1Component implements OnInit, OnDestroy {
     this.statusMessage = null;
     this.statusType = null;
   }
+
+
+  isSidebarOpen = false;
+
+
+
+  trackCategoryChanges(index: number) {
+  const row = this.tableData.at(index);
+  row.get('category')?.valueChanges.subscribe(value => {
+    // Optional: Clear item when category changes
+    row.get('item')?.setValue('');
+    // Trigger your logic to populate availableItemsByRow[index] based on 'value'
+  });
+}
+
+
+
+/* ===================== Custom Validators ===================== */
+
+// Validates that the category exists in your keys
+private categoryExistsValidator() {
+  return (control: any) => {
+    const value = control.value;
+    if (!value) return null; // Let 'required' validator handle empty
+    return this.categories.includes(value) ? null : { invalidCategory: true };
+  };
+}
+
+// Validates that the item exists for the currently selected category
+private itemExistsValidator(index: number) {
+  return (control: any) => {
+    const value = control.value;
+    if (!value) return null;
+
+    // Check if the value is in the currently available items for this specific row
+    const items = this.availableItemsByRow[index] || [];
+    return items.includes(value) ? null : { invalidItem: true };
+  };
+}
+
 }

@@ -1,6 +1,6 @@
 <app-header></app-header>
 
-<div class="page-container">
+<div class="content d-flex flex-row">
   <aside class="sidebar">
     <h5>مرحبًا بك</h5>
 
@@ -107,8 +107,12 @@
         </div>
       </div>
 
+      <div class="d-md-none text-center text-muted mb-2 small">
+  <i class="fas fa-arrows-alt-h"></i> اسحب الجدول يميناً ويساراً لمشاهدة كافة البيانات
+</div>
+
       <!-- Table -->
-      <div class="table-section">
+      <div class="table-section custom-scrollbar">
         <table>
           <thead>
             <tr>
@@ -126,26 +130,26 @@
 
           <tbody>
             <tr *ngFor="let item of filteredInventory" [ngClass]="getRowClass(item)">
-          
+
               <td class="fw-bold">{{ item.itemName }}</td>
               <td>{{ item.unit }}</td>
               <td>{{ item.totalQuantity }}</td>
-          
+
               <td *ngIf="viewMode === 'history'">
                 {{ item.incomingQuantity }}
               </td>
-          
+
               <td>{{ item.issuedQuantity }}</td>
               <td>{{ item.remainingQuantity }}</td>
-          
+
               <td [ngClass]="{ 'text-danger fw-bold': getDeficit(item) > 0 }">
                 {{ getDeficit(item) }}
               </td>
-          
+
               <td>
                 <span class="category-pill">{{ item.category }}</span>
               </td>
-          
+
               <td>
                 <span [ngClass]="{
                     'badge-permanent': item.itemType === 'مستديم',
@@ -155,7 +159,7 @@
                 </span>
               </td>
             </tr>
-          
+
             <tr *ngIf="filteredInventory.length === 0">
               <td [attr.colspan]="viewMode === 'history' ? 9 : 8" class="text-center py-4 text-muted">
                 لا توجد بيانات

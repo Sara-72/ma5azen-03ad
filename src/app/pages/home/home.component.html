@@ -1,29 +1,46 @@
+
 <div class="home-page-container p-4">
-
-
   <!-- <img class="u-logo" src="assets/images/Hurghada-University.png" alt="University Logo"> -->
+<!-- <div class="warehouse-floor">
+    <div class="ground-stage" #stage>
+      <div class="floor-glow"></div>
+
+      <div class="pile-wrapper d-flex">
+        <img src="assets/images/boxes5.png" class="ground-boxes-img" alt="Warehouse Pile">
+        <img src="assets/images/boxes5.png" class="ground-boxes-img pile2" alt="Warehouse Pile">
+        <div class="floor-reflection"></div>
+      </div>
+    </div>
+  </div> -->
+
+
 
   <div class="content d-flex flex-column mx-auto">
-    <p class="fs-5 fw-semibold text-3d-parent"
-       [style.textShadow]="shadowX + 'px ' + shadowY + 'px 15px rgba(0,0,0,0.15)'">
+    <p
+      class="fs-5 fw-semibold text-3d-parent"
+      [style.textShadow]="
+        shadowX + 'px ' + shadowY + 'px 15px rgba(0,0,0,0.15)'
+      "
+    >
       <span class="flip-line line-1">مرحبًا بكم في</span>
-      <span class="flip-line line-2 label me-1">نظام المخازن و العهد</span>
+      <span class="flip-line line-2 label me-1">نظام المخازن والعُهد</span>
       <span class="flip-line line-3">جامعة الغردقة.</span>
     </p>
 
     <div class="button mt-3">
-      <a (click)="goToLogin(); $event.preventDefault()"
-         class="btn text-white fw-medium p-3 fs-5"
-         role="button"
-         href="/login5">
+      <a
+        (click)="goToLogin(); $event.preventDefault()"
+        class="btn text-white fw-medium p-3 fs-5"
+        role="button"
+        href="/login5"
+      >
         سجل الدخول
       </a>
     </div>
   </div>
 
-  <div class="social-icons d-flex flex-column align-items-end mt-5">
-    <a href="#"><img src="assets/images/logos_facebook.png" alt="Facebook"></a>
-    <a href="#"><img class="mt-4" src="assets/images/logos_whatsapp-icon.png" alt="Whatsapp"></a>
-  </div>
+
+
 
 </div>
+

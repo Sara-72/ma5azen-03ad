@@ -1,12 +1,22 @@
 <app-header></app-header>
 
-<div class="page-container">
+<div *ngIf="statusMessage" class="status-overlay">
+  <div class="status-box" [ngClass]="statusType">
+    <div class="mb-3" style="font-size: 4rem;">
+      {{ statusType === 'success' ? '✅' : '❌' }}
+    </div>
+    <h3 class="fw-bold mb-3" [style.color]="statusType === 'success' ? '#28a745' : '#dc3545'">
+      {{ statusType === 'success' ? 'تمت العملية' : 'تنبيه' }}
+    </h3>
+    <p class="fs-5 text-dark">{{ statusMessage }}</p>
+    <button type="button" class="close-btn" (click)="closeStatusMessage()">موافق</button>
+  </div>
+</div>
+
+<div class="content d-flex flex-row">
   <aside class="sidebar">
-    <h5>
-      مرحبًا بك
-      <span *ngIf="displayName">، {{ displayName }}</span>
-    </h5>
-    <ul class="mt-5">
+    <h5>مرحبًا بك <span *ngIf="displayName">، {{ displayName }}</span></h5>
+    <ul class="mt-lg-5">
       <li><a href="/ameen1">المخزن</a></li>
       <li class="active"><a>دفتر اليومية</a></li>
       <li><a href="/ameen3">أذونات الصرف</a></li>
@@ -17,68 +27,73 @@
     </ul>
   </aside>
 
-  <form [formGroup]="inventoryLogForm" (ngSubmit)="onSubmit()" dir="rtl" class="flex-grow-1 d-flex flex-column align-items-center">
+  <ng-container *ngIf="dates.length > 0; else noDataTemplate">
+    <form [formGroup]="inventoryLogForm" class="flex-grow-1 d-flex flex-column align-items-center" dir="rtl">
+      <ng-container formArrayName="dates">
+        <div *ngFor="let dateGroup of dates.controls; let di = index" [formGroupName]="di" class="table-container-3d mb-4">
+          <header class="log-header text-center">
+            <h2 class="text-center">دفتر اليومية</h2>
+<div class="date-badge-wrapper text-end">
+    <span class="date-badge">
+      <i class="fas fa-calendar-alt ms-2"></i>
+      التاريخ: {{ dateGroup.get('date')?.value }}
+    </span>
+  </div>          </header>
 
-    <div class="table-container-3d">
-      <header class="log-header text-center">
-        <h2>يومية المخزن</h2>
-      </header>
+          <div class="table-outer-wrapper">
+            <div class="table-responsive custom-scrollbar">
+              <table class="custom-table text-center">
+                <thead>
+                  <tr>
+                    <th>الصنف</th>
+                    <th>وارد من / منصرف إلى</th>
+                    <th>قيمة الأصناف</th>
+                    <th>الوحدة</th>
+                    <th>نوع المخزن</th>
+                  </tr>
+                </thead>
+                <tbody formArrayName="rows">
+                  <tr *ngFor="let row of getDateRows(di).controls; let ri = index" [formGroupName]="ri">
+                    <td>
+                      <select formControlName="itemName" class="form-select table-select">
+                        <option value="" disabled>اختر الصنف</option>
+                        <option *ngFor="let item of availableItems" [value]="item">{{ item }}</option>
+                      </select>
+                    </td>
+                    <td>
+                      <input type="text" formControlName="documentReference" class="form-control-plaintext text-center">
+                    </td>
+                    <td>
+                      <input type="number" formControlName="addedValue" class="form-control">
+                    </td>
+                    <td>
+                      <input type="text" formControlName="unit" class="form-control" placeholder="كجم / قطعة">
+                    </td>
+                    <td>
+                      {{ getStoreTypeText(row.get('storeType')?.value) }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </ng-container>
 
-      <div class="mb-4 text-end px-3">
-        <label for="assetTypeSelect" class="form-label fw-bold">المخزن</label>
-        <select id="assetTypeSelect" formControlName="assetType" class="form-select custom-select">
-          <option value="" disabled>اختر نوع المخزن</option>
-          <option *ngFor="let type of assetTypes" [value]="type">{{ type }}</option>
-        </select>
+      <div class="button-section w-100 d-flex justify-content-center">
+        <button type="button" (click)="onSubmit()" [disabled]="isSubmitting()" class="submit-btn mt-4 mb-5">
+          {{ isSubmitting() ? 'جاري الحفظ...' : 'حفظ البيانات' }}
+        </button>
       </div>
+    </form>
+  </ng-container>
 
-      <div class="table-responsive">
-        <table class="custom-table text-center">
-          <thead>
-            <tr>
-              <th>التاريخ</th>
-              <th>الصنف</th>
-              <th>وارد من / منصرف إلى</th>
-              <th>قيمة الأصناف</th>
-            </tr>
-          </thead>
-
-          <tbody formArrayName="tableData">
-            <tr *ngFor="let rowGroup of tableData.controls; let i = index" [formGroupName]="i">
-              <td><input type="date" formControlName="date" class="form-control table-input"></td>
-              <td>
-                <select formControlName="itemName" class="form-select table-select">
-                  <option value="" disabled>اختر الصنف</option>
-                  <option *ngFor="let item of availableItems" [value]="item">{{ item }}</option>
-                </select>
-              </td>
-              <td>
-                <select formControlName="sourceOrDestination" class="form-select table-select">
-                  <option value="" disabled>اختر</option>
-                  <option *ngFor="let opt of sourceDestinationOptions" [value]="opt">{{ opt }}</option>
-                </select>
-              </td>
-              <td>
-                <div class="input-group-3d">
-                  <input type="number" class="form-control table-input no-spin"
-                         placeholder="0.00"
-                         [formControlName]="rowGroup.get('transactionType')?.value === 'added' ? 'addedValue' : 'issuedValue'">
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+  <ng-template #noDataTemplate>
+    <div class="no-data-wrapper">
+      <div class="text-center">
+        <i class="fas fa-clipboard-list d-block mb-3 empty-icon m-auto"></i>
+        <p class="m-auto fw-bold fs-4 text-muted">لا توجد دفاتر يومية اليوم.</p>
       </div>
-
-      <button type="button" class="remove-row-button" (click)="removeRow()">-</button>
-      <button type="button" class="add-row-button" (click)="addRow()">+</button>
     </div>
-
-    <div class="button-section">
-      <button type="submit" [disabled]="isSubmitting() || inventoryLogForm.invalid" class="submit-btn mt-4">
-        {{ isSubmitting() ? 'جاري الحفظ...' : 'حفظ البيانات' }}
-      </button>
-    </div>
-  </form>
+  </ng-template>
 </div>
-

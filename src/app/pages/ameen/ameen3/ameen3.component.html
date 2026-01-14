@@ -1,31 +1,22 @@
 <app-header></app-header>
 
-
-
 <div *ngIf="statusMessage" class="status-overlay">
   <div class="status-box" [ngClass]="statusType">
-
     <div class="mb-3" style="font-size: 4rem;">
        {{ statusType === 'success' ? '✅' : '❌' }}
     </div>
-
     <h3 class="fw-bold mb-3" [style.color]="statusType === 'success' ? '#28a745' : '#dc3545'">
        {{ statusType === 'success' ? 'تمت العملية' : 'تنبيه' }}
     </h3>
-
-    <p class="fs-5 text-dark">
-      {{ statusMessage }}
-    </p>
-
+    <p class="fs-5 text-dark">{{ statusMessage }}</p>
     <button class="close-btn" (click)="closeStatusMessage()">موافق</button>
   </div>
 </div>
 
-<div class="page-container">
+<div class="content d-flex flex-row">
   <aside class="sidebar">
-    <h5>  مرحبًا بك</h5>
-    <span *ngIf="displayName">، {{ displayName }}</span>
-    <ul class="mt-5">
+    <h5>مرحبًا بك <span *ngIf="displayName">، {{ displayName }}</span></h5>
+    <ul class="mt-lg-5">
       <li><a href="/ameen1">المخزن</a></li>
       <li><a href="/ameen2">دفتر اليومية</a></li>
       <li class="active"><a>أذونات الصرف</a></li>
@@ -36,67 +27,64 @@
     </ul>
   </aside>
 
-  <div class="big-container m-auto">
-     <!-- لا يوجد أذونات -->
-<div *ngIf="!hasPermissions()" class="no-data-wrapper">
-    <div class="text-center">
+  <div class="big-container flex-grow-1 px-2 px-lg-4">
+    <div *ngIf="!hasPermissions()" class="no-data-wrapper">
+      <div class="text-center">
         <i class="fas fa-clipboard-list d-block mb-3 empty-icon m-auto"></i>
         <p class="m-auto fw-bold fs-4 text-muted">لا توجد أذونات صرف حالياً.</p>
+      </div>
     </div>
-</div>
-    <div *ngFor="let perm of groupedPermissions" class="form-container mb-5" dir="rtl">
 
+    <div *ngFor="let perm of groupedPermissions" class="form-container mb-5" dir="rtl">
       <header class="form-header">
         <h2 class="title">طلب و إذن صرف</h2>
         <h3 class="subtitle">مستديم | مستهلك</h3>
       </header>
 
-
       <div class="info-section">
-      <div class="info-section">
-        <div class="row">
-          <div class="field mb-2">
+        <div class="row flex-wrap">
+          <div class="col-md-6 field mb-2">
             <label>اسم الجهة :</label>
             <span>{{ perm.destinationName }}</span>
           </div>
-          <div class="field mb-2">
+          <div class="col-md-6 field mb-2">
             <label>الفئة :</label>
             <span>{{ perm.category }}</span>
           </div>
         </div>
 
-        <div class="row">
-          <div class="field mb-2 date-group">
+        <div class="row flex-wrap">
+          <div class="col-md-4 field mb-2 date-group">
             <label>تاريخ الطلب :</label>
             <span>{{ perm.requestDate | date:'shortDate' }}</span>
           </div>
-          <div class="field mb-2 date-group">
+          <div class="col-md-4 field mb-2 date-group">
             <label>تاريخ الإذن :</label>
             <span>{{ perm.documentDate | date:'shortDate' }}</span>
           </div>
-          <div class="field mb-2 date-group">
-  <label>تاريخ الصرف :</label>
-  <span>{{ today | date:'shortDate' }}</span>
-</div>
-
+          <div class="col-md-4 field mb-2 date-group">
+            <label>تاريخ الصرف :</label>
+            <span>{{ today | date:'shortDate' }}</span>
+          </div>
         </div>
 
         <div class="row">
-          <div class="field mb-2">
+          <div class="col-12 field mb-2">
             <label>اسم الطالب ( المخزن / الإدارة / العامل ) :</label>
             <span>{{ perm.requestorName }}</span>
           </div>
         </div>
 
         <div class="row">
-          <div class="field mb-2">
+          <div class="col-12 field mb-2">
             <label>(*) سند الصرف :</label>
             <span>{{ perm.documentNumber }}</span>
           </div>
         </div>
       </div>
 
-      <div class="table-section">
+       <div class="table-responsive custom-scrollbar">
+      <div class="table table-bordered text-center">
         <table>
           <thead>
             <tr>
@@ -126,6 +114,7 @@
           </tbody>
         </table>
       </div>
+      </div>
 
       <div class="signature-section">
         <div>توقيع الطالب</div>
@@ -137,9 +126,7 @@
         <div>
           <div style="white-space:nowrap">تم الصرف أمين المخازن</div>
           <span>{{ fullName }}</span>
-
         </div>
-
         <div>كاتب الشطب</div>
         <div>توقيع المستلم</div>
       </div>
@@ -151,25 +138,19 @@
 
       <hr>
 
-      <div class="my-2">
-        <button *ngIf="confirmingPerm !== perm" type="button" class="btn btn-success" (click)="openConfirmInline(perm)">
+      <div class="my-2 text-center text-md-start">
+        <button *ngIf="confirmingPerm !== perm" type="button" class="btn btn-success px-5" (click)="openConfirmInline(perm)">
            قبول اذن الصرف
         </button>
 
-        <div *ngIf="confirmingPerm === perm" class="d-flex align-items-center justify-content-between">
-          <p class="fw-bold" style="color:var(--primary-color)">هل أنت متأكد من قبول إذن الصرف؟</p>
+        <div *ngIf="confirmingPerm === perm" class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+          <p class="fw-bold mb-0" style="color:var(--primary-color)">هل أنت متأكد من قبول إذن الصرف؟</p>
           <div class="d-flex gap-3">
-
-            <button type="button" class="btn btn-primary mx-2" (click)="confirmApprove()">تأكيد</button>
-            <button class="btn btn-warning" (click)="cancelConfirm()">تراجع</button>
-
+            <button type="button" class="btn btn-primary px-4" (click)="confirmApprove()">تأكيد</button>
+            <button class="btn btn-warning px-4" (click)="cancelConfirm()">تراجع</button>
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </div>
-
-</div>
-

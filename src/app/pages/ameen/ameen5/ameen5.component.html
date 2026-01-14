@@ -1,6 +1,6 @@
 <app-header></app-header>
 
-<div class="page-container">
+<div class="content d-flex flex-row">
   <aside class="sidebar">
     <h5>
       مرحبًا بك
@@ -17,27 +17,28 @@
     </ul>
   </aside>
 
-  <main class="content">
-    <div class="table-container" dir="rtl">
-      <h2 class="mb-4 fw-bold text-center" style="color: var(--primary-color);">
-        عرض مخزنك
-      </h2>
+<main class="content">
+  <div class="table-container" dir="rtl">
+    <h2 class="mb-4 fw-bold text-center" style="color: var(--primary-color);">
+      عرض مخزنك
+    </h2>
 
-      <!-- 🔹 فلترة حسب الفئة -->
-      <div class="mb-4 text-end">
-        <label class="form-label fw-medium">اختر الفئة:</label>
-        <select
-          class="form-select w-50"
-          [(ngModel)]="selectedCategory"
-          (change)="filterByCategory()"
-        >
-          <option value="">الكل</option>
-          <option *ngFor="let cat of categories" [value]="cat">
-            {{ cat }}
-          </option>
-        </select>
-      </div>
+    <div class="mb-4 text-end">
+      <label class="form-label fw-medium">اختر الفئة:</label>
+      <select
+        class="form-select w-sm-100 w-md-50 ms-auto"
+        [(ngModel)]="selectedCategory"
+        (change)="filterByCategory()"
+      >
+        <option value="">الكل</option>
+        <option *ngFor="let cat of categories" [value]="cat">
+          {{ cat }}
+        </option>
+      </select>
+    </div>
 
+    <div class="table-responsive">
+      <div class="custom-scrollbar">
       <table class="custom-3d-table text-center">
         <thead>
           <tr>
@@ -48,14 +49,10 @@
             <th>العدد</th>
           </tr>
         </thead>
-
         <tbody>
-          <!-- 🔹 حالة عدم وجود بيانات -->
           <tr *ngIf="filteredStocks.length === 0">
-            <td colspan="6">لا توجد بيانات متوفرة</td>
+            <td colspan="5">لا توجد بيانات متوفرة</td>
           </tr>
-
-          <!-- 🔹 عرض البيانات -->
           <tr *ngFor="let stock of filteredStocks; trackBy: trackById">
             <td>{{ stock.category }}</td>
             <td>{{ stock.itemName }}</td>
@@ -66,5 +63,11 @@
         </tbody>
       </table>
     </div>
-  </main>
+
+    <p class="d-md-none text-muted text-center mt-2 small">
+      <i class="bi bi-arrow-left-right"></i> اسحب الجدول لليسار أو اليمين لمشاهدة باقي البيانات
+    </p>
+  </div>
+  </div>
+</main>
 </div>

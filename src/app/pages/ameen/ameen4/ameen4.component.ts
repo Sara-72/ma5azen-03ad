@@ -2,17 +2,16 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { HeaderComponent } from '../../../components/header/header.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { CommonModule } from '@angular/common';
-import { forkJoin, of, lastValueFrom } from 'rxjs';
+import { of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { FormsModule } from '@angular/forms';
 
-import { CentralStoreService } from '../../../services/central-store.service';
-import { SpendPermissionService } from '../../../services/spend-permission.service';
 import { LedgerService, LedgerEntry } from '../../../services/ledger.service';
 
 @Component({
-  selector: 'app-ameen2',
+  selector: 'app-ameen4',
   standalone: true,
-  imports: [HeaderComponent, FooterComponent, CommonModule],
+  imports: [HeaderComponent, FooterComponent, CommonModule, FormsModule],
   templateUrl: './ameen4.component.html',
   styleUrls: ['./ameen4.component.css']
 })
@@ -21,23 +20,32 @@ export class Ameen4Component implements OnInit {
   userName = '';
   displayName = '';
 
-  private centralStoreService = inject(CentralStoreService);
-  private spendService = inject(SpendPermissionService);
   private ledgerService = inject(LedgerService);
 
   consumerEntries = signal<any[]>([]);
   durableEntries = signal<any[]>([]);
+
+  // 🔹 البيانات الأصلية لكل جدول
+  private allConsumerEntries: any[] = [];
+  private allDurableEntries: any[] = [];
+
+  selectedConsumerDate: string = '';
+  selectedDurableDate: string = '';
+
+  consumerDates: {value: string, display: string}[] = [];
+  durableDates: {value: string, display: string}[] = [];
 
   ngOnInit(): void {
     this.userName = localStorage.getItem('name') || '';
     this.displayName = this.getFirstTwoNames(this.userName);
 
     this.loadLedgerEntries();
-    this.updateLedgerFromStores();
   }
 
   getFirstTwoNames(fullName: string): string {
-    return fullName ? fullName.trim().split(/\s+/).slice(0, 2).join(' ') : '';
+    return fullName
+      ? fullName.trim().split(/\s+/).slice(0, 2).join(' ')
+      : '';
   }
 
   private loadLedgerEntries() {
@@ -45,121 +53,74 @@ export class Ameen4Component implements OnInit {
       catchError(() => of([]))
     ).subscribe((ledgerEntries: LedgerEntry[]) => {
 
+      const confirmedEntries = ledgerEntries.filter(entry => entry.status === 'تم التأكيد');
+
       const consumer: any[] = [];
       const durable: any[] = [];
 
-      ledgerEntries
+      confirmedEntries
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
         .forEach(entry => {
           const row = {
-            date: entry.date ? new Date(entry.date) : new Date(),
+            date: entry.date,
             itemName: entry.itemName,
-            category: entry.storeType === 0 ? 'مستهلك' : 'مستديم',
+            unit: entry.unit,
+            source: entry.documentReference,
             quantity: entry.itemsValue,
-            source: entry.documentReference
+            storeType: entry.storeType
           };
 
           entry.storeType === 0 ? consumer.push(row) : durable.push(row);
         });
 
+      // 🔹 تخزين البيانات الأصلية
+      this.allConsumerEntries = consumer;
+      this.allDurableEntries = durable;
+
       this.consumerEntries.set(consumer);
       this.durableEntries.set(durable);
 
-      localStorage.setItem('consumerEntries', JSON.stringify(consumer));
-      localStorage.setItem('durableEntries', JSON.stringify(durable));
+      // 🔹 توليد التواريخ الفريدة بصيغة yyyy-MM-dd للفلتر
+      this.consumerDates = Array.from(new Set(consumer.map(c => this.formatDateValue(c.date))))
+        .map(d => ({ value: d, display: this.formatDateDisplay(d) }));
+
+      this.durableDates = Array.from(new Set(durable.map(d => this.formatDateValue(d.date))))
+        .map(d => ({ value: d, display: this.formatDateDisplay(d) }));
     });
   }
 
-  private updateLedgerFromStores() {
-    forkJoin({
-      central: this.centralStoreService.getAll().pipe(catchError(() => of([]))),
-      spend: this.spendService.getAll().pipe(catchError(() => of([]))),
-      ledger: this.ledgerService.getLedgerEntries().pipe(catchError(() => of([])))
-    }).subscribe(async ({ central, spend, ledger }) => {
+  private formatDateValue(dateStr: string) {
+    const d = new Date(dateStr);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`; // صيغة مناسبة للـ select
+  }
 
-      const requests: Promise<any>[] = [];
+  private formatDateDisplay(value: string) {
+    const d = new Date(value);
+    return d.toLocaleDateString('ar-EG'); // عرض التاريخ بشكل عربي
+  }
 
-      // فقط المخزن المركزي يحتاج تفادي duplicates
-      const ledgerKeys = new Set(
-        ledger.map(l => `${l.itemName}|${l.date}|${l.documentReference}|${l.storeType}`)
-      );
+  filterConsumerByDate() {
+    if (!this.selectedConsumerDate) {
+      this.consumerEntries.set([...this.allConsumerEntries]);
+      return;
+    }
+    const filtered = this.allConsumerEntries.filter(entry =>
+      this.formatDateValue(entry.date) === this.selectedConsumerDate
+    );
+    this.consumerEntries.set(filtered);
+  }
 
-      /* ======================
-         1️⃣ المخزن المركزي
-      ====================== */
-      central.forEach(entry => {
-        const e = entry as any;
-
-        if (e.ledgerEntriesStatus !== 'لم يسجل') return;
-
-        const key = `${e.itemName}|${e.date}|وارد من|${e.storeType === 'مستهلك' ? 0 : 1}`;
-        if (ledgerKeys.has(key)) return;
-
-        const ledgerEntry: LedgerEntry = {
-          date: e.date || new Date(),
-          itemName: e.itemName,
-          documentReference: 'وارد من',
-          itemsValue: Math.abs(e.quantity || 0),
-          storeType: e.storeType === 'مستهلك' ? 0 : 1,
-          spendPermissionId: null,
-          spendPermission: null
-        };
-
-        ledgerKeys.add(key);
-
-        requests.push(
-          lastValueFrom(this.ledgerService.addLedgerEntry(ledgerEntry))
-            .then(() =>
-              lastValueFrom(
-                this.centralStoreService.update(e.id, {
-                  ...e,
-                  ledgerEntriesStatus: 'تم التسجيل'
-                })
-              )
-            )
-        );
-      });
-
-      /* ======================
-         2️⃣ أذونات الصرف
-         ✅ كل الصرف يتم تسجيله بالقيمة الموجبة حتى لو نفس العنصر والفئة والتاريخ
-      ====================== */
-      spend.forEach(sp => {
-        const s = sp as any;
-
-        if (
-          s.ledgerEntriesStatus === 'تم التسجيل' || 
-          (s.permissionStatus !== 'تم الصرف' && s.permissionStatus !== 'تم الاسترجاع')
-        ) return;
-
-        const sourceText = s.permissionStatus === 'تم الصرف' ? 'منصرف إلى' : 'وارد من';
-        const storeType = (s.storeHouse || '').toLowerCase().includes('مستهلك') ? 0 : 1;
-
-        const ledgerEntry: LedgerEntry = {
-          date: s.issueDate || new Date(),
-          itemName: s.itemName,
-          documentReference: sourceText,
-          itemsValue: Math.abs(s.issuedQuantity || 0), // ✅ دائمًا موجبة
-          storeType,
-          spendPermissionId: s.id,
-          spendPermission: null
-        };
-
-        requests.push(
-          lastValueFrom(this.ledgerService.addLedgerEntry(ledgerEntry))
-            .then(() =>
-              lastValueFrom(
-                this.spendService.update(s.id, {
-                  ...s,
-                  ledgerEntriesStatus: 'تم التسجيل'
-                })
-              )
-            )
-        );
-      });
-
-      await Promise.all(requests);
-      this.loadLedgerEntries();
-    });
+  filterDurableByDate() {
+    if (!this.selectedDurableDate) {
+      this.durableEntries.set([...this.allDurableEntries]);
+      return;
+    }
+    const filtered = this.allDurableEntries.filter(entry =>
+      this.formatDateValue(entry.date) === this.selectedDurableDate
+    );
+    this.durableEntries.set(filtered);
   }
 }

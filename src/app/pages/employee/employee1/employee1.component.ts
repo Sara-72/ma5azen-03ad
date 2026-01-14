@@ -30,7 +30,8 @@ export function fourStringsValidator(): ValidatorFn {
   standalone: true,
   imports: [HeaderComponent, FooterComponent, CommonModule, ReactiveFormsModule],
   templateUrl: './employee1.component.html',
-  styleUrl: './employee1.component.css'
+  styleUrls: ['./employee1.component.css']
+
 })
 export class Employee1Component implements OnInit {
   private stockService = inject(StoreKeeperStockService);
@@ -45,8 +46,17 @@ export class Employee1Component implements OnInit {
 
   allStocks: any[] = [];
   categoriesFromStock: string[] = [];
-  itemDataFromStock: { [key: string]: string[] } = {};
-  availableQuantityMap: { [key: string]: number } = {};
+  itemDataFromStock: {
+  [category: string]: {
+    itemName: string;
+    unit: string;
+  }[];
+} = {};
+
+availableQuantityMap: {
+  [key: string]: number; // category|itemName|unit
+} = {};
+
 
   collegeAdminMap: { [key: string]: string } = {
     'كلية الحاسبات والذكاء الاصطناعي': 'محمود محمد محمد',
@@ -66,18 +76,20 @@ export class Employee1Component implements OnInit {
     });
   }
 
-  ngOnInit(): void {
+ngOnInit(): void {
     this.userName = localStorage.getItem('name') || '';
     this.displayName = this.getFirstTwoNames(this.userName);
     const role = (localStorage.getItem('role') || 'USER').toUpperCase();
 
-    if (role !== 'USER' && role !== 'ADMIN') {
-      this.userCollege = 'مركزية';
-      this.collegeAdmin = 'حمدي محمد علي';
-    } else {
-      this.userCollege = localStorage.getItem('faculty') || 'مركزية';
-      this.collegeAdmin = this.collegeAdminMap[this.userCollege] || '';
-    }
+if (role === 'USER') {
+  // موظف عادي
+  this.userCollege = localStorage.getItem('faculty') || 'مركزية';
+  this.collegeAdmin = this.collegeAdminMap[this.userCollege] || '';
+} else {
+  // أي حد غير الموظف
+  this.userCollege = 'مركزية';
+  this.collegeAdmin = 'حمدي محمد علي';
+}
 
     this.todayDate = new Date().toISOString().substring(0, 10);
 
@@ -88,10 +100,32 @@ export class Employee1Component implements OnInit {
       this.availableQuantityMap = {};
 
       stocks.forEach(stock => {
-        if (!this.itemDataFromStock[stock.category]) this.itemDataFromStock[stock.category] = [];
-        this.itemDataFromStock[stock.category].push(stock.itemName);
-        this.availableQuantityMap[`${stock.category}|${stock.itemName}`] = stock.quantity;
-      });
+  if (!this.itemDataFromStock[stock.category]) {
+    this.itemDataFromStock[stock.category] = [];
+  }
+
+  // 🔹 منع التكرار (نفس الصنف + نفس الوحدة + نفس الفئة)
+  const exists = this.itemDataFromStock[stock.category].some(
+    item =>
+      item.itemName === stock.itemName &&
+      item.unit === stock.unit
+  );
+
+  if (!exists) {
+    this.itemDataFromStock[stock.category].push({
+      itemName: stock.itemName,
+      unit: stock.unit
+    });
+  }
+
+  // 🔹 تخزين الكمية حسب (فئة + صنف + وحدة)
+  const key = `${stock.category}|${stock.itemName}|${stock.unit}`;
+
+this.availableQuantityMap[key] =
+  (this.availableQuantityMap[key] || 0) + stock.quantity;
+
+});
+
 
       this.addRow();
     });
@@ -139,45 +173,75 @@ export class Employee1Component implements OnInit {
     return group;
   }
 
-  addItemLine(memoIndex: number, isOtherCategory: boolean = false): void {
-    const itemGroup = this.fb.group({
-      itemName: [null, Validators.required],
-      customItemName: [null],
-      count: [1, [Validators.required, Validators.min(1)]]
-    });
+addItemLine(memoIndex: number, isOtherCategory: boolean = false): void {
+  const itemGroup = this.fb.group({
+    itemName: [null, isOtherCategory ? [] : [Validators.required]],
+    customItemName: [null],
+    customUnit: [null],
+    count: [1, [Validators.required, Validators.min(1)]]
+  });
 
-    if (!isOtherCategory) {
-      itemGroup.get('itemName')?.valueChanges.subscribe(value => {
-        const customCtrl = itemGroup.get('customItemName');
-        if (value === 'OTHER') {
-          customCtrl?.setValidators([Validators.required]);
-        } else {
-          customCtrl?.clearValidators();
-          customCtrl?.setValue(null);
-        }
-        customCtrl?.updateValueAndValidity({ emitEvent: false });
-      });
-    }
+  if (!isOtherCategory) {
+    itemGroup.get('itemName')?.valueChanges.subscribe((value: any) => {
+  const customItemCtrl = itemGroup.get('customItemName');
+  const unitCtrl = itemGroup.get('customUnit');
 
-    this.getItemLines(memoIndex).push(itemGroup);
+  if (value && typeof value === 'object' && value.itemName === 'OTHER') {
+    customItemCtrl?.setValidators([Validators.required]);
+    unitCtrl?.setValidators([Validators.required]);
+  } else {
+    customItemCtrl?.clearValidators();
+    customItemCtrl?.setValue(null);
+
+    unitCtrl?.clearValidators();
+    unitCtrl?.setValue(null);
   }
 
-  getAvailableItems(memoIndex: number, itemLineIndex: number): string[] {
-    const memoGroup = this.requests.at(memoIndex) as FormGroup;
-    const category = memoGroup.get('category')?.value;
-    if (!category || category === 'OTHER') return [];
+  customItemCtrl?.updateValueAndValidity({ emitEvent: false });
+  unitCtrl?.updateValueAndValidity({ emitEvent: false });
+});
 
-    const allItems = this.itemDataFromStock[category] || [];
-    const itemLines = this.getItemLines(memoIndex).controls;
-    const selectedItems = itemLines
-      .map((ctrl, idx) => idx !== itemLineIndex ? ctrl.get('itemName')?.value : null)
-      .filter(Boolean);
-
-    return [...allItems.filter(item => !selectedItems.includes(item)), 'OTHER'];
   }
+
+  this.getItemLines(memoIndex).push(itemGroup);
+}
+
+
+
+
+
+
+
+
+ getAvailableItems(memoIndex: number, itemLineIndex: number) {
+  const memoGroup = this.requests.at(memoIndex) as FormGroup;
+  const category = memoGroup.get('category')?.value;
+
+  if (!category || category === 'OTHER') return [];
+
+  const allItems = this.itemDataFromStock[category] || [];
+
+  const selectedItems = this.getItemLines(memoIndex).controls
+    .map((ctrl, idx) =>
+      idx !== itemLineIndex ? ctrl.get('itemName')?.value : null
+    )
+    .filter(Boolean);
+
+  return [
+    ...allItems.filter(
+      item =>
+        !selectedItems.some(
+          (s: any) =>
+            s.itemName === item.itemName && s.unit === item.unit
+        )
+    ),
+    { itemName: 'OTHER', unit: '' }
+  ];
+}
+
 
   private fillFixedData(memoGroup: FormGroup): void {
-    const displayCollege = this.userCollege === 'مركزية' ? 'المركز الرئيسي' : this.userCollege;
+    const displayCollege = this.userCollege === 'مركزية' ?  'مركزية': this.userCollege;
     const adminName = this.userCollege === 'مركزية' ? 'حمدي محمد علي' : this.collegeAdmin;
 
     memoGroup.patchValue({
@@ -188,117 +252,200 @@ export class Employee1Component implements OnInit {
     });
   }
 
-  onSubmit(): void {
-    this.statusMessage = null;
-    this.statusType = null;
+onSubmit(): void {
+  this.statusMessage = null;
+  this.statusType = null;
 
-    // --- DEBUGGER START ---
-    this.requests.controls.forEach((memo, i) => {
-      const m = memo as FormGroup;
-      m.get('customCategory')?.updateValueAndValidity();
-      const lines = m.get('itemLines') as FormArray;
-      lines.controls.forEach((line, j) => {
-        line.get('itemName')?.updateValueAndValidity();
-        line.get('customItemName')?.updateValueAndValidity();
-        if (line.invalid) console.log(`Invalid Line: Request ${i}, Item ${j}`, line.errors, line.value);
-      });
-      if (m.invalid) console.log(`Invalid Request Memo ${i}:`, m.errors, m.value);
+  // --- DEBUGGER START ---
+  this.requests.controls.forEach((memo, i) => {
+    const m = memo as FormGroup;
+    m.get('customCategory')?.updateValueAndValidity();
+    const lines = m.get('itemLines') as FormArray;
+    lines.controls.forEach((line, j) => {
+      line.get('itemName')?.updateValueAndValidity();
+      line.get('customItemName')?.updateValueAndValidity();
+      if (line.invalid) {
+        console.log(`Invalid Line: Request ${i}, Item ${j}`, line.errors, line.value);
+      }
     });
-    // --- DEBUGGER END ---
-
-    if (this.memoContainerForm.invalid) {
-      this.statusType = 'error';
-      this.statusMessage = 'الرجاء التأكد من ملء جميع الحقول المطلوبة بشكل صحيح';
-      return;
+    if (m.invalid) {
+      console.log(`Invalid Request Memo ${i}:`, m.errors, m.value);
     }
+  });
+  // --- DEBUGGER END ---
 
-    if (this.hasInvalidQuantity()) {
-      this.statusType = 'error';
-      this.statusMessage = 'الكمية المطلوبة غير متاحة في المخزن';
-      return;
-    }
+  if (this.memoContainerForm.invalid) {
+    this.statusType = 'error';
+    this.statusMessage = 'الرجاء التأكد من ملء جميع الحقول المطلوبة بشكل صحيح';
+    return;
+  }
 
-    this.isSubmitting.set(true);
-    let totalRequests = 0;
-    let successCount = 0;
-    let hasError = false;
+  if (this.hasInvalidQuantity()) {
+    this.statusType = 'error';
+    this.statusMessage = 'الكمية المطلوبة غير متاحة في المخزن';
+    return;
+  }
 
-    // Use .getRawValue() to include disabled fields in the payload
-    const formValues = this.memoContainerForm.getRawValue();
+  this.isSubmitting.set(true);
 
-    formValues.requests.forEach((memo: any) => {
-      const categoryValue = memo.category;
+  let totalRequests = 0;
+  let successCount = 0;
+  let hasError = false;
 
-      memo.itemLines.forEach((item: any) => {
-        totalRequests++;
-        let finalItemName = item.itemName;
-        if (categoryValue !== 'OTHER' && item.itemName === 'OTHER') {
-          finalItemName = item.customItemName;
+  const formValues = this.memoContainerForm.getRawValue();
+
+  formValues.requests.forEach((memo: any) => {
+    const categoryValue = memo.category;
+
+    memo.itemLines.forEach((item: any) => {
+      totalRequests++;
+
+let finalItemName = '';
+let unit: string | null = null;
+
+// 🟠 شراء مباشر (فئة OTHER)
+if (memo.category === 'OTHER') {
+  finalItemName = item.customItemName;
+  unit = item.customUnit;
+}
+
+// 🟠 صنف OTHER داخل فئة موجودة
+else if (item.itemName && item.itemName.itemName === 'OTHER') {
+  finalItemName = item.customItemName;
+  unit = item.customUnit;
+}
+
+// 🟢 صنف من المخزن
+else if (item.itemName?.itemName) {
+  finalItemName = item.itemName.itemName;
+  unit = item.itemName.unit;
+}
+
+
+
+let finalCategory = memo.category;
+
+if (memo.category === 'OTHER') {
+  finalCategory = memo.customCategory; // 👈 اسم الفئة اللي الموظف كتبها
+}
+
+
+const payload = {
+  itemName: finalItemName,
+  unit: unit,
+  quantity: item.count,
+  requestDate: new Date(memo.requestDate).toISOString(),
+  userSignature: memo.employeeSignature,
+  college: memo.collegeName,
+  category: memo.category === 'OTHER'
+    ? memo.customCategory
+    : memo.category,
+  permissinStatus: 'قيد المراجعة',
+  collageKeeper: memo.collegeAdminName,
+  employeeId: 1
+};
+
+
+
+
+      this.spendNotesService.createSpendNote(payload).subscribe({
+        next: () => {
+          successCount++;
+          if (successCount === totalRequests && !hasError) {
+            this.statusMessage = 'تم إرسال جميع الأصناف بنجاح ✅';
+            this.statusType = 'success';
+            this.resetForm();
+          }
+        },
+        error: () => {
+          hasError = true;
+          this.statusMessage = 'حدث خطأ أثناء الاتصال بالخادم ❌';
+          this.statusType = 'error';
+          this.isSubmitting.set(false);
         }
+      });
+    });
+  });
+}
 
-        const payload = {
-          itemName: finalItemName,
-          quantity: item.count,
-          requestDate: new Date(memo.requestDate).toISOString(),
-          userSignature: memo.employeeSignature,
-          college: memo.collegeName,
-          category: categoryValue === 'OTHER' ? 'أخرى' : categoryValue,
-          permissinStatus: 'قيد المراجعة',
-          collageKeeper: memo.collegeAdminName,
-          employeeId: 1
-        };
+private hasInvalidQuantity(): boolean {
+  let hasError = false;
+  const totalRequestedMap: { [key: string]: number } = {};
 
-        this.spendNotesService.createSpendNote(payload).subscribe({
-          next: () => {
-            successCount++;
-            if (successCount === totalRequests && !hasError) {
-              this.statusMessage = 'تم إرسال جميع الأصناف بنجاح ✅';
-              this.statusType = 'success';
-              this.resetForm();
-            }
-          },
-          error: (err) => {
-            hasError = true;
-            this.statusMessage = 'حدث خطأ أثناء الاتصال بالخادم ❌';
-            this.statusType = 'error';
-            this.isSubmitting.set(false);
+  // 🔹 1) تجميع الكميات المطلوبة (مخزن فقط)
+  this.requests.controls.forEach(memoCtrl => {
+    const memo = memoCtrl as FormGroup;
+    const category = memo.get('category')?.value;
+
+    // ❌ تجاهل فئة OTHER (شراء)
+    if (!category || category === 'OTHER') return;
+
+    const itemLines = memo.get('itemLines') as FormArray;
+
+    itemLines.controls.forEach(itemCtrl => {
+      const itemGroup = itemCtrl as FormGroup;
+      const selectedItem = itemGroup.get('itemName')?.value;
+      const count = itemGroup.get('count')?.value || 0;
+
+      // ❌ تجاهل صنف OTHER (شراء)
+      if (selectedItem?.itemName === 'OTHER') return;
+
+      // ✔ صنف موجود بالمخزن فقط
+      if (!selectedItem || typeof selectedItem !== 'object') return;
+
+      const key = `${category}|${selectedItem.itemName}|${selectedItem.unit}`;
+      totalRequestedMap[key] = (totalRequestedMap[key] || 0) + count;
+    });
+  });
+
+  // 🔹 2) المقارنة مع الكمية المتاحة بالمخزن
+  Object.keys(totalRequestedMap).forEach(key => {
+    const available = this.availableQuantityMap[key] ?? 0;
+
+    if (totalRequestedMap[key] > available) {
+      hasError = true;
+
+      // 🔹 3) تعليم الحقول بالخطأ
+      this.requests.controls.forEach(memoCtrl => {
+        const memo = memoCtrl as FormGroup;
+        const category = memo.get('category')?.value;
+
+        if (!category || category === 'OTHER') return;
+
+        const itemLines = memo.get('itemLines') as FormArray;
+
+        itemLines.controls.forEach(itemCtrl => {
+          const itemGroup = itemCtrl as FormGroup;
+          const selectedItem = itemGroup.get('itemName')?.value;
+
+          if (
+            selectedItem &&
+            typeof selectedItem === 'object' &&
+            selectedItem.itemName !== 'OTHER' &&
+            `${category}|${selectedItem.itemName}|${selectedItem.unit}` === key
+          ) {
+            itemGroup.get('count')?.setErrors({ exceedStock: true });
           }
         });
       });
-    });
-  }
+    }
+  });
 
-  private hasInvalidQuantity(): boolean {
-    let hasError = false;
-    this.requests.controls.forEach((memoCtrl) => {
-      const memo = memoCtrl as FormGroup;
-      const category = memo.get('category')?.value;
-      if (category === 'OTHER') return;
+  return hasError;
+}
 
-      const itemLines = (memo.get('itemLines') as FormArray).controls;
-      itemLines.forEach((itemCtrl) => {
-        const itemGroup = itemCtrl as FormGroup;
-        const itemName = itemGroup.get('itemName')?.value;
-        const count = itemGroup.get('count')?.value;
-        if (itemName === 'OTHER') return;
 
-        const available = this.availableQuantityMap[`${category}|${itemName}`] ?? 0;
-        if (count > available) {
-          itemGroup.get('count')?.setErrors({ exceedStock: true });
-          hasError = true;
-        }
-      });
-    });
-    return hasError;
-  }
 
-  resetForm() {
-    this.requests.clear();
-    this.addRow();
-    this.isSubmitting.set(false);
-    this.memoContainerForm.markAsPristine();
-    this.memoContainerForm.markAsUntouched();
-  }
+
+
+
+resetForm() {
+  this.memoContainerForm.reset();
+  this.requests.clear();
+  this.addRow(); // إضافة سطر جديد فارغ
+  this.isSubmitting.set(false);
+}
+
 
   addRow(): void {
     const newMemo = this.createRequestMemoGroup();
