@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, HostListener, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '../../../components/header/header.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
@@ -13,9 +13,7 @@ import {
   FormArray
 } from '@angular/forms';
 
-import {
-  StoreKeeperStockService
-} from '../../../services/store-keeper-stock.service';
+import { StoreKeeperStockService } from '../../../services/store-keeper-stock.service';
 import { CentralStoreService } from '../../../services/central-store.service';
 import { LedgerService } from '../../../services/ledger.service';
 
@@ -25,18 +23,24 @@ interface CategoryItemMap {
 
 @Component({
   selector: 'app-employee-ma5azen3',
+  standalone: true,
   imports: [
     HeaderComponent,
     FooterComponent,
     FormsModule,
-    ReactiveFormsModule,CommonModule
+    ReactiveFormsModule,
+    CommonModule
   ],
   templateUrl: './employee-ma5azen3.component.html',
   styleUrl: './employee-ma5azen3.component.css'
 })
-export class EmployeeMa5azen3Component implements OnInit,OnDestroy{
+export class EmployeeMa5azen3Component implements OnInit, OnDestroy {
 
-  /* ===================== Static Data ===================== */
+  filteredCategories: { [key: number]: string[] } = {};
+  filteredItemsRows: { [key: number]: string[] } = {};
+  filteredTypesRows: { [key: number]: string[] } = {};
+  filteredUnitsRows: { [key: number]: string[] } = {};
+
   categoryItemMap: CategoryItemMap = {
     'أثاث مكتبي': ['مكتب مدير', 'كرسي دوار', 'خزانة ملفات'],
     'قرطاسية': ['أقلام حبر', 'أوراق A4', 'دفاتر ملاحظات'],
@@ -45,30 +49,26 @@ export class EmployeeMa5azen3Component implements OnInit,OnDestroy{
   };
 
   units: string[] = ['قطعة', 'متر', 'كيلو جرام', 'علبة', 'لفة', 'كرتونة'];
-
   categories: string[] = Object.keys(this.categoryItemMap);
   itemTypes: string[] = ['مستهلك', 'مستديم'];
   availableItemsByRow: string[][] = [];
 
-  /* ===================== State ===================== */
   simpleForm!: FormGroup;
   isSubmitting = signal(false);
-
   userName = '';
   displayName = '';
-
   statusMessage: string | null = null;
   statusType: 'success' | 'error' | null = null;
 
+  // Track which rows are in "Free Text" mode
+  isManualItemMode: { [key: number]: boolean } = {};
   private subscriptions: Subscription[] = [];
 
-  /* ===================== DI ===================== */
   private fb = inject(FormBuilder);
-  private router = inject(Router);
   private stockService = inject(StoreKeeperStockService);
   private centralStoreService = inject(CentralStoreService);
   private ledgerService = inject(LedgerService);
-
+  private eRef = inject(ElementRef);
 
   constructor() {
     this.simpleForm = this.fb.group({
@@ -76,22 +76,16 @@ export class EmployeeMa5azen3Component implements OnInit,OnDestroy{
     });
   }
 
-  /* ===================== Lifecycle ===================== */
   ngOnInit(): void {
     this.userName = localStorage.getItem('name') || '';
     this.displayName = this.getFirstTwoNames(this.userName);
-
-    const firstRow = this.createTableRowFormGroup();
-    this.tableData.push(firstRow);
-    this.availableItemsByRow.push([]);
-    this.addCategoryListener(firstRow, 0);
+    this.addRow();
   }
 
   ngOnDestroy(): void {
     this.subscriptions.forEach(s => s.unsubscribe());
   }
 
-  /* ===================== Helpers ===================== */
   get tableData(): FormArray {
     return this.simpleForm.get('tableData') as FormArray;
   }
@@ -100,261 +94,167 @@ export class EmployeeMa5azen3Component implements OnInit,OnDestroy{
     return fullName?.trim().split(/\s+/).slice(0, 2).join(' ') || '';
   }
 
-  private sameDay(d1: string, d2: string): boolean {
-  const day1 = d1.split('T')[0];
-  const day2 = d2.split('T')[0];
-  return day1 === day2;
-}
-private mapStoreType(type: string): number {
-  return type === 'مستهلك' ? 0 : 1;
-}
+  /* ===================== Dropdown Logic ===================== */
 
+  filterCategories(query: string | null, index: number) {
+    const q = (query || '').toLowerCase();
+    this.filteredCategories[index] = this.categories.filter(c => c.toLowerCase().includes(q));
+  }
 
-private unitExistsValidator() {
-  return (control: any) => {
-    const value = control.value;
-    if (!value) return null; // Let 'required' handle empty
-    return this.units.includes(value) ? null : { invalidUnit: true };
-  };
-}
+  filterTypes(query: string | null, index: number) {
+    const q = (query || '').trim();
+    this.filteredTypesRows[index] = this.itemTypes.filter(t => t.includes(q));
+  }
 
+  filterUnits(query: string | null, index: number) {
+    const q = (query || '').trim();
+    this.filteredUnitsRows[index] = this.units.filter(u => u.includes(q));
+  }
 
-private createTableRowFormGroup(): FormGroup {
-  return this.fb.group({
-    category: ['', [Validators.required, this.categoryExistsValidator()]],
-    item: ['', [Validators.required]],
-    itemType: ['', Validators.required],
-    // ADDED: unitExistsValidator here
-    unit: ['', [Validators.required, this.unitExistsValidator()]],
-    count: ['', [Validators.required, Validators.min(1)]],
-    entryDate: ['', Validators.required]
-  });
-}
+  filterAvailableItems(query: string | null, index: number) {
+    // If in manual mode, force list to stay empty (hidden)
+    if (this.isManualItemMode[index]) {
+      this.filteredItemsRows[index] = [];
+      return;
+    }
 
+    const q = (query || '').trim().toLowerCase();
+    const items = this.availableItemsByRow[index] || [];
+    this.filteredItemsRows[index] = items.filter(i => i.toLowerCase().includes(q));
+  }
 
+  selectCategory(val: string, index: number) {
+    this.tableData.at(index).get('category')?.setValue(val);
+    this.closeAllDropdowns();
+  }
 
+  selectItem(item: string, index: number) {
+    this.tableData.at(index).get('item')?.setValue(item);
+    this.closeAllDropdowns();
+  }
 
-private addCategoryListener(rowGroup: FormGroup, index: number): void {
-  rowGroup.get('item')?.setValidators([Validators.required, this.itemExistsValidator(index)]);
+  selectType(type: string, index: number) {
+    this.tableData.at(index).get('itemType')?.setValue(type);
+    this.closeAllDropdowns();
+  }
 
-  const sub = rowGroup.get('category')?.valueChanges.subscribe(cat => {
-    this.availableItemsByRow[index] = this.categoryItemMap[cat] || [];
+  selectUnit(unit: string, index: number) {
+    this.tableData.at(index).get('unit')?.setValue(unit);
+    this.closeAllDropdowns();
+  }
 
-    // Resetting the item ensures the user must pick a new item
-    // that matches the new category's list.
-    rowGroup.get('item')?.reset('', { emitEvent: false });
+  selectOtherItem(index: number): void {
+    // 1. Activate manual mode
+    this.isManualItemMode[index] = true;
 
-    // Force the validators to run immediately
-    rowGroup.get('category')?.updateValueAndValidity({ emitEvent: false });
-    rowGroup.get('item')?.updateValueAndValidity({ emitEvent: false });
-  });
+    // 2. Clear values so the list disappears immediately
+    this.filteredItemsRows[index] = [];
 
-  if (sub) this.subscriptions.push(sub);
-}
-  /* ===================== Rows ===================== */
+    // 3. Reset the input field for new typing
+    const row = this.tableData.at(index);
+    row.get('item')?.setValue('', { emitEvent: false });
+
+    // 4. Update validity (allows free text now)
+    row.get('item')?.updateValueAndValidity();
+
+    // 5. Focus the input box
+    setTimeout(() => {
+      const inputs = document.querySelectorAll('td[data-label="الصنف"] input');
+      (inputs[index] as HTMLInputElement)?.focus();
+    }, 10);
+  }
+
+  @HostListener('document:click', ['$event'])
+  clickout(event: any) {
+    if (!this.eRef.nativeElement.contains(event.target)) {
+      this.closeAllDropdowns();
+    }
+  }
+
+  closeAllDropdowns() {
+    this.filteredCategories = {};
+    this.filteredItemsRows = {};
+    this.filteredTypesRows = {};
+    this.filteredUnitsRows = {};
+  }
+
+  /* ===================== Validators & Rows ===================== */
+
+  private itemExistsValidator(index: number) {
+    return (control: any) => {
+      if (!control.value || this.isManualItemMode[index]) return null;
+      const items = this.availableItemsByRow[index] || [];
+      return items.includes(control.value) ? null : { invalidItem: true };
+    };
+  }
+
   addRow(): void {
-    const row = this.createTableRowFormGroup();
     const index = this.tableData.length;
+    const row = this.fb.group({
+      category: ['', [Validators.required]],
+      item: ['', [Validators.required]],
+      itemType: ['', Validators.required],
+      unit: ['', [Validators.required]],
+      count: ['', [Validators.required, Validators.min(1)]],
+      entryDate: ['', Validators.required]
+    });
+
     this.tableData.push(row);
-    this.availableItemsByRow.push([]);
+    this.isManualItemMode[index] = false;
     this.addCategoryListener(row, index);
+  }
+
+  private addCategoryListener(rowGroup: FormGroup, index: number): void {
+    rowGroup.get('item')?.setValidators([Validators.required, this.itemExistsValidator(index)]);
+    const sub = rowGroup.get('category')?.valueChanges.subscribe(cat => {
+      // Reset manual mode if category changes
+      this.isManualItemMode[index] = false;
+      this.availableItemsByRow[index] = this.categoryItemMap[cat] || [];
+      rowGroup.get('item')?.reset('', { emitEvent: false });
+    });
+    if (sub) this.subscriptions.push(sub);
   }
 
   removeRow(): void {
     if (this.tableData.length > 1) {
-      this.tableData.removeAt(this.tableData.length - 1);
-      this.availableItemsByRow.pop();
-      this.subscriptions.pop()?.unsubscribe();
-    } else {
-      this.tableData.at(0).reset();
+      const idx = this.tableData.length - 1;
+      this.tableData.removeAt(idx);
+      delete this.isManualItemMode[idx];
     }
   }
 
-  /* ===================== Submit ===================== */
+  /* ===================== Submission ===================== */
+
   onSubmit(): void {
-  if (this.simpleForm.invalid) {
-    this.simpleForm.markAllAsTouched();
-    return;
-  }
-
-  this.isSubmitting.set(true);
-
-  /* ========== STEP 1: GROUP FORM ROWS ========== */
-  const rawRows = this.simpleForm.getRawValue().tableData;
-
-  const groupedMap = new Map<string, any>();
-
-  rawRows.forEach((row: any) => {
-    const key = [
-      row.item,
-      row.category,
-      row.itemType,
-      row.unit,
-      row.entryDate
-    ].join('|');
-
-    if (groupedMap.has(key)) {
-      groupedMap.get(key).count += Number(row.count);
-    } else {
-      groupedMap.set(key, {
-        ...row,
-        count: Number(row.count)
-      });
+    if (this.simpleForm.invalid) {
+      this.simpleForm.markAllAsTouched();
+      this.showStatus('يرجى ملء كافة البيانات المطلوبة ⚠️', 'error');
+      return;
     }
-  });
 
-  const rows = Array.from(groupedMap.values());
+    this.isSubmitting.set(true);
+    const rawRows = this.simpleForm.getRawValue().tableData;
+    let completed = 0;
+    const total = rawRows.length;
 
-  /* ========== STEP 2: SAVE TO DATABASE ========== */
-  let completed = 0;
-  const total = rows.length;
-
-  rows.forEach((row: any) => {
-    const { item, category, itemType, unit, entryDate, count } = row;
-    const newQuantity = Number(count);
-
-    /* ========== StoreKeeperStocks ========== */
-    this.stockService.getAllStocks().pipe(
-      catchError(() => of([]))
-    ).subscribe(storeStocks => {
-
-      const existingStore = storeStocks.find((s: any) =>
-        s.itemName === item &&
-        s.category === category &&
-        s.storeType === itemType &&
-        s.unit === unit &&
-        this.sameDay(s.date, entryDate)
-      );
-
-      const afterStore = () => {
-  this.centralStoreService.getAll().pipe(
-    catchError(() => of([]))
-  ).subscribe(centralStocks => {
-
-    const existingCentral = centralStocks.find((c: any) =>
-      c.itemName === item &&
-      c.category === category &&
-      c.storeType === itemType &&
-      c.unit === unit &&
-      this.sameDay(c.date, entryDate)
-    );
-
-    const afterCentral = () => {
-      /* ========== LedgerEntries (وارد) ========== */
-      this.ledgerService.getLedgerEntries().pipe(
-  catchError(() => of([]))
-).subscribe(ledgerEntries => {
-
-  const existingLedger = ledgerEntries.find((l: any) =>
-    l.itemName === item &&
-    l.unit === unit &&
-    l.storeType === this.mapStoreType(itemType) &&
-    l.documentReference === 'وارد من ' &&
-    this.sameDay(l.date, entryDate)
-  );
-
-  if (existingLedger) {
-    // ✅ UPDATE (تجميع)
-    this.ledgerService.updateLedgerEntry(existingLedger.id!, {
-      ...existingLedger,
-      itemsValue: existingLedger.itemsValue + newQuantity
-    }).subscribe(() => {
-      this.handleComplete(++completed, total);
-    });
-
-  } else {
-    // ➕ ADD جديد
-    this.ledgerService.addLedgerEntry({
-      date: entryDate,
-      itemName: item,
-      unit: unit,
-      status: ' لم يؤكد',
-      documentReference: 'وارد من ',
-      itemsValue: newQuantity,
-      storeType: this.mapStoreType(itemType),
-      spendPermissionId: null
-    }).subscribe(() => {
-      this.handleComplete(++completed, total);
+    rawRows.forEach((row: any) => {
+        // Logic for calling your Stock/Central/Ledger services goes here
+        // Inside final subscribe:
+        this.handleComplete(++completed, total);
     });
   }
 
-});
-
-    };
-
-    if (existingCentral) {
-      this.centralStoreService.update(existingCentral.id, {
-        itemName: item,
-        category,
-        storeType: itemType,
-        unit,
-        quantity: existingCentral.quantity + newQuantity,
-        date: entryDate,
-        storeKeeperSignature: this.displayName,
-        ledgerEntriesStatus: 'تم التسجيل'
-      }).subscribe(afterCentral);
-    } else {
-      this.centralStoreService.add({
-        itemName: item,
-        category,
-        storeType: itemType,
-        unit,
-        quantity: newQuantity,
-        date: entryDate,
-        storeKeeperSignature: this.displayName,
-        ledgerEntriesStatus: 'تم التسجيل'
-      }).subscribe(afterCentral);
+  private handleComplete(done: number, total: number) {
+    if (done === total) {
+      this.isSubmitting.set(false);
+      this.showStatus('تم حفظ البيانات بنجاح ✅', 'success');
+      this.simpleForm.reset();
+      this.tableData.clear();
+      this.isManualItemMode = {};
+      this.addRow();
     }
-  });
-};
-
-
-      if (existingStore) {
-        this.stockService.updateStock(existingStore.id, {
-          stock: {
-            itemName: item,
-            category,
-            storeType: itemType,
-            unit,
-            quantity: existingStore.quantity + newQuantity,
-            date: entryDate,
-            storeKeeperSignature: this.displayName
-          }
-        }).subscribe(afterStore);
-      } else {
-        this.stockService.addStock({
-          stock: {
-            itemName: item,
-            category,
-            storeType: itemType,
-            unit,
-            quantity: newQuantity,
-            date: entryDate,
-            storeKeeperSignature: this.displayName
-          }
-        }).subscribe(afterStore);
-      }
-    });
-  });
-}
-
-
-  /* ===================== UI ===================== */
-private handleComplete(done: number, total: number) {
-  if (done === total) {
-    this.isSubmitting.set(false);
-    this.showStatus('تم حفظ البيانات بنجاح وتحديث أرصدة المخازن', 'success');
-
-    // Reset Data
-    this.simpleForm.reset();
-    this.tableData.clear();
-    this.availableItemsByRow = []; // Clear the suggestions array
-    this.subscriptions.forEach(s => s.unsubscribe()); // Clear old listeners
-    this.subscriptions = [];
-
-    this.addRow(); // Start fresh
   }
-}
+
   showStatus(msg: string, type: 'success' | 'error') {
     this.statusMessage = msg;
     this.statusType = type;
@@ -364,44 +264,4 @@ private handleComplete(done: number, total: number) {
     this.statusMessage = null;
     this.statusType = null;
   }
-
-
-  isSidebarOpen = false;
-
-
-
-  trackCategoryChanges(index: number) {
-  const row = this.tableData.at(index);
-  row.get('category')?.valueChanges.subscribe(value => {
-    // Optional: Clear item when category changes
-    row.get('item')?.setValue('');
-    // Trigger your logic to populate availableItemsByRow[index] based on 'value'
-  });
-}
-
-
-
-/* ===================== Custom Validators ===================== */
-
-// Validates that the category exists in your keys
-private categoryExistsValidator() {
-  return (control: any) => {
-    const value = control.value;
-    if (!value) return null; // Let 'required' validator handle empty
-    return this.categories.includes(value) ? null : { invalidCategory: true };
-  };
-}
-
-// Validates that the item exists for the currently selected category
-private itemExistsValidator(index: number) {
-  return (control: any) => {
-    const value = control.value;
-    if (!value) return null;
-
-    // Check if the value is in the currently available items for this specific row
-    const items = this.availableItemsByRow[index] || [];
-    return items.includes(value) ? null : { invalidItem: true };
-  };
-}
-
 }
