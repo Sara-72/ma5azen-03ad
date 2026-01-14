@@ -21,8 +21,8 @@
     </ul>
   </aside>
 
-  <main class="flex-grow-1">
-    <form
+<main class="flex-grow-1 container-fluid">
+      <form
       [formGroup]="simpleForm"
       (ngSubmit)="onSubmit()"
       dir="rtl"
@@ -49,6 +49,7 @@
                 <td class="dropdown-cell">
                   <input
                     type="text"
+                    data-label="الفئة"
                     formControlName="category"
                     class="form-control"
                     (focus)="
@@ -76,6 +77,7 @@
                   <input
                     type="text"
                     formControlName="item"
+                    data-label="اسم الصنف"
                     class="form-control"
                     [placeholder]="
                       isManualItemMode[i] ? 'اكتب صنفاً جديداً...' : 'ابحث...'
@@ -152,6 +154,7 @@
                   <input
                     type="text"
                     formControlName="unit"
+                    data-label="الوحدة"
                     class="form-control"
                     (focus)="filterUnits(rowGroup.get('unit')?.value, i)"
                   />
