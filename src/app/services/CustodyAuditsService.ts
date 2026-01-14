@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class CustodyAuditsService {
+
   private apiUrl = 'https://newwinventoryapi.runasp.net/api/CustodyAudits';
 
   constructor(private http: HttpClient) {}
@@ -14,5 +15,9 @@ export class CustodyAuditsService {
 
   getAllAudits(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl);
+  }
+
+  deleteAudit(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
   }
 }
