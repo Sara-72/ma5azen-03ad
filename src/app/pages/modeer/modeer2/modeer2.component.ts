@@ -349,45 +349,54 @@ removeRowFromForm(form: FormGroup) {
 
   /** ملأ الفورمز */
   private fillFormsFromGroups(groups: any[][]) {
-    this.consumableForms = [];
-    this.filteredItemsByRow = [];
+  this.consumableForms = [];
+  this.filteredItemsByRow = [];
 
-    groups.forEach(group => {
-      const form = this.createForm();
-      const firstNote = group[0];
+  groups.forEach(group => {
+    // 🔹 تحقق أولًا لو كل الأصناف موجودة في المخزن
+    const allItemsExist = group.every(note => 
+      this.storeKeeperStocks.some(stock => stock.itemName?.trim() === note.itemName?.trim())
+    );
 
-      form.patchValue({
-        destinationName: firstNote.college,
-        category: firstNote.category,
-        requestDateGroup: firstNote.requestDate.slice(0,10),
-        requestorName: firstNote.userSignature
-      });
+    if (!allItemsExist) {
+      // لو فيه صنف مش موجود → تجاهل الإذن بالكامل
+      return;
+    }
 
-      const tableArray = form.get('tableData') as FormArray;
+    const form = this.createForm();
+    const firstNote = group[0];
 
-      group.forEach(note => {
-        const rowGroup = this.createTableRowFormGroup();
-        rowGroup.patchValue({
-          itemName: note.itemName,
-          itemSearchText: note.itemName,
-          category: note.category,
-          quantityRequired: note.quantity,
-          unit: note.unit,
-          storeType: this.getItemDefaults(note.itemName).storeType,
-          itemCondition: 'جديدة',
-          quantityAuthorized: '',
-          quantityIssued: '',
-          unitPrice: '',
-          value: 0
-        });
-        tableArray.push(rowGroup);
-      });
-
-      this.consumableForms.push(form);
-      this.filteredItemsByRow.push(tableArray.controls.map(() => []));
+    form.patchValue({
+      destinationName: firstNote.college,
+      category: firstNote.category,
+      requestDateGroup: firstNote.requestDate.slice(0,10),
+      requestorName: firstNote.userSignature
     });
-  }
 
+    const tableArray = form.get('tableData') as FormArray;
+
+    group.forEach(note => {
+      const rowGroup = this.createTableRowFormGroup();
+      rowGroup.patchValue({
+        itemName: note.itemName,
+        itemSearchText: note.itemName,
+        category: note.category,
+        quantityRequired: note.quantity,
+        unit: note.unit,
+        storeType: this.getItemDefaults(note.itemName).storeType,
+        itemCondition: 'جديدة',
+        quantityAuthorized: '',
+        quantityIssued: '',
+        unitPrice: '',
+        value: 0
+      });
+      tableArray.push(rowGroup);
+    });
+
+    this.consumableForms.push(form);
+    this.filteredItemsByRow.push(tableArray.controls.map(() => []));
+  });
+}
   /** كالكوليشن للقيمة */
   updateValue(formIndex: number, rowIndex: number) {
     const row = (this.consumableForms[formIndex].get('tableData') as FormArray).at(rowIndex);
@@ -397,16 +406,29 @@ removeRowFromForm(form: FormGroup) {
   }
 
   /** حفظ الفورم */
-onSubmitForm(form: FormGroup) {
+onSubmitForm(form: FormGroup, fIndex: number) {
+  console.log('Index:', fIndex, form);
 
-  // 1️⃣ فاليديشن الفورم الأساسي
+  //  فاليديشن الفورم الأساسي
   if (form.invalid) {
     form.markAllAsTouched();
-    this.scrollToFirstInvalidControl(form);
-    return;
+
+    // scroll بس داخل الفورم الحالي
+    setTimeout(() => {
+      const formEl = document.querySelector(`[data-index="${fIndex}"]`); // استخدمي fIndex هنا
+      const firstInvalid = formEl?.querySelector('input.ng-invalid, select.ng-invalid, textarea.ng-invalid') as HTMLElement;
+      if (firstInvalid) {
+        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstInvalid.focus();
+        firstInvalid.classList.add('error-border');
+        setTimeout(() => firstInvalid.classList.remove('error-border'), 3000);
+      }
+    });
+
+    return;  // إرجاع بعد الفحص، من غير ما يأثر على باقي الفورمز
   }
 
-  // 2️⃣ فاليديشن الصفوف (tableData)
+  //  فاليديشن الصفوف (tableData)
   const tableArray = form.get('tableData') as FormArray;
 
   let hasRowError = false;
@@ -431,7 +453,7 @@ onSubmitForm(form: FormGroup) {
   }
 
   // ===============================
-  // لو وصلنا هنا → كله VALID ✅
+  // لو وصلنا هنا → كله VALID 
   // ===============================
 
   this.isSubmitting.set(true);
