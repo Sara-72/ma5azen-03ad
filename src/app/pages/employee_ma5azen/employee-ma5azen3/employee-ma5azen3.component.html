@@ -16,11 +16,16 @@
   </aside>
 
   <main class="flex-grow-1">
-    <form [formGroup]="simpleForm" (ngSubmit)="onSubmit()" dir="rtl" class="mt-5">
+   <form
+    [formGroup]="simpleForm"
+    (ngSubmit)="onSubmit()"
+    dir="rtl"
+    class="mt-5 form-part m-auto flex-grow-1 d-flex flex-column align-items-center"
+  >
+    <div class="table-section">
+      <h2 class="text-center">المخزن</h2>
 
-      <div class="table-section px-4 py-4">
-        <h2 class="text-center">المخزن</h2>
-
+      <div class="table-outer-wrapper">
         <div class="table-responsive custom-scrollbar">
           <table class="table table-bordered text-center">
             <thead>
@@ -31,63 +36,114 @@
                 <th>الوحدة</th>
                 <th>العدد</th>
                 <th>التاريخ</th>
-
               </tr>
             </thead>
-
             <tbody formArrayName="tableData">
               @for (rowGroup of tableData.controls; track $index) {
               <tr [formGroupName]="$index">
                 <td>
-                  <select formControlName="category" class="form-control text-center">
-                    <option value="" disabled selected hidden>اختر فئة</option>
+                  <input
+                    type="text"
+                    formControlName="category"
+                    class="form-control"
+                    list="categoryOptions"
+                    placeholder="ابحث عن فئة..."
+                  />
+                  <datalist id="categoryOptions">
                     @for (category of categories; track category) {
-                    <option [value]="category">{{ category }}</option>
+                    <option [value]="category"></option>
                     }
-                  </select>
+                  </datalist>
+                  @if (rowGroup.get('category')?.errors?.['invalidCategory'] &&
+                  rowGroup.get('category')?.touched) {
+                  <div class="text-danger small mt-1">هذه الفئة غير موجودة</div>
+                  }
                 </td>
+
                 <td>
-                  <select formControlName="item" class="form-control text-center">
-                    <option [ngValue]="null" disabled selected hidden>اختر صنف</option>
+                  <input
+                    type="text"
+                    formControlName="item"
+                    class="form-control"
+                    [attr.list]="'itemOptions' + $index"
+                    placeholder="ابحث عن صنف..."
+                  />
+                  <datalist [id]="'itemOptions' + $index">
                     @for (item of availableItemsByRow[$index]; track item) {
-                    <option [value]="item">{{ item }}</option>
+                    <option [value]="item"></option>
                     }
-                  </select>
+                  </datalist>
+                  @if (rowGroup.get('item')?.errors?.['invalidItem'] &&
+                  rowGroup.get('item')?.touched) {
+                  <div class="text-danger small mt-1">
+                    هذا الصنف غير متاح لهذه الفئة
+                  </div>
+                  }
                 </td>
                 <td>
-                  <select formControlName="itemType" class="form-control text-center">
+                  <select formControlName="itemType" class="form-control">
                     <option value="" disabled selected hidden>اختر نوع</option>
                     @for (type of itemTypes; track type) {
                     <option [value]="type">{{ type }}</option>
                     }
                   </select>
                 </td>
-                <td><input type="text" formControlName="unit" class="form-control text-center"></td>
-                <td><input type="number" min="0" formControlName="count" class="form-control text-center" /></td>
+                <td>
+                  <input
+                    type="text"
+                    formControlName="unit"
+                    class="form-control"
+                    list="unitOptions"
+                    placeholder="الوحدة..."
+                    [ngClass]="{'is-invalid': rowGroup.get('unit')?.errors?.['invalidUnit'] && rowGroup.get('unit')?.touched}"
+                  />
+                  <datalist id="unitOptions">
+                    @for (u of units; track u) {
+                    <option [value]="u"></option>
+                    }
+                  </datalist>
 
-    <td>
-  <input
-    type="date"
-    formControlName="entryDate"
-    class="form-control text-center bg-light"
-   >
-</td>
+                  @if (rowGroup.get('unit')?.errors?.['invalidUnit'] &&
+                  rowGroup.get('unit')?.touched) {
+                  <div class="text-danger small mt-1">هذه الوحدة غير مسجلة</div>
+                  }
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    formControlName="count"
+                    class="form-control"
+                  />
+                </td>
+
+                <td>
+                  <input
+                    type="date"
+                    formControlName="entryDate"
+                    class="form-control bg-light"
+                  />
+                </td>
               </tr>
               }
             </tbody>
           </table>
         </div>
-
-        <button type="button" class="remove-row-button" (click)="removeRow()">-</button>
-        <button type="button" class="add-row-button" (click)="addRow()">+</button>
       </div>
 
-      <div class="text-center mt-5">
-        <button type="submit" [disabled]="isSubmitting() || simpleForm.invalid" class="submit-btn">
-          @if (isSubmitting()) { جاري الحفظ... } @else { حفظ البيانات }
-        </button>
-      </div>
-    </form>
+      <button type="button" class="remove-row-button" (click)="removeRow()">
+        -
+      </button>
+      <button type="button" class="add-row-button" (click)="addRow()">+</button>
+    </div>
+
+    <button
+      type="submit"
+      [disabled]="isSubmitting() || simpleForm.invalid"
+      class="submit-btn mt-5"
+    >
+      @if (isSubmitting()) { جاري الحفظ... } @else { حفظ البيانات }
+    </button>
+  </form>
   </main>
 </div>
 
