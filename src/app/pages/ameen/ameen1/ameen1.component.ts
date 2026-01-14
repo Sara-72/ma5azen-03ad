@@ -46,6 +46,8 @@ export class Ameen1Component implements OnInit, OnDestroy {
     'أدوات نظافة': ['مطهرات', 'مكانس', 'مناشف ورقية']
   };
 
+  units: string[] = ['قطعة', 'متر', 'كيلو جرام', 'علبة', 'لفة', 'كرتونة'];
+
   categories: string[] = Object.keys(this.categoryItemMap);
   itemTypes: string[] = ['مستهلك', 'مستديم'];
   availableItemsByRow: string[][] = [];
@@ -110,26 +112,47 @@ private mapStoreType(type: string): number {
 }
 
 
+private unitExistsValidator() {
+  return (control: any) => {
+    const value = control.value;
+    if (!value) return null; // Let 'required' handle empty
+    return this.units.includes(value) ? null : { invalidUnit: true };
+  };
+}
 
-  private createTableRowFormGroup(): FormGroup {
-    return this.fb.group({
-      category: ['', Validators.required],
-      item: [null, Validators.required],
-      itemType: ['', Validators.required],
-      unit: ['', Validators.required],
-      count: ['', Validators.required],
-      entryDate: ['', Validators.required]
-    });
-  }
 
-  private addCategoryListener(rowGroup: FormGroup, index: number): void {
-    const sub = rowGroup.get('category')?.valueChanges.subscribe(cat => {
-      this.availableItemsByRow[index] = this.categoryItemMap[cat] || [];
-      rowGroup.get('item')?.reset(null, { emitEvent: false });
-    });
-    if (sub) this.subscriptions.push(sub);
-  }
+private createTableRowFormGroup(): FormGroup {
+  return this.fb.group({
+    category: ['', [Validators.required, this.categoryExistsValidator()]],
+    item: ['', [Validators.required]],
+    itemType: ['', Validators.required],
+    // ADDED: unitExistsValidator here
+    unit: ['', [Validators.required, this.unitExistsValidator()]],
+    count: ['', [Validators.required, Validators.min(1)]],
+    entryDate: ['', Validators.required]
+  });
+}
 
+
+
+
+private addCategoryListener(rowGroup: FormGroup, index: number): void {
+  rowGroup.get('item')?.setValidators([Validators.required, this.itemExistsValidator(index)]);
+
+  const sub = rowGroup.get('category')?.valueChanges.subscribe(cat => {
+    this.availableItemsByRow[index] = this.categoryItemMap[cat] || [];
+
+    // Resetting the item ensures the user must pick a new item
+    // that matches the new category's list.
+    rowGroup.get('item')?.reset('', { emitEvent: false });
+
+    // Force the validators to run immediately
+    rowGroup.get('category')?.updateValueAndValidity({ emitEvent: false });
+    rowGroup.get('item')?.updateValueAndValidity({ emitEvent: false });
+  });
+
+  if (sub) this.subscriptions.push(sub);
+}
   /* ===================== Rows ===================== */
   addRow(): void {
     const row = this.createTableRowFormGroup();
@@ -319,16 +342,21 @@ private mapStoreType(type: string): number {
 
 
   /* ===================== UI ===================== */
-  private handleComplete(done: number, total: number) {
-    if (done === total) {
-      this.isSubmitting.set(false);
-      this.showStatus('تم حفظ البيانات بنجاح وتحديث أرصدة المخازن', 'success');
-      this.simpleForm.reset();
-      this.tableData.clear();
-      this.addRow();
-    }
-  }
+private handleComplete(done: number, total: number) {
+  if (done === total) {
+    this.isSubmitting.set(false);
+    this.showStatus('تم حفظ البيانات بنجاح وتحديث أرصدة المخازن', 'success');
 
+    // Reset Data
+    this.simpleForm.reset();
+    this.tableData.clear();
+    this.availableItemsByRow = []; // Clear the suggestions array
+    this.subscriptions.forEach(s => s.unsubscribe()); // Clear old listeners
+    this.subscriptions = [];
+
+    this.addRow(); // Start fresh
+  }
+}
   showStatus(msg: string, type: 'success' | 'error') {
     this.statusMessage = msg;
     this.statusType = type;
@@ -341,4 +369,41 @@ private mapStoreType(type: string): number {
 
 
   isSidebarOpen = false;
+
+
+
+  trackCategoryChanges(index: number) {
+  const row = this.tableData.at(index);
+  row.get('category')?.valueChanges.subscribe(value => {
+    // Optional: Clear item when category changes
+    row.get('item')?.setValue('');
+    // Trigger your logic to populate availableItemsByRow[index] based on 'value'
+  });
+}
+
+
+
+/* ===================== Custom Validators ===================== */
+
+// Validates that the category exists in your keys
+private categoryExistsValidator() {
+  return (control: any) => {
+    const value = control.value;
+    if (!value) return null; // Let 'required' validator handle empty
+    return this.categories.includes(value) ? null : { invalidCategory: true };
+  };
+}
+
+// Validates that the item exists for the currently selected category
+private itemExistsValidator(index: number) {
+  return (control: any) => {
+    const value = control.value;
+    if (!value) return null;
+
+    // Check if the value is in the currently available items for this specific row
+    const items = this.availableItemsByRow[index] || [];
+    return items.includes(value) ? null : { invalidItem: true };
+  };
+}
+
 }

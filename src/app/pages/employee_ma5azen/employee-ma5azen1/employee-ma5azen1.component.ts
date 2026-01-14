@@ -1,124 +1,191 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
 import { HeaderComponent } from '../../../components/header/header.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { FormBuilder, ReactiveFormsModule, FormGroup, Validators, FormArray } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-
+import { AdditionsService } from '../../../services/additions.service';
+import { StoreKeeperStockService, StockResponse } from '../../../services/store-keeper-stock.service';
 
 @Component({
   selector: 'app-employee-ma5azen1',
+  standalone: true, // Assuming standalone based on imports
   imports: [
     HeaderComponent,
     FooterComponent,
-    ReactiveFormsModule,CommonModule],
+    ReactiveFormsModule,
+    CommonModule
+  ],
   templateUrl: './employee-ma5azen1.component.html',
   styleUrl: './employee-ma5azen1.component.css'
 })
-export class EmployeeMa5azen1Component {
-
-
-  ma5azenItemOptions: string[] = [
-  'أقلام جاف',
-  'أوراق A4',
-  'حاسوب محمول',
-  'كرسي مكتبي',
-  'طابعة ليزر',
-  'مواد تنظيف',
-  'شاشات عرض',
-  'كابلات شبكة'
-];
-
-  // The main form group for the page
-  inventoryLogForm!: FormGroup;
+export class EmployeeMa5azen1Component implements OnInit {
+  statusMessage: string | null = null;
+  statusType: 'success' | 'error' | null = null;
+  allStockItems: string[] = [];
+  filteredItems: { [key: number]: string[] } = {};
+  isFormSubmitted = signal(false);
   isSubmitting = signal(false);
+  userName: string = '';
+  displayName: string = '';
+  inventoryLogForm!: FormGroup;
 
+  private stockService = inject(StoreKeeperStockService);
+  private additionsService = inject(AdditionsService);
   private fb = inject(FormBuilder);
 
   constructor() {
     this.inventoryLogForm = this.fb.group({
-      // You can add a top-level field for Storehouse Name or Date here if needed
-      // storehouseName: ['', Validators.required],
-
-      // The FormArray holds the data for the table rows
       tableData: this.fb.array([])
     });
   }
 
+  ngOnInit(): void {
+    this.userName = localStorage.getItem('name') || '';
+    this.displayName = this.getFirstTwoNames(this.userName);
 
-ngOnInit(): void {
-  this.userName = localStorage.getItem('name') || '';
-  this.displayName = this.getFirstTwoNames(this.userName);
+    // Get unique items from stock
+    this.stockService.getAllStocks().subscribe((stocks: StockResponse[]) => {
+      const uniqueItems = Array.from(new Set(stocks.map(s => s.itemName)));
+      this.allStockItems = uniqueItems;
+    });
 
-  this.tableData.push(this.createTableRowFormGroup());
-}
- userName: string = '';
- displayName: string = '';
+    // Add first row
+    this.addRow();
+  }
 
+  getFirstTwoNames(fullName: string): string {
+    if (!fullName) return '';
+    return fullName.trim().split(/\s+/).slice(0, 2).join(' ');
+  }
 
-getFirstTwoNames(fullName: string): string {
-  if (!fullName) return '';
-
-  return fullName
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .join(' ');
-}
-
-
-  // Helper getter to easily access the FormArray
   get tableData(): FormArray {
     return this.inventoryLogForm.get('tableData') as FormArray;
   }
 
-  // Helper function to create the form group for a single table row
   private createTableRowFormGroup(): FormGroup {
     return this.fb.group({
-      // Based on image_522963.png columns (Raqm Al-Idafa, Ism Al-Sinf, etc.)
-      additionNumber: [0, [Validators.required, Validators.min(0)]], // رقم الإضافة
-      itemName: ['', Validators.required],                       // اسم الصنف
-      unit: ['', Validators.required],                           // الوحدة
-      quantity: [0, [Validators.required, Validators.min(1)]],     // الكمية
-      unitPrice: [0, [Validators.required, Validators.min(0)]], // سعر الوحدة
-      value: [0, [Validators.required, Validators.min(0)]],        // القيمة
-      itemCondition: ['', Validators.required]                     // حالة الصنف
+      additionNumber: [null, Validators.required],
+      itemName: ['', [Validators.required, Validators.minLength(2)]],
+      unit: ['', Validators.required],
+      quantity: [null, [Validators.required, Validators.min(1)]],
+      unitPrice: [null, [Validators.required, Validators.min(0.1)]],
+      value: [null],
+      itemCondition: ['', Validators.required]
     });
   }
 
-  // ➕ Method to add a new row
+  filterItems(value: string, index: number): void {
+    if (!value || value.trim() === '') {
+      this.filteredItems[index] = [];
+      return;
+    }
+
+    this.filteredItems[index] = this.allStockItems
+      .filter(item => item.toLowerCase().includes(value.toLowerCase()))
+      .slice(0, 10);
+  }
+
+  selectItem(item: string, index: number): void {
+    const row = this.tableData.at(index) as FormGroup;
+    row.get('itemName')?.setValue(item);
+    this.filteredItems[index] = [];
+    row.get('itemName')?.updateValueAndValidity();
+  }
+
+  selectOther(index: number): void {
+    const row = this.tableData.at(index) as FormGroup;
+    const itemField = row.get('itemName');
+    if (!itemField) return;
+
+    itemField.setValue('');
+    itemField.markAsTouched();
+    this.filteredItems[index] = [];
+  }
+
   addRow(): void {
     this.tableData.push(this.createTableRowFormGroup());
   }
 
-  // ➖ Method to remove the last row
   removeRow(): void {
     if (this.tableData.length > 1) {
       this.tableData.removeAt(this.tableData.length - 1);
-    } else if (this.tableData.length === 1) {
-      // If only one row remains, clear it instead of removing it entirely
+    } else {
       this.tableData.at(0).reset();
     }
   }
 
-  // --- SUBMIT BUTTON LOGIC ---
+  closeStatusMessage(): void {
+    const wasSuccess = this.statusType === 'success';
+    this.statusMessage = null;
+    this.statusType = null;
+
+    if (wasSuccess) {
+      this.resetForm();
+    }
+  }
+
+  resetForm(): void {
+    this.tableData.clear();
+    this.addRow();
+    this.isSubmitting.set(false);
+    this.isFormSubmitted.set(false); // Reset validation state
+    this.inventoryLogForm.markAsPristine();
+    this.inventoryLogForm.markAsUntouched();
+  }
+
+  onItemChange(index: number): void {
+    const row = this.tableData.at(index) as FormGroup;
+    row.get('itemName')?.updateValueAndValidity();
+  }
+
   onSubmit(): void {
+    this.isFormSubmitted.set(true);
+
     if (this.inventoryLogForm.invalid) {
       this.inventoryLogForm.markAllAsTouched();
-      console.warn('Form is invalid. Cannot submit.', this.inventoryLogForm.errors);
       return;
     }
 
-    this.isSubmitting.set(true); // Disable the button
-    const formData = this.inventoryLogForm.value;
-    console.log('Sending Inventory Log Data:', formData);
+    this.isSubmitting.set(true);
+    const additionsPayload = this.tableData.getRawValue();
+    let total = additionsPayload.length;
+    let completed = 0;
+    let hasError = false;
 
-    // --- Placeholder API Call ---
-    setTimeout(() => {
-      console.log('Request submitted successfully!');
-      this.isSubmitting.set(false);
-      // Optional: Clear form or show success message
-    }, 2000);
+    additionsPayload.forEach((row: any) => {
+      const payload = {
+        itemName: row.itemName,
+        unit: row.unit,
+        quantity: row.quantity,
+        unitPrice: row.unitPrice,
+        totalValue: row.quantity * row.unitPrice,
+        itemStatus: row.itemCondition
+      };
+
+      this.additionsService.addAddition(payload).subscribe({
+        next: () => {
+          completed++;
+          checkFinish();
+        },
+        error: () => {
+          hasError = true;
+          completed++;
+          checkFinish();
+        }
+      });
+    });
+
+    const checkFinish = () => {
+      if (completed === total) {
+        this.isSubmitting.set(false);
+        if (hasError) {
+          this.statusType = 'error';
+          this.statusMessage = 'حدث خطأ أثناء حفظ بعض البيانات ❌';
+        } else {
+          this.statusType = 'success';
+          this.statusMessage = 'تم حفظ جميع الإضافات بنجاح ✅';
+        }
+      }
+    };
   }
-
 }

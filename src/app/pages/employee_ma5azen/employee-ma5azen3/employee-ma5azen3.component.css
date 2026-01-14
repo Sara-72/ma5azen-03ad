@@ -131,7 +131,7 @@ th {
   background-color: #f8f9fa;
   border: 1px solid #000 !important;
   color: var(--primary-color);
-  padding: 15px !important;
+padding: 15px 21px !important;
 }
 
 td {
@@ -205,6 +205,63 @@ td {
 .custom-scrollbar::-webkit-scrollbar-thumb {
     background: var(--primary-color);
     border-radius: 10px;
+}
+
+
+
+
+/* Search Input Styling */
+input[list] {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 10px center; /* RTL support: icon on the left */
+  padding-left: 35px;
+  transition: border-color 0.2s;
+}
+
+input[list]:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+}
+
+/* Ensure datalist options don't look crowded on mobile */
+datalist option {
+  padding: 10px;
+}
+
+
+/* Highlight invalid search inputs */
+input.ng-invalid.ng-touched {
+  border-color: #dc3545 !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23dc3545' viewBox='0 0 24 24'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 10px center;
+  background-size: 20px;
+}
+/* Styling for validation messages */
+.text-danger.small {
+  font-size: 0.75rem;
+  display: block;
+  text-align: right;
+  margin-top: 4px;
+  font-weight: bold;
+}
+
+/* Optional: add a slight red tint to the input box itself */
+input.ng-invalid.ng-touched {
+  border: 1.5px solid #dc3545 !important;
+  background-color: #fff8f8;
+}
+
+
+/* Ensure the table columns have enough width for the search inputs */
+th:nth-child(1), td:nth-child(1) { min-width: 150px; } /* Category */
+th:nth-child(2), td:nth-child(2) { min-width: 180px; } /* Item */
+th:nth-child(4), td:nth-child(4) { min-width: 120px; } /* Unit */
+
+/* Clean up the unit input specifically */
+input[formControlName="unit"] {
+  text-align: center;
 }
 
 

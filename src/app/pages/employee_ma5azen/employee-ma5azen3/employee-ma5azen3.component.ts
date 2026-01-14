@@ -1,28 +1,27 @@
-import { Component ,OnDestroy,OnInit, inject, signal} from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '../../../components/header/header.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
-import { FormsModule, FormBuilder, ReactiveFormsModule, FormGroup, Validators, FormArray } from '@angular/forms';
-import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
-// Assuming you have an ApiService to handle HTTP requests
-// import { ApiService } from '../services/api.service';
+import { catchError, of, Subscription } from 'rxjs';
+import {
+  FormsModule,
+  FormBuilder,
+  ReactiveFormsModule,
+  FormGroup,
+  Validators,
+  FormArray
+} from '@angular/forms';
 
-
-
-
-interface SimpleRow {
-  item: string;      // الصنف
-  category: string;  // الفئة
-  // date: string;      // الكود
-  count: string;     // العدد
-  unit:string;
-}
+import {
+  StoreKeeperStockService
+} from '../../../services/store-keeper-stock.service';
+import { CentralStoreService } from '../../../services/central-store.service';
+import { LedgerService } from '../../../services/ledger.service';
 
 interface CategoryItemMap {
   [key: string]: string[];
 }
-
 
 @Component({
   selector: 'app-employee-ma5azen3',
@@ -36,173 +35,373 @@ interface CategoryItemMap {
   styleUrl: './employee-ma5azen3.component.css'
 })
 export class EmployeeMa5azen3Component implements OnInit,OnDestroy{
- userName: string = '';
- displayName: string = '';
 
-
-getFirstTwoNames(fullName: string): string {
-  if (!fullName) return '';
-
-  return fullName
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .join(' ');
-}
-
- 
-    categoryItemMap: CategoryItemMap = {
+  /* ===================== Static Data ===================== */
+  categoryItemMap: CategoryItemMap = {
     'أثاث مكتبي': ['مكتب مدير', 'كرسي دوار', 'خزانة ملفات'],
     'قرطاسية': ['أقلام حبر', 'أوراق A4', 'دفاتر ملاحظات'],
     'إلكترونيات': ['حاسوب محمول', 'طابعة ليزر', 'شاشة عرض'],
     'أدوات نظافة': ['مطهرات', 'مكانس', 'مناشف ورقية']
   };
 
-  categories: string[] = Object.keys(this.categoryItemMap);
+  units: string[] = ['قطعة', 'متر', 'كيلو جرام', 'علبة', 'لفة', 'كرتونة'];
 
-  // NEW: Array to hold available items for each *specific* row
+  categories: string[] = Object.keys(this.categoryItemMap);
+  itemTypes: string[] = ['مستهلك', 'مستديم'];
   availableItemsByRow: string[][] = [];
 
-  // NEW: Array to hold subscriptions for cleaning up when the component is destroyed
-  private subscriptions: Subscription[] = [];
-
-  itemTypes: string[] = ['مستهلك', 'مستديم'];
-
-
+  /* ===================== State ===================== */
   simpleForm!: FormGroup;
   isSubmitting = signal(false);
 
-  // Dependency Injection
+  userName = '';
+  displayName = '';
+
+  statusMessage: string | null = null;
+  statusType: 'success' | 'error' | null = null;
+
+  private subscriptions: Subscription[] = [];
+
+  /* ===================== DI ===================== */
   private fb = inject(FormBuilder);
   private router = inject(Router);
+  private stockService = inject(StoreKeeperStockService);
+  private centralStoreService = inject(CentralStoreService);
+  private ledgerService = inject(LedgerService);
+
 
   constructor() {
     this.simpleForm = this.fb.group({
-      // The only control is the FormArray for the table data
-
-
       tableData: this.fb.array([])
     });
-
-
-
   }
-ngOnInit(): void {
-  this.userName = localStorage.getItem('name') || '';
-  this.displayName = this.getFirstTwoNames(this.userName);
-    // 1. Create the single instance of the first row
-    const initialRowGroup = this.createTableRowFormGroup();
 
-    // 2. Push this instance into the FormArray
-    this.tableData.push(initialRowGroup);
+  /* ===================== Lifecycle ===================== */
+  ngOnInit(): void {
+    this.userName = localStorage.getItem('name') || '';
+    this.displayName = this.getFirstTwoNames(this.userName);
 
-    // 3. Initialize available items for index 0
+    const firstRow = this.createTableRowFormGroup();
+    this.tableData.push(firstRow);
     this.availableItemsByRow.push([]);
-
-    // 4. Attach the listener to the correct instance (initialRowGroup) at the correct index (0)
-    this.addCategoryListener(initialRowGroup, 0);
+    this.addCategoryListener(firstRow, 0);
   }
 
   ngOnDestroy(): void {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.subscriptions.forEach(s => s.unsubscribe());
   }
 
-  // Helper getter to easily access the FormArray
+  /* ===================== Helpers ===================== */
   get tableData(): FormArray {
     return this.simpleForm.get('tableData') as FormArray;
   }
 
+  private getFirstTwoNames(fullName: string): string {
+    return fullName?.trim().split(/\s+/).slice(0, 2).join(' ') || '';
+  }
 
-  // Add this helper method to get today's date in YYYY-MM-DD format
-private getTodayDate(): string {
-  return new Date().toISOString().split('T')[0];
+  private sameDay(d1: string, d2: string): boolean {
+  const day1 = d1.split('T')[0];
+  const day2 = d2.split('T')[0];
+  return day1 === day2;
+}
+private mapStoreType(type: string): number {
+  return type === 'مستهلك' ? 0 : 1;
 }
 
-  // Helper function to create the form group for a single table row (4 columns)
-  private createTableRowFormGroup(): FormGroup {
-    return this.fb.group({
-      item: [null,Validators.required],
-      category: ['',Validators.required],
+
+private unitExistsValidator() {
+  return (control: any) => {
+    const value = control.value;
+    if (!value) return null; // Let 'required' handle empty
+    return this.units.includes(value) ? null : { invalidUnit: true };
+  };
+}
 
 
-      count: ['', Validators.required],
-      itemType: ['', Validators.required], // نوع الصنف
-      unit:[ '',Validators.required],
-      entryDate: ['' ,Validators.required]
-    });
-  }
+private createTableRowFormGroup(): FormGroup {
+  return this.fb.group({
+    category: ['', [Validators.required, this.categoryExistsValidator()]],
+    item: ['', [Validators.required]],
+    itemType: ['', Validators.required],
+    // ADDED: unitExistsValidator here
+    unit: ['', [Validators.required, this.unitExistsValidator()]],
+    count: ['', [Validators.required, Validators.min(1)]],
+    entryDate: ['', Validators.required]
+  });
+}
 
 
 
-  // Helper function to handle the cascading logic
-  private addCategoryListener(rowGroup: FormGroup, index: number): void {
-    const sub = rowGroup.get('category')?.valueChanges.subscribe(selectedCategory => {
-      // 1. Get the list of items for the selected category
-      const items = this.categoryItemMap[selectedCategory] || [];
 
-      // 2. Update the available items list for this specific row index
-      this.availableItemsByRow[index] = items;
+private addCategoryListener(rowGroup: FormGroup, index: number): void {
+  rowGroup.get('item')?.setValidators([Validators.required, this.itemExistsValidator(index)]);
 
-      // 3. Reset the itemName dropdown for this row, forcing the user to select a new item
-      rowGroup.get('item')?.reset(null, { emitEvent: false });
-    });
+  const sub = rowGroup.get('category')?.valueChanges.subscribe(cat => {
+    this.availableItemsByRow[index] = this.categoryItemMap[cat] || [];
 
-    if (sub) {
-        this.subscriptions.push(sub);
-    }
-  }
+    // Resetting the item ensures the user must pick a new item
+    // that matches the new category's list.
+    rowGroup.get('item')?.reset('', { emitEvent: false });
 
-  // ➕ Method to add a new row
+    // Force the validators to run immediately
+    rowGroup.get('category')?.updateValueAndValidity({ emitEvent: false });
+    rowGroup.get('item')?.updateValueAndValidity({ emitEvent: false });
+  });
+
+  if (sub) this.subscriptions.push(sub);
+}
+  /* ===================== Rows ===================== */
   addRow(): void {
-    const newRowGroup = this.createTableRowFormGroup();
-    const newIndex = this.tableData.length; // Get the index BEFORE pushing
-
-    this.tableData.push(newRowGroup);
-
-    //  Initialize new slot for items
+    const row = this.createTableRowFormGroup();
+    const index = this.tableData.length;
+    this.tableData.push(row);
     this.availableItemsByRow.push([]);
+    this.addCategoryListener(row, index);
+  }
 
-    // Attach listener to the new row
-    this.addCategoryListener(newRowGroup, newIndex);
+  removeRow(): void {
+    if (this.tableData.length > 1) {
+      this.tableData.removeAt(this.tableData.length - 1);
+      this.availableItemsByRow.pop();
+      this.subscriptions.pop()?.unsubscribe();
+    } else {
+      this.tableData.at(0).reset();
+    }
+  }
+
+  /* ===================== Submit ===================== */
+  onSubmit(): void {
+  if (this.simpleForm.invalid) {
+    this.simpleForm.markAllAsTouched();
+    return;
+  }
+
+  this.isSubmitting.set(true);
+
+  /* ========== STEP 1: GROUP FORM ROWS ========== */
+  const rawRows = this.simpleForm.getRawValue().tableData;
+
+  const groupedMap = new Map<string, any>();
+
+  rawRows.forEach((row: any) => {
+    const key = [
+      row.item,
+      row.category,
+      row.itemType,
+      row.unit,
+      row.entryDate
+    ].join('|');
+
+    if (groupedMap.has(key)) {
+      groupedMap.get(key).count += Number(row.count);
+    } else {
+      groupedMap.set(key, {
+        ...row,
+        count: Number(row.count)
+      });
+    }
+  });
+
+  const rows = Array.from(groupedMap.values());
+
+  /* ========== STEP 2: SAVE TO DATABASE ========== */
+  let completed = 0;
+  const total = rows.length;
+
+  rows.forEach((row: any) => {
+    const { item, category, itemType, unit, entryDate, count } = row;
+    const newQuantity = Number(count);
+
+    /* ========== StoreKeeperStocks ========== */
+    this.stockService.getAllStocks().pipe(
+      catchError(() => of([]))
+    ).subscribe(storeStocks => {
+
+      const existingStore = storeStocks.find((s: any) =>
+        s.itemName === item &&
+        s.category === category &&
+        s.storeType === itemType &&
+        s.unit === unit &&
+        this.sameDay(s.date, entryDate)
+      );
+
+      const afterStore = () => {
+  this.centralStoreService.getAll().pipe(
+    catchError(() => of([]))
+  ).subscribe(centralStocks => {
+
+    const existingCentral = centralStocks.find((c: any) =>
+      c.itemName === item &&
+      c.category === category &&
+      c.storeType === itemType &&
+      c.unit === unit &&
+      this.sameDay(c.date, entryDate)
+    );
+
+    const afterCentral = () => {
+      /* ========== LedgerEntries (وارد) ========== */
+      this.ledgerService.getLedgerEntries().pipe(
+  catchError(() => of([]))
+).subscribe(ledgerEntries => {
+
+  const existingLedger = ledgerEntries.find((l: any) =>
+    l.itemName === item &&
+    l.unit === unit &&
+    l.storeType === this.mapStoreType(itemType) &&
+    l.documentReference === 'وارد من ' &&
+    this.sameDay(l.date, entryDate)
+  );
+
+  if (existingLedger) {
+    // ✅ UPDATE (تجميع)
+    this.ledgerService.updateLedgerEntry(existingLedger.id!, {
+      ...existingLedger,
+      itemsValue: existingLedger.itemsValue + newQuantity
+    }).subscribe(() => {
+      this.handleComplete(++completed, total);
+    });
+
+  } else {
+    // ➕ ADD جديد
+    this.ledgerService.addLedgerEntry({
+      date: entryDate,
+      itemName: item,
+      unit: unit,
+      status: ' لم يؤكد',
+      documentReference: 'وارد من ',
+      itemsValue: newQuantity,
+      storeType: this.mapStoreType(itemType),
+      spendPermissionId: null
+    }).subscribe(() => {
+      this.handleComplete(++completed, total);
+    });
+  }
+
+});
+
+    };
+
+    if (existingCentral) {
+      this.centralStoreService.update(existingCentral.id, {
+        itemName: item,
+        category,
+        storeType: itemType,
+        unit,
+        quantity: existingCentral.quantity + newQuantity,
+        date: entryDate,
+        storeKeeperSignature: this.displayName,
+        ledgerEntriesStatus: 'تم التسجيل'
+      }).subscribe(afterCentral);
+    } else {
+      this.centralStoreService.add({
+        itemName: item,
+        category,
+        storeType: itemType,
+        unit,
+        quantity: newQuantity,
+        date: entryDate,
+        storeKeeperSignature: this.displayName,
+        ledgerEntriesStatus: 'تم التسجيل'
+      }).subscribe(afterCentral);
+    }
+  });
+};
+
+
+      if (existingStore) {
+        this.stockService.updateStock(existingStore.id, {
+          stock: {
+            itemName: item,
+            category,
+            storeType: itemType,
+            unit,
+            quantity: existingStore.quantity + newQuantity,
+            date: entryDate,
+            storeKeeperSignature: this.displayName
+          }
+        }).subscribe(afterStore);
+      } else {
+        this.stockService.addStock({
+          stock: {
+            itemName: item,
+            category,
+            storeType: itemType,
+            unit,
+            quantity: newQuantity,
+            date: entryDate,
+            storeKeeperSignature: this.displayName
+          }
+        }).subscribe(afterStore);
+      }
+    });
+  });
+}
+
+
+  /* ===================== UI ===================== */
+private handleComplete(done: number, total: number) {
+  if (done === total) {
+    this.isSubmitting.set(false);
+    this.showStatus('تم حفظ البيانات بنجاح وتحديث أرصدة المخازن', 'success');
+
+    // Reset Data
+    this.simpleForm.reset();
+    this.tableData.clear();
+    this.availableItemsByRow = []; // Clear the suggestions array
+    this.subscriptions.forEach(s => s.unsubscribe()); // Clear old listeners
+    this.subscriptions = [];
+
+    this.addRow(); // Start fresh
+  }
+}
+  showStatus(msg: string, type: 'success' | 'error') {
+    this.statusMessage = msg;
+    this.statusType = type;
+  }
+
+  closeStatusMessage() {
+    this.statusMessage = null;
+    this.statusType = null;
   }
 
 
-// ➖ Method to remove the last row
-    removeRow(): void {
-      if (this.tableData.length > 1) {
-        const lastIndex = this.tableData.length - 1;
+  isSidebarOpen = false;
 
-        // Clean up the subscription
-        if (this.subscriptions.length > 0) {
-          this.subscriptions.pop()?.unsubscribe();
-        }
 
-        // Remove the available items array slot
-        this.availableItemsByRow.pop();
 
-        this.tableData.removeAt(lastIndex);
-      } else if (this.tableData.length === 1) {
-        this.tableData.at(0).reset();
-      }
-    }
+  trackCategoryChanges(index: number) {
+  const row = this.tableData.at(index);
+  row.get('category')?.valueChanges.subscribe(value => {
+    // Optional: Clear item when category changes
+    row.get('item')?.setValue('');
+    // Trigger your logic to populate availableItemsByRow[index] based on 'value'
+  });
+}
 
-  // --- SAVE BUTTON LOGIC ---
 
-onSubmit(): void {
-      if (this.simpleForm.invalid) {
-        this.simpleForm.markAllAsTouched();
-        console.warn('Form is invalid. Cannot submit.');
-        return;
-      }
 
-      this.isSubmitting.set(true);
-      const formData = this.simpleForm.getRawValue();
-      console.log('Sending Form Data:', formData);
+/* ===================== Custom Validators ===================== */
 
-      setTimeout(() => {
-        console.log('Request submitted successfully!');
-        this.isSubmitting.set(false);
-        // router navigation logic here
-      }, 2000);
-    }
+// Validates that the category exists in your keys
+private categoryExistsValidator() {
+  return (control: any) => {
+    const value = control.value;
+    if (!value) return null; // Let 'required' validator handle empty
+    return this.categories.includes(value) ? null : { invalidCategory: true };
+  };
+}
+
+// Validates that the item exists for the currently selected category
+private itemExistsValidator(index: number) {
+  return (control: any) => {
+    const value = control.value;
+    if (!value) return null;
+
+    // Check if the value is in the currently available items for this specific row
+    const items = this.availableItemsByRow[index] || [];
+    return items.includes(value) ? null : { invalidItem: true };
+  };
+}
+
 }

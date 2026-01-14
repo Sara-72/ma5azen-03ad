@@ -5,22 +5,27 @@ a {
   transition: 0.3s;
 }
 
-/* Updated parent container to manage space better */
+/* ✅ FIXED: Changed min-height to height: 100vh and added overflow: hidden to lock the window */
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
 .content.d-flex.flex-row {
   background-color: var(--bg-light);
-  min-height: 100vh;
-  perspective: 2000px; /* Crucial for the 3D depth */
+  height: 100vh; /* Changed from min-height */
+  perspective: 2000px;
   padding: 20px;
   gap: 20px;
   width: 100%;
-  overflow-x: hidden; /* Prevents 3D tilt from creating scrollbars */
+  overflow: hidden; /* Prevent parent scrolling */
 }
 
-/* --- SIDEBAR - Balanced Fixed Width --- */
+/* --- SIDEBAR --- */
 .sidebar {
-  /* Changed from 25% to fixed width to prevent it being too wide on large screens */
   flex: 0 0 280px;
-  min-height: calc(100vh - 40px);
+  height: calc(100vh - 40px); /* Changed from min-height */
   margin: 0;
   background: #ffffff;
   padding: 30px 20px;
@@ -84,25 +89,35 @@ a {
 
 /* --- MAIN CONTENT AREA --- */
 main {
-  flex: 1; /* Tells the main area to take up all remaining width */
+  flex: 1;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  overflow-y: auto; /* ✅ This allows only the form area to scroll if needed, not the whole window */
 }
 
-/* --- THE TABLE SECTION (The "Floating Paper") --- */
+/* ✅ FIXED: Dropdown visibility */
+.table-responsive {
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    width: 100%;
+    padding: 0;
+}
+
+/* --- THE TABLE SECTION --- */
 .table-section {
   background: var(--white-color);
   border-radius: 15px;
   padding: 40px !important;
   position: relative;
-  /* Changed from 60% to 100% of the flex-grow container */
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
   border: 1px solid #eee;
   box-shadow: 0 10px 30px rgba(50, 50, 93, 0.1);
-  /* Adjusted tilt to be subtler so it doesn't create wide gaps */
   transform: rotateY(-1deg);
+  /* ✅ FIXED: This ensures the dropdown stays on top of the 3D transformed card */
+  transform-style: preserve-3d;
   transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
   animation: paperFadeUp 0.7s ease-out;
 }
@@ -125,6 +140,8 @@ main {
   border-collapse: collapse;
   border: 1px solid #000;
   width: 100%;
+  table-layout: fixed;
+  overflow: visible !important; /* ✅ Vital for dropdowns */
 }
 
 th {
@@ -137,6 +154,8 @@ th {
 td {
   border: 1px solid #000 !important;
   vertical-align: middle;
+  position: relative; /* ✅ Anchor for dropdown */
+  overflow: visible !important; /* ✅ Allow dropdown to exit cell */
 }
 
 .form-control, .form-select {
@@ -243,70 +262,93 @@ td {
   100% { box-shadow: 0 0 0 0 rgba(10, 58, 99, 0); }
 }
 
-
-
-
-/* --- RESPONSIVE MEDIA QUERIES --- */
-
-/* For smaller laptops and large tablets */
-@media (max-width: 1200px) {
-    .content.d-flex.flex-row {
-        flex-direction: column !important; /* Stacks sidebar and main */
-        padding: 15px;
-        gap: 15px;
-    }
-
-    .sidebar {
-        flex: none;
-        width: 100%;
-        min-height: auto;
-        margin: 0 0 10px 0;
-        padding: 20px;
-    }
-
-    .sidebar ul {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 1.5rem !important;
-    }
-
-    .sidebar li {
-        margin-bottom: 0;
-        flex: 1 1 auto; /* Allows menu items to sit side-by-side */
-        text-align: center;
-    }
-
-    .table-section {
-        width: 100%;
-        transform: none !important; /* Remove 3D tilt for better space usage */
-        padding: 20px !important;
-    }
+/* ===== Overlay ===== */
+.modal-overlay {
+  position: fixed !important;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
 }
 
-/* For mobile phones */
-@media (max-width: 768px) {
-    .sidebar h5 {
-        text-align: center;
-        font-size: 1.2rem;
-    }
-
-    .sidebar ul {
-        flex-direction: column; /* Back to vertical on very small screens */
-    }
-
-    .table-section h2 {
-        font-size: 1.4rem;
-        margin-bottom: 20px;
-    }
-
-    /* Make table inputs easier to tap on mobile */
-    .form-control, .form-select {
-        min-width: 120px;
-        padding: 8px;
-    }
-
-    .submit-btn {
-        width: 100%; /* Full width button for thumbs */
-    }
+.modal-box {
+  background: #fff;
+  padding: 2.5rem;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 420px;
+  text-align: center;
+  animation: scaleIn 0.25s ease-in-out;
 }
+
+/* dropdown الأصناف */
+.floating-dropdown {
+  position: absolute !important;
+  top: 100%;
+  left: 0;
+  z-index: 9999 !important; /* ✅ Over everything */
+  max-height: 220px;
+  overflow-y: auto;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  border-radius: 8px;
+  width: 100%;
+  margin-top: 2px;
+}
+
+/* ✅ Final fixes for dropdown clipping */
+tbody, tr {
+  overflow: visible !important;
+}
+
+
+/* 1. Ensure the cell is the anchor for the dropdown */
+td.dropdown-cell {
+  position: relative !important;
+  overflow: visible !important;
+}
+
+/* 2. Turn the UL into a floating menu */
+.floating-dropdown {
+  position: absolute !important;
+  top: 100%; /* Positions it directly below the input */
+  left: 0;
+  right: 0;
+  z-index: 9999 !important; /* Forces it to stay on top of other rows */
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  max-height: 200px; /* Limits height */
+  overflow-y: auto;  /* Adds internal scroll if many items */
+  padding: 0;
+  margin: 2px 0 0 0;
+  list-style: none;
+}
+
+/* 3. Style the items for a better "menu" feel */
+.floating-dropdown .list-group-item {
+  cursor: pointer;
+  padding: 10px;
+  border: none;
+  border-bottom: 1px solid #f0f0f0;
+  text-align: right;
+  transition: background 0.2s;
+}
+
+.floating-dropdown .list-group-item:hover {
+  background-color: #f8f9fa;
+  color: var(--secondary-color);
+}
+
+/* 4. Critical: Prevent the table from cutting off the dropdown */
+.table-responsive {
+  overflow: visible !important;
+}
+.table {
+  overflow: visible !important;
+}
+
+
