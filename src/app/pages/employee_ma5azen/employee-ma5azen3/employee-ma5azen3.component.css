@@ -123,7 +123,7 @@ main {
 
 .table {
   border-collapse: collapse;
-  border: 1px solid #000;
+  /* border: 1px solid #000; */
   width: 100%;
 }
 
@@ -258,56 +258,7 @@ input.ng-invalid.ng-touched {
 color:var(--secondary-color);
 }
 
-/* --- Dropdown Styling --- */
-.dropdown-cell {
-  position: relative; /* Crucial for absolute positioning of the UL */
-}
-
-.floating-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  z-index: 1000;
-  max-height: 200px;
-  overflow-y: auto;
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-
-.list-group-item {
-  padding: 10px;
-  cursor: pointer;
-  transition: background 0.2s;
-  border-bottom: 1px solid #eee;
-}
-
-.list-group-item:hover {
-  background-color: #f8f9fa;
-}
-
-/* --- The "Other" Button Styling --- */
-.other-option {
-  color: #007bff;
-  background-color: #f0f7ff !important; /* Light blue background */
-  font-weight: bold;
-  border-top: 2px solid #e0eaff;
-  text-align: center;
-  position: sticky; /* Keeps it visible at bottom of scroll */
-  bottom: 0;
-}
-
-.other-option:hover {
-  background-color: #e0eaff !important;
-  color: #0056b3;
-}
-
-/* --- Status Modal Styling --- */
+/* Modal Overlay */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -318,23 +269,24 @@ color:var(--secondary-color);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000;
-  backdrop-filter: blur(4px);
+  z-index: 10000;
+  backdrop-filter: blur(5px);
 }
 
+/* Modal Box */
 .modal-box {
   background: white;
   padding: 30px;
-  border-radius: 15px;
-  width: 90%;
-  max-width: 400px;
+  border-radius: 20px;
   text-align: center;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-  animation: slideDown 0.3s ease-out;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  animation: modalIn 0.3s ease-out;
 }
 
-.modal-box.success { border-top: 5px solid #28a745; }
-.modal-box.error { border-top: 5px solid #dc3545; }
+.modal-box.success { border-top: 8px solid #28a745; }
+.modal-box.error { border-top: 8px solid #dc3545; }
 
 .modal-box .icon {
   font-size: 3rem;
@@ -342,19 +294,38 @@ color:var(--secondary-color);
 }
 
 .confirm-btn {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 30px;
-  border-radius: 5px;
   margin-top: 20px;
-  cursor: pointer;
+  padding: 10px 40px;
+  border: none;
+  border-radius: 8px;
+  background: var(--primary-color);
+  color: white;
   font-weight: bold;
+  transition: 0.3s;
 }
 
-@keyframes slideDown {
-  from { transform: translateY(-20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+.confirm-btn:hover {
+  transform: scale(1.05);
+  filter: brightness(1.2);
+}
+
+.floating-dropdown .list-group-item.fw-bold:hover {
+  background-color: var(--primary-color) !important;
+  color: white !important;
+}
+
+/* Ensure the dropdown stays above other table rows */
+.dropdown-cell {
+  position: relative;
+  z-index: 100;
+}
+.dropdown-cell:focus-within {
+  z-index: 101;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 
@@ -376,4 +347,137 @@ color:var(--secondary-color);
 @keyframes slideInDown {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+
+
+/* --- RESPONSIVE & MOBILE OPTIMIZATIONS --- */
+
+@media (max-width: 1200px) {
+  .content.d-flex.flex-row {
+    flex-direction: column !important;
+    padding: 10px;
+    perspective: none; /* Disable perspective on smaller screens for stability */
+  }
+
+  .sidebar {
+    flex: none;
+    width: 100%;
+    min-height: auto;
+    margin-bottom: 20px;
+    padding: 20px;
+  }
+
+  .sidebar:hover {
+    transform: none; /* Disable 3D tilt on hover for tablets/mobile */
+  }
+
+  .sidebar ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  .sidebar li {
+    flex: 1 1 auto;
+    margin-bottom: 0;
+    padding: 10px 15px;
+    text-align: center;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Disable 3D effects on mobile for better performance and readability */
+  .table-section {
+    padding: 20px 15px !important;
+    transform: none !important;
+    animation: none;
+    max-width: 100%;
+  }
+
+  /* --- STACKED TABLE LOGIC --- */
+  /* This turns the table rows into individual cards on mobile */
+
+  .table-responsive {
+    overflow: visible !important;
+  }
+
+  thead {
+    display: none; /* Hide headers on small screens */
+  }
+
+  tbody tr {
+    display: block;
+    margin-bottom: 20px;
+    border: 2px solid var(--primary-color);
+    border-radius: 12px;
+    background: #fff;
+    padding: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  }
+
+  td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: none !important;
+    padding: 12px 10px !important;
+    text-align: left;
+    border-bottom: 1px solid #eee !important;
+  }
+
+  td:last-child {
+    border-bottom: none !important;
+  }
+
+  /* Add labels via data-label attribute defined in your HTML */
+  td::before {
+    content: attr(data-label);
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-right: 15px;
+    flex-shrink: 0;
+  }
+
+  /* Fix inputs inside the stacked table cells */
+  .form-control {
+    width: 60% !important;
+    height: 38px;
+  }
+
+  /* Floating dropdown needs to stay absolute but occupy more space */
+  .floating-dropdown {
+    width: 200px;
+    right: 10px;
+    left: auto;
+  }
+
+  .add-row-button, .remove-row-button {
+    bottom: -15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar ul {
+    flex-direction: column;
+  }
+
+  .sidebar li {
+    width: 100%;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 12px 20px;
+  }
+}
+
+
+
+@media screen and (max-width: 768px) {
+  .form-control, input, select, textarea {
+    font-size: 16px !important;
+  }
 }

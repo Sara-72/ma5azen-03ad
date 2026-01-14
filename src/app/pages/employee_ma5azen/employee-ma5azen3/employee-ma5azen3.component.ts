@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { HeaderComponent } from '../../../components/header/header.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { CommonModule } from '@angular/common';
-import { catchError, of, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import {
   FormsModule,
   FormBuilder,
@@ -59,8 +59,6 @@ export class EmployeeMa5azen3Component implements OnInit, OnDestroy {
   displayName = '';
   statusMessage: string | null = null;
   statusType: 'success' | 'error' | null = null;
-
-  // Track which rows are in "Free Text" mode
   isManualItemMode: { [key: number]: boolean } = {};
   private subscriptions: Subscription[] = [];
 
@@ -112,12 +110,10 @@ export class EmployeeMa5azen3Component implements OnInit, OnDestroy {
   }
 
   filterAvailableItems(query: string | null, index: number) {
-    // If in manual mode, force list to stay empty (hidden)
     if (this.isManualItemMode[index]) {
       this.filteredItemsRows[index] = [];
       return;
     }
-
     const q = (query || '').trim().toLowerCase();
     const items = this.availableItemsByRow[index] || [];
     this.filteredItemsRows[index] = items.filter(i => i.toLowerCase().includes(q));
@@ -144,24 +140,25 @@ export class EmployeeMa5azen3Component implements OnInit, OnDestroy {
   }
 
   selectOtherItem(index: number): void {
-    // 1. Activate manual mode
     this.isManualItemMode[index] = true;
-
-    // 2. Clear values so the list disappears immediately
     this.filteredItemsRows[index] = [];
-
-    // 3. Reset the input field for new typing
     const row = this.tableData.at(index);
     row.get('item')?.setValue('', { emitEvent: false });
-
-    // 4. Update validity (allows free text now)
     row.get('item')?.updateValueAndValidity();
 
-    // 5. Focus the input box
     setTimeout(() => {
       const inputs = document.querySelectorAll('td[data-label="الصنف"] input');
       (inputs[index] as HTMLInputElement)?.focus();
     }, 10);
+  }
+
+  resetManualMode(index: number): void {
+    this.isManualItemMode[index] = false;
+    const row = this.tableData.at(index);
+    row.get('item')?.setValue('');
+    row.get('item')?.updateValueAndValidity();
+    // Trigger the dropdown to show again
+    this.filterAvailableItems('', index);
   }
 
   @HostListener('document:click', ['$event'])
@@ -207,7 +204,6 @@ export class EmployeeMa5azen3Component implements OnInit, OnDestroy {
   private addCategoryListener(rowGroup: FormGroup, index: number): void {
     rowGroup.get('item')?.setValidators([Validators.required, this.itemExistsValidator(index)]);
     const sub = rowGroup.get('category')?.valueChanges.subscribe(cat => {
-      // Reset manual mode if category changes
       this.isManualItemMode[index] = false;
       this.availableItemsByRow[index] = this.categoryItemMap[cat] || [];
       rowGroup.get('item')?.reset('', { emitEvent: false });
@@ -231,15 +227,13 @@ export class EmployeeMa5azen3Component implements OnInit, OnDestroy {
       this.showStatus('يرجى ملء كافة البيانات المطلوبة ⚠️', 'error');
       return;
     }
-
     this.isSubmitting.set(true);
     const rawRows = this.simpleForm.getRawValue().tableData;
     let completed = 0;
     const total = rawRows.length;
 
     rawRows.forEach((row: any) => {
-        // Logic for calling your Stock/Central/Ledger services goes here
-        // Inside final subscribe:
+        // Your Service Logic Here...
         this.handleComplete(++completed, total);
     });
   }

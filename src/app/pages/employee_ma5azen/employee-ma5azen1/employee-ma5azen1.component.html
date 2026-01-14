@@ -62,38 +62,46 @@
                     class="form-control text-center"
                   />
                 </td>
-                <td data-label="اسم الصنف" class="dropdown-cell">
-  <input
-    type="text"
-    class="form-control text-center"
-    formControlName="itemName"
-    placeholder="ابحث عن صنف..."
-    (click)="$event.stopPropagation()"
-    (input)="filterItems(tableData.at(i).get('itemName')?.value, i)"
-    (focus)="filterItems(tableData.at(i).get('itemName')?.value, i)"
-  />
 
-<ul
-  *ngIf="!isManualMode[i] && filteredItems[i] && filteredItems[i].length > 0"
-  class="floating-dropdown"
->
-    <li
-      class="list-group-item"
-      *ngFor="let item of filteredItems[i]"
-      (mousedown)="selectItem(item, i)"
-    >
-      {{ item }}
-    </li>
+                <td class="dropdown-cell position-relative d-flex align-items-center justify-content-between">
+                  <input
+                    type="text"
+                    formControlName="itemName"
+                    class="form-control"
+                    [placeholder]="
+                      isManualItemMode[i] ? 'اكتب صنفاً جديداً...' : 'ابحث...'
+                    "
+                    (input)="filterItems($any($event.target).value, i)"
+                    (focus)="filterItems($any($event.target).value, i)"
+                  />
 
-    <li
-      class="list-group-item fw-bold border-top"
-      style="color: var(--primary-color); background-color: #f0f7ff;"
-      (mousedown)="selectOther(i)"
-    >
-      أخرى +
-    </li>
-  </ul>
-</td>
+                  <span
+                    *ngIf="isManualItemMode[i]"
+                    class="reset-btn fw-bold me-1"
+                    style="cursor:pointer ;color:red;"
+                    (click)="resetManualMode(i)"
+                    >↩</span>
+
+                  <ul
+                    *ngIf="!isManualItemMode[i] && filteredItems[i]?.length"
+                    class="floating-dropdown"
+                  >
+                    <li
+                      class="list-group-item"
+                      *ngFor="let itm of filteredItems[i]"
+                      (mousedown)="selectItem(itm, i)"
+                    >
+                      {{ itm }}
+                    </li>
+                    <li
+                      class="other-option list-group-item fw-bold border-top"
+                      style="background-color: #f0f7ff; color:var(--primary-color)"
+                      (mousedown)="selectOther(i); $event.preventDefault()"
+                    >
+                     <span class="fw-bold">+</span>أخرى
+                    </li>
+                  </ul>
+                </td>
                 <td data-label="الوحدة" class="dropdown-cell">
                   <input
                     type="text"
