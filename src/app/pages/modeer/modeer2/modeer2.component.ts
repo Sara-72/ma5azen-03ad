@@ -412,7 +412,7 @@ onSubmitForm(form: FormGroup) {
   let hasRowError = false;
 
   tableArray.controls.forEach(control => {
-  const row = control as FormGroup; // 👈 الحل هنا
+  const row = control as FormGroup; 
 
   Object.values(row.controls).forEach(ctrl => {
     ctrl.markAsTouched();
