@@ -39,18 +39,19 @@ interface CategoryItemMap {
 export class Ameen1Component implements OnInit, OnDestroy {
 
   /* ===================== Static Data ===================== */
-  categoryItemMap: CategoryItemMap = {
-    'أثاث مكتبي': ['مكتب مدير', 'كرسي دوار', 'خزانة ملفات'],
-    'قرطاسية': ['أقلام حبر', 'أوراق A4', 'دفاتر ملاحظات'],
-    'إلكترونيات': ['حاسوب محمول', 'طابعة ليزر', 'شاشة عرض'],
-    'أدوات نظافة': ['مطهرات', 'مكانس', 'مناشف ورقية']
-  };
+  categoryItemMap: CategoryItemMap = {};
+categories: string[] = [];
+units: string[] = [];
 
-  units: string[] = ['قطعة', 'متر', 'كيلو جرام', 'علبة', 'لفة', 'كرتونة'];
+availableItemsByRow: string[][] = [];
 
-  categories: string[] = Object.keys(this.categoryItemMap);
+// Manual mode flags
+isManualCategory: { [key: number]: boolean } = {};
+isManualItem: { [key: number]: boolean } = {};
+isManualUnit: { [key: number]: boolean } = {};
+
   itemTypes: string[] = ['مستهلك', 'مستديم'];
-  availableItemsByRow: string[][] = [];
+  //availableItemsByRow: string[][] = [];
 
   /* ===================== State ===================== */
   simpleForm!: FormGroup;
@@ -80,14 +81,173 @@ export class Ameen1Component implements OnInit, OnDestroy {
 
   /* ===================== Lifecycle ===================== */
   ngOnInit(): void {
-    this.userName = localStorage.getItem('name') || '';
-    this.displayName = this.getFirstTwoNames(this.userName);
+  this.userName = localStorage.getItem('name') || '';
+  this.displayName = this.getFirstTwoNames(this.userName);
 
-    const firstRow = this.createTableRowFormGroup();
-    this.tableData.push(firstRow);
-    this.availableItemsByRow.push([]);
-    this.addCategoryListener(firstRow, 0);
+  this.loadLookupsFromStock();
+
+  const firstRow = this.createTableRowFormGroup();
+  this.tableData.push(firstRow);
+  this.availableItemsByRow.push([]);
+  this.addCategoryListener(firstRow, 0);
+}
+private loadLookupsFromStock(): void {
+  this.stockService.getAllStocks().subscribe(stocks => {
+
+    // Categories
+    this.categories = Array.from(
+      new Set(stocks.map(s => s.category))
+    );
+
+    // Units
+    this.units = Array.from(
+      new Set(stocks.map(s => s.unit))
+    );
+
+    // Category -> Items map
+    this.categoryItemMap = {};
+    stocks.forEach(s => {
+  if (!this.categoryItemMap[s.category]) {
+    this.categoryItemMap[s.category] = [];
   }
+  if (!this.categoryItemMap[s.category].includes(s.itemName)) {
+    this.categoryItemMap[s.category].push(s.itemName);
+  }
+});
+
+// أضف "أخرى" لكل فئة
+Object.keys(this.categoryItemMap).forEach(cat => {
+  if (!this.categoryItemMap[cat].includes('أخرى')) {
+    this.categoryItemMap[cat].push('أخرى');
+  }
+});
+
+
+    // Add "Other"
+    this.categories.push('أخرى');
+    this.units.push('أخرى');
+  });
+}
+onCategoryChange(value: string, index: number) {
+  const row = this.tableData.at(index);
+
+  if (value === 'أخرى') {
+    this.isManualCategory[index] = true;
+
+    // 🔥 أوقف validator الفئة
+    row.get('category')?.clearValidators();
+    row.get('category')?.updateValueAndValidity();
+
+    // Reset item logic
+    this.availableItemsByRow[index] = [];
+    this.isManualItem[index] = true;
+    row.get('item')?.clearValidators();
+    row.get('item')?.updateValueAndValidity();
+
+    row.get('category')?.setValue('');
+  } else {
+    this.isManualCategory[index] = false;
+
+    // 🔥 رجّع validator
+    row.get('category')?.setValidators([
+      Validators.required,
+      this.categoryExistsValidator()
+    ]);
+
+    this.availableItemsByRow[index] = [
+      ...(this.categoryItemMap[value] || []),
+      'أخرى'
+    ];
+
+    row.get('category')?.updateValueAndValidity();
+  }
+}
+
+onItemChange(value: string, index: number) {
+  const row = this.tableData.at(index);
+
+  if (value === 'أخرى') {
+    this.isManualItem[index] = true;
+
+    // السماح بإدخال أي صنف جديد
+    row.get('item')?.clearValidators();
+    row.get('item')?.updateValueAndValidity();
+
+    row.get('item')?.setValue('');
+  } else {
+    this.isManualItem[index] = false;
+
+    row.get('item')?.setValidators([
+      Validators.required,
+      this.itemExistsValidator(index) // للتحقق من الصنف ضمن الفئة إذا لم يكن "أخرى"
+    ]);
+    row.get('item')?.updateValueAndValidity();
+  }
+}
+
+
+onUnitChange(value: string, index: number) {
+  const row = this.tableData.at(index);
+
+  if (value === 'أخرى') {
+    this.isManualUnit[index] = true;
+
+    // 🔥 اسمحي بأي وحدة
+    row.get('unit')?.clearValidators();
+    row.get('unit')?.updateValueAndValidity();
+
+    row.get('unit')?.setValue('');
+  } else {
+    this.isManualUnit[index] = false;
+
+    row.get('unit')?.setValidators([Validators.required]);
+    row.get('unit')?.updateValueAndValidity();
+  }
+}
+resetCategory(index: number) {
+  this.isManualCategory[index] = false;
+
+  const row = this.tableData.at(index);
+  row.get('category')?.setValue('');
+
+  // رجّعي validators
+  row.get('category')?.setValidators([
+    Validators.required,
+    this.categoryExistsValidator()
+  ]);
+  row.get('category')?.updateValueAndValidity();
+
+  // Reset item
+  this.isManualItem[index] = false;
+  this.availableItemsByRow[index] = [];
+  row.get('item')?.setValue('');
+}
+
+resetItem(index: number) {
+  this.isManualItem[index] = false;
+
+  const row = this.tableData.at(index);
+  row.get('item')?.setValue('');
+
+  row.get('item')?.setValidators([
+    Validators.required,
+    this.itemExistsValidator(index)
+  ]);
+  row.get('item')?.updateValueAndValidity();
+}
+
+resetUnit(index: number) {
+  this.isManualUnit[index] = false;
+
+  const row = this.tableData.at(index);
+  row.get('unit')?.setValue('');
+
+  row.get('unit')?.setValidators([Validators.required]);
+  row.get('unit')?.updateValueAndValidity();
+}
+
+
+
 
   ngOnDestroy(): void {
     this.subscriptions.forEach(s => s.unsubscribe());
@@ -113,12 +273,9 @@ private mapStoreType(type: string): number {
 
 
 private unitExistsValidator() {
-  return (control: any) => {
-    const value = control.value;
-    if (!value) return null; // Let 'required' handle empty
-    return this.units.includes(value) ? null : { invalidUnit: true };
-  };
+  return () => null; // السماح بأي وحدة
 }
+
 
 
 private createTableRowFormGroup(): FormGroup {

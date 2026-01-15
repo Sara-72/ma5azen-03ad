@@ -1,11 +1,10 @@
 <app-header></app-header>
 
-
 <div class="content d-flex flex-row">
-  <aside class="sidebar">
+   <aside class="sidebar">
     <h5>
       مرحبًا بك
-      <!-- <span *ngIf="displayName">، {{ displayName }}</span> -->
+      <span *ngIf="displayName">، {{ displayName }}</span>
     </h5>
     <ul class="mt-5">
       <li><a href="/ameen1">المخزن</a></li>
@@ -18,66 +17,93 @@
     </ul>
   </aside>
 
-
-
-<div class="big-container m-lg-5 m-2 flex-grow-1">
+  <div class="big-container  m-5 flex-grow-1">
     <div class="form-container" dir="rtl">
-
       <header class="form-header">
         <h2 class="title">كشف جرد المخزن</h2>
         <h3 class="subtitle">مطابقة الرصيد الفعلي والدفتري</h3>
       </header>
 
+      <!-- Filters -->
+      <div class="filter-bar mb-4 d-flex align-items-center gap-3 flex-wrap">
 
-
-      <div class="filter-bar mb-4 d-flex align-items-center gap-3">
-
-
-<div class="d-flex align-items-center gap-2 border-end pe-3">
-    <label class="fw-bold">عرض:</label>
-    <select class="form-select shadow-sm" [(ngModel)]="viewMode" (change)="onViewModeChange()">
-      <option value="live">الحالة الحالية (اليوم)</option>
-      <option value="history">سجلات سابقة (فترة زمنية)</option>
-    </select>
-  </div>
-
-  <div class="d-flex align-items-center gap-2 border-end pe-3" *ngIf="viewMode === 'history'">
-    <label class="fw-bold">من:</label>
-    <input type="date" class="form-control shadow-sm" [(ngModel)]="startDate" (change)="loadHistoryData()">
-
-    <label class="fw-bold ms-2">إلى:</label>
-    <input type="date" class="form-control shadow-sm" [(ngModel)]="endDate" (change)="loadHistoryData()">
-  </div>
-
-        <div class="d-flex align-items-center gap-2 flex-grow-1">
-          <label class="fw-bold">الفئة</label>
-          <select class="form-select w-60 shadow-sm"
-                  [(ngModel)]="selectedCategory"
-                  (change)="applyFilter()">
-            <option value="الكل">جميع الفئات (عرض الكل)</option>
-            <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+        <!-- عرض -->
+        <div class="d-flex align-items-center gap-2 border-end pe-3">
+          <label class="fw-bold">عرض:</label>
+          <select class="form-select shadow-sm" [(ngModel)]="viewMode" (change)="onViewModeChange()">
+            <option value="live">الحالة الحالية (اليوم)</option>
+            <option value="history">سجلات سابقة</option>
           </select>
         </div>
 
-        <div class="stats-badge">
-          <span>إجمالي الأصناف: </span>
-          <span class="count">{{ filteredInventory.length }}</span>
+        <!-- نوع الجرد -->
+        <div class="d-flex align-items-center gap-2 border-end pe-3" *ngIf="viewMode === 'history'">
+          <label class="fw-bold">نوع الجرد:</label>
+          <select class="form-select shadow-sm" [(ngModel)]="auditMode" (change)="onAuditModeChange()">
+            <option value="range">فترة زمنية</option>
+            <option value="single">يوم معين</option>
+          </select>
         </div>
 
+        <!-- فترة زمنية -->
+        <div class="d-flex align-items-center gap-2 border-end pe-3"
+          *ngIf="viewMode === 'history' && auditMode === 'range'">
+          <label class="fw-bold">من:</label>
+          <input type="date" class="form-control shadow-sm" [(ngModel)]="startDate" (change)="onDateChange()" />
+
+          <label class="fw-bold">إلى:</label>
+          <input type="date" class="form-control shadow-sm" [(ngModel)]="endDate" (change)="onDateChange()" />
+          <!-- رسالة الخطأ -->
+          <div *ngIf="endDateError" class="text-danger small mt-1">
+            {{ endDateError }}
+          </div>
+        </div>
+
+        <!-- يوم معين -->
+        <div class="d-flex align-items-center gap-2 border-end pe-3"
+          *ngIf="viewMode === 'history' && auditMode === 'single'">
+          <label class="fw-bold">اليوم:</label>
+          <input type="date" class="form-control shadow-sm" [(ngModel)]="singleDate" (change)="onSingleDateChange()" />
+        </div>
+
+        <!-- الفئة -->
+        <div class="d-flex align-items-center gap-2 flex-grow-1">
+          <label class="fw-bold">الفئة</label>
+          <select class="form-select w-60 shadow-sm" [(ngModel)]="selectedCategory" (change)="applyFilter()"
+            [disabled]="categories.length === 0">
+            <option value="الكل">جميع الفئات</option>
+            <option *ngFor="let cat of categories" [value]="cat">
+              {{ cat }}
+            </option>
+          </select>
+        </div>
+
+        <!-- إحصائية -->
+        <div class="stats-badge">
+          <span>إجمالي الأصناف:</span>
+          <span class="count">{{ filteredInventory.length }}</span>
+        </div>
       </div>
 
+      <!-- Info -->
       <div class="info-section">
         <div class="row">
-         <div class="field mb-2">
-  <label>التاريخ :</label>
-  <span *ngIf="viewMode === 'live'">{{ today | date:'fullDate' }}</span>
-  <span *ngIf="viewMode === 'history' && startDate && endDate">
-    من {{ startDate }} إلى {{ endDate }}
-  </span>
-  <span *ngIf="viewMode === 'history' && (!startDate || !endDate)" class="text-muted">
-    (يرجى تحديد الفترة الزمنية)
-  </span>
-</div>
+          <div class="field mb-2">
+            <label>التاريخ :</label>
+
+            <span *ngIf="viewMode === 'live'">
+              {{ today | date : 'fullDate' }}
+            </span>
+
+            <span *ngIf="viewMode === 'history' && auditMode === 'range' && startDate && endDate">
+              من {{ startDate }} إلى {{ endDate }}
+            </span>
+
+            <span *ngIf="viewMode === 'history' && auditMode === 'single' && singleDate">
+              حتى تاريخ {{ singleDate }}
+            </span>
+          </div>
+
           <div class="field mb-2">
             <label>القائم بالجرد :</label>
             <span>{{ fullName }}</span>
@@ -85,79 +111,67 @@
         </div>
       </div>
 
-      <div class="table-section shadow-sm custom-scrollbar">
+      <div class="d-md-none text-center text-muted mb-2 small">
+  <i class="fas fa-arrows-alt-h"></i> اسحب الجدول يميناً ويساراً لمشاهدة كافة البيانات
+</div>
+
+      <!-- Table -->
+      <div class="table-section custom-scrollbar">
         <table>
           <thead>
             <tr>
               <th>اسم الصنف</th>
+              <th>الوحدة</th>
               <th>الكمية الكلية</th>
-              <th> الكمية المنصرفة</th>
-              <th>الكمية المتبقية (الفعلية)</th>
+              <th *ngIf="viewMode === 'history'">كمية الوارد</th>
+              <th>الكمية المنصرفة</th>
+              <th>الكمية المتبقية</th>
               <th>العجز</th>
               <th>الفئة</th>
               <th>نوع الصنف</th>
             </tr>
           </thead>
-         <tbody>
-  <tr *ngFor="let item of filteredInventory">
-    <td class="fw-bold">{{ item.itemName }}</td>
-    <td>{{ item.totalQuantity }}</td>
-    <td>{{ item.issuedQuantity }}</td>
-    <td>{{ item.remainingQuantity }}</td>
-    <td [ngClass]="{'text-danger fw-bold': getDeficit(item) > 0}">
-      {{ getDeficit(item) }}
-    </td>
-    <td><span class="category-pill">{{ item.category }}</span></td>
 
-    <td>
-      <span [ngClass]="{
-        'badge-permanent': item.itemType === 'مستديم',
-        'badge-consumable': item.itemType === 'مستهلك'
-      }">
-        {{ item.itemType }}
-      </span>
-    </td>
-  </tr>
+          <tbody>
+            <tr *ngFor="let item of filteredInventory" [ngClass]="getRowClass(item)">
 
-  <tr *ngIf="filteredInventory.length === 0">
-    <td colspan="7" class="text-center py-4 text-muted">
-      لا توجد أصناف تندرج تحت هذه الفئة
-    </td>
-  </tr>
-</tbody>
+              <td class="fw-bold">{{ item.itemName }}</td>
+              <td>{{ item.unit }}</td>
+              <td>{{ item.totalQuantity }}</td>
+
+              <td *ngIf="viewMode === 'history'">
+                {{ item.incomingQuantity }}
+              </td>
+
+              <td>{{ item.issuedQuantity }}</td>
+              <td>{{ item.remainingQuantity }}</td>
+
+              <td [ngClass]="{ 'text-danger fw-bold': getDeficit(item) > 0 }">
+                {{ getDeficit(item) }}
+              </td>
+
+              <td>
+                <span class="category-pill">{{ item.category }}</span>
+              </td>
+
+              <td>
+                <span [ngClass]="{
+                    'badge-permanent': item.itemType === 'مستديم',
+                    'badge-consumable': item.itemType === 'مستهلك'
+                  }">
+                  {{ item.itemType }}
+                </span>
+              </td>
+            </tr>
+
+            <tr *ngIf="filteredInventory.length === 0">
+              <td [attr.colspan]="viewMode === 'history' ? 9 : 8" class="text-center py-4 text-muted">
+                لا توجد بيانات
+              </td>
+            </tr>
+          </tbody>
         </table>
-      </div>
-
-      <hr class="my-4">
-
-      <div class="d-flex justify-content-center">
-        <button type="button" class="btn px-5 py-2 fw-bold" (click)="confirmInventoryAudit()">
-           اعتماد وحفظ الجرد
-        </button>
       </div>
     </div>
   </div>
 </div>
-
-<div *ngIf="statusMessage" class="status-overlay">
-  <div class="status-box" [ngClass]="statusType">
-    <div class="mb-3" style="font-size: 4rem;">
-       {{ statusType === 'success' ? '✅' : '❌' }}
-    </div>
-
-    <h3 class="fw-bold mb-3" [style.color]="statusType === 'success' ? '#28a745' : '#dc3545'">
-       {{ statusType === 'success' ? 'تمت العملية' : 'تنبيه' }}
-    </h3>
-
-    <p class="fs-5 text-dark">
-      {{ statusMessage }}
-    </p>
-
-    <button class="close-btn" (click)="closeStatusMessage()">موافق</button>
-  </div>
-
-
-
-
-  </div>
-

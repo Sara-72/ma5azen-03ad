@@ -82,7 +82,6 @@ a {
   box-shadow: 0 0 10px var(--primary-color);
 }
 
-
 /* Inherit Global Page Styles */
 .page-container {
     display: flex;
@@ -355,59 +354,55 @@ input[type="date"] {
     border: 1px solid #bbdefb;
     font-weight: bold;
 }
-
-
-
-/* Custom Scrollbar for the table */
-.custom-scrollbar::-webkit-scrollbar {
-    height: 8px;
+/*  صف فيه عجز */
+.row-deficit {
+    background-color: #ffe6e6 !important;
 }
-.custom-scrollbar::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
-    border-radius: 10px;
+
+/*  أي منصرف (حالة حالية أو سجلات) */
+.row-live-issued,
+.row-history-move {
+    background-color: #e7f1ff;
 }
+
+
 
 
 
 /* --- ENHANCED RESPONSIVE LOGIC --- */
-/* --- ENHANCED RESPONSIVE LOGIC --- */
 
-/* Base container fix */
-.content.d-flex.flex-row {
-    flex-wrap: wrap; /* Allows sidebar to stack on smaller screens */
-}
 
-/* 1. Laptop/Large Tablet */
+
 @media (max-width: 1200px) {
-    .sidebar {
-        flex: 0 0 240px;
-    }
-    .form-container {
-        padding: 30px;
-        margin: 20px;
+    .big-container {
+        margin: 20px !important; /* Reduce the large m-5 margin */
     }
 }
 
-/* 2. Tablets (Switch to Vertical Layout) */
 @media (max-width: 991px) {
+    /* 1. Transform Sidebar to Top Navigation */
     .content.d-flex.flex-row {
         flex-direction: column !important;
         padding: 10px;
+        perspective: none; /* Disable 3D to prevent mobile layout bugs */
     }
 
     .sidebar {
-        flex: none;
+        flex: 0 0 auto;
         width: 100% !important;
         min-height: auto;
-        margin: 0 0 20px 0;
+        margin-bottom: 20px;
         padding: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
     }
+
+    .sidebar h5 { text-align: center; font-size: 1.1rem; }
 
     .sidebar ul {
         display: flex;
         flex-wrap: wrap;
-        gap: 8px;
         justify-content: center;
+        gap: 10px;
         margin-top: 15px !important;
     }
 
@@ -415,7 +410,7 @@ input[type="date"] {
         margin-bottom: 0;
         flex: 1 1 auto;
         text-align: center;
-        padding: 8px 12px;
+        padding: 10px;
         font-size: 0.9rem;
     }
 
@@ -438,51 +433,61 @@ input[type="date"] {
     .filter-bar {
         flex-direction: column;
         align-items: stretch !important;
-        gap: 10px;
-        padding: 15px;
+        gap: 15px !important;
+        padding: 20px;
     }
 
     .filter-bar > div {
-        border-left: none !important; /* Remove the RTL border-end */
+        border-left: none !important; /* RTL support: remove previous border-end */
+        border-bottom: 1px solid #eee;
+        padding-bottom: 12px;
         padding-left: 0 !important;
+        width: 100%;
+    }
+
+    .filter-bar .flex-grow-1 {
         width: 100%;
     }
 
     .stats-badge {
         width: 100%;
-        margin-top: 5px;
+        order: -1; /* Move stats to the top of the filter list */
     }
 
-    /* Force Table Scroll */
-    .table-section {
-        display: block;
-        width: 100%;
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    table {
-        min-width: 850px; /* Ensures columns don't squash */
-    }
-
-    .status-box {
-        min-width: 90% !important;
-        padding: 25px;
+    /* 3. Form Container tweaks */
+    .form-container {
+        padding: 20px !important;
+        margin: 0 auto;
+        transform: none !important; /* Disable 3D tilt on touch devices */
+        max-width: 100%;
     }
 }
 
-/* 4. Small Mobile Refinements */
-@media (max-width: 480px) {
-    .title { font-size: 1.3rem; }
-    .subtitle { font-size: 0.9rem; }
+/* 4. Table Responsiveness Strategy */
+.table-section {
+    overflow-x: auto; /* Enable horizontal swipe */
+    -webkit-overflow-scrolling: touch;
+    border-radius: 8px;
+    box-shadow: inset -10px 0 10px -10px rgba(0,0,0,0.05);
+}
 
-    .form-container {
-        padding: 15px;
+@media (max-width: 576px) {
+    .form-header .title { font-size: 1.3rem; }
+    .form-header .subtitle { font-size: 0.9rem; }
+
+    .info-section .row {
+        flex-direction: column;
+        gap: 5px;
     }
 
-    .field label, .field span {
-        display: block;
-        width: 100%;
+    .status-box {
+        min-width: 90%;
+        padding: 20px;
+    }
+
+    input[type="date"], .form-select {
+        width: 100% !important;
+        max-width: none !important;
     }
 }
 
