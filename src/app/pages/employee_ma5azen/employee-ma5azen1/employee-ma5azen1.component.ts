@@ -211,13 +211,15 @@ export class EmployeeMa5azen1Component implements OnInit {
 
     additionsPayload.forEach((row: any) => {
       const payload = {
-        itemName: row.itemName,
-        unit: row.unit,
-        quantity: row.quantity,
-        unitPrice: row.unitPrice,
-        totalValue: row.quantity * row.unitPrice,
-        itemStatus: row.itemCondition
-      };
+  additionCode: row.additionNumber.toString(), // 👈 هنا الربط
+  itemName: row.itemName,
+  unit: row.unit,
+  quantity: row.quantity,
+  unitPrice: row.unitPrice,
+  totalValue: row.quantity * row.unitPrice,
+  itemStatus: row.itemCondition
+};
+
 
       this.additionsService.addAddition(payload).subscribe({
         next: () => {

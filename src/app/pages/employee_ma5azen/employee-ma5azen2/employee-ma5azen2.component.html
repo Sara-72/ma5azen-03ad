@@ -16,6 +16,17 @@
   </aside>
 
   <main class="content">
+   <div class="search-container mb-3">
+  <input
+    type="text"
+    placeholder="ابحث برقم الإضافة..."
+    [(ngModel)]="searchCode"
+    (ngModelChange)="applyFilter()"
+    class="form-control search-input"
+  />
+</div>
+
+
     <div class="table-container">
       <div class="table-responsive custom-scrollbar">
         <table class="custom-3d-table" dir="rtl">
@@ -32,15 +43,17 @@
           </thead>
           <tbody>
             <!-- عرض البيانات الديناميكية -->
-            <tr *ngFor="let addition of additions">
-              <td>{{ addition.id }}</td>
-              <td>{{ addition.itemName }}</td>
-              <td>{{ addition.unit }}</td>
-              <td>{{ addition.quantity }}</td>
-              <td>{{ addition.unitPrice }}</td>
-              <td>{{ addition.totalValue }}</td>
-              <td>{{ addition.itemStatus }}</td>
-            </tr>
+          <tr *ngFor="let addition of filteredAdditions">
+  <td>{{ addition.additionCode }}</td>
+  <td>{{ addition.itemName }}</td>
+  <td>{{ addition.unit }}</td>
+  <td>{{ addition.quantity }}</td>
+  <td>{{ addition.unitPrice }}</td>
+  <td>{{ addition.totalValue }}</td>
+  <td>{{ addition.itemStatus }}</td>
+</tr>
+
+
 
             <!-- حالة لو مفيش بيانات -->
             <tr *ngIf="additions.length === 0">
