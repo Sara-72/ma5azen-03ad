@@ -156,28 +156,24 @@ checkStockAvailability(note: any, stockMap: Map<string, number>, stocks: any[]):
 }
 
 
-
 async changeStatus(note: any, decision: 'مقبول' | 'مرفوض'): Promise<void> {
 
-  // نخزن القرار
   note.decision = decision;
   note.showReasonError = false;
 
   try {
-    // 🔹 نحمّل المخزون ونعمل فحص في الحالتين
-    const stocks = await this.loadStoreKeeperStocks();
-    const stockMap = this.groupStoreStocks(stocks);
-
-    const hasStockError = this.checkStockAvailability(note, stockMap, stocks);
 
     // =================================
-    // 🔴 حالة الرفض
+    // 🔴 حالة الرفض (نخلي الفحص موجود)
     // =================================
     if (decision === 'مرفوض') {
 
+      const stocks = await this.loadStoreKeeperStocks();
+      const stockMap = this.groupStoreStocks(stocks);
+      const hasStockError = this.checkStockAvailability(note, stockMap, stocks);
+
       note.showButtons = false;
 
-      // ✅ سبب الرفض تلقائي
       if (hasStockError && note.autoRejectionReason) {
         note.rejectionReason = note.autoRejectionReason;
       } else {
@@ -189,19 +185,10 @@ async changeStatus(note: any, decision: 'مقبول' | 'مرفوض'): Promise<vo
     }
 
     // =================================
-    // 🟢 حالة القبول
+    // 🟢 حالة القبول (بدون أي شرط)
     // =================================
     if (decision === 'مقبول') {
 
-      // ❌ لو فيه مشاكل مخزون → نمنع القبول
-      if (hasStockError) {
-        note.showButtons = true;   // يفضل في نفس المرحلة
-        note.currentStatus = '';
-        note.decision = null;
-        return;
-      }
-
-      // ✅ لو كله تمام
       note.showButtons = false;
       note.rejectionReason = '';
       note.currentStatus = 'هل تريد قبول الطلب ؟';
@@ -209,11 +196,11 @@ async changeStatus(note: any, decision: 'مقبول' | 'مرفوض'): Promise<vo
     }
 
   } catch (err) {
-    // ❌ خطأ تقني
     note.showButtons = true;
     note.currentStatus = '';
   }
 }
+
 
 async confirmNote(note: any): Promise<void> {
 

@@ -46,8 +46,8 @@
 </div>
 
     <!--  لو فيه أذونات -->
-    <form *ngFor="let form of consumableForms; let fIndex = index" [formGroup]="form" (ngSubmit)="onSubmitForm(form)"
-      class="form-container mb-5" dir="rtl">
+    <form *ngFor="let form of consumableForms; let fIndex = index" [formGroup]="form"
+      (ngSubmit)="onSubmitForm(form, fIndex)" [attr.data-index]="fIndex" class="form-container mb-5" dir="rtl">
 
       <header class="form-header text-center">
         <h2 class="title">طلب و إذن صرف</h2>
@@ -180,7 +180,11 @@
       </div>
 
       <div class="signature-section">
-        <div class="sig-item">توقيع الطالب</div>
+        <div class="sig-item">
+          توقيع الطالب
+          <input type="text" [value]="form.get('requestorName')?.value" class="signature-input" readonly />
+        </div>
+
 
         <div class="sig-item approval-box">
           <span>يصرح بالصرف مدير المخازن</span>
