@@ -144,8 +144,6 @@ export class EmployeeMa5azen3Component implements OnInit, OnDestroy {
     this.filteredItemsRows[index] = [];
     const row = this.tableData.at(index);
     row.get('item')?.setValue('', { emitEvent: false });
-    row.get('item')?.updateValueAndValidity();
-
     setTimeout(() => {
       const inputs = document.querySelectorAll('td[data-label="الصنف"] input');
       (inputs[index] as HTMLInputElement)?.focus();
