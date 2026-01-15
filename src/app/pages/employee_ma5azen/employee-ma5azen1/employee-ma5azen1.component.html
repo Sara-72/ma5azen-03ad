@@ -51,9 +51,10 @@
 
             <tbody formArrayName="tableData">
               <tr
-                *ngFor="let rowGroup of tableData.controls; let i = index"
-                [formGroupName]="i"
-              >
+  *ngFor="let rowGroup of tableData.controls; let i = index"
+  [formGroupName]="i"
+>
+
                 <td data-label="رقم الإضافة">
                   <input
                     type="number"
@@ -64,16 +65,18 @@
                 </td>
 
                 <td class="dropdown-cell position-relative d-flex align-items-center justify-content-between">
-                  <input
-                    type="text"
-                    formControlName="itemName"
-                    class="form-control"
-                    [placeholder]="
-                      isManualItemMode[i] ? 'اكتب صنفاً جديداً...' : 'ابحث...'
-                    "
-                    (input)="filterItems($any($event.target).value, i)"
-                    (focus)="filterItems($any($event.target).value, i)"
-                  />
+                 <input
+  #itemInput
+  type="text"
+  formControlName="itemName"
+  class="form-control"
+  [placeholder]="
+    isManualItemMode[i] ? 'اكتب صنفاً جديداً...' : 'ابحث...'
+  "
+  (input)="filterItems(itemInput.value, i)"
+  (focus)="filterItems(itemInput.value, i)"
+/>
+
 
                   <span
                     *ngIf="isManualItemMode[i]"
@@ -104,14 +107,18 @@
                 </td>
                 <td data-label="الوحدة" class="dropdown-cell">
                   <input
-                    type="text"
-                    class="form-control text-center"
-                    formControlName="unit"
-                    placeholder="اختر الوحدة"
-                    (click)="$event.stopPropagation()"
-                    (focus)="filterUnits('', i)"
-                    (input)="filterUnits(tableData.at(i).get('unit')?.value, i)"
-                  />
+  #unitInput
+  type="text"
+  class="form-control text-center"
+  formControlName="unit"
+  placeholder="اختر الوحدة"
+  (click)="$event.stopPropagation()"
+  (focus)="filterUnits(unitInput.value, i)"
+  (input)="filterUnits(unitInput.value, i)"
+/>
+
+
+
                   <ul
                     *ngIf="filteredUnits[i]?.length"
                     class="floating-dropdown"
@@ -154,20 +161,17 @@
                 </td>
 
                 <td data-label="حالة الصنف" class="dropdown-cell">
-                  <input
-                    type="text"
-                    class="form-control text-center"
-                    formControlName="itemCondition"
-                    placeholder="الحالة"
-                    (click)="$event.stopPropagation()"
-                    (focus)="filterConditions('', i)"
-                    (input)="
-                      filterConditions(
-                        tableData.at(i).get('itemCondition')?.value,
-                        i
-                      )
-                    "
-                  />
+                 <input
+  #conditionInput
+  type="text"
+  class="form-control text-center"
+  formControlName="itemCondition"
+  placeholder="الحالة"
+  (click)="$event.stopPropagation()"
+  (focus)="filterConditions(conditionInput.value, i)"
+  (input)="filterConditions(conditionInput.value, i)"
+/>
+
                   <ul
                     *ngIf="filteredConditions[i]?.length"
                     class="floating-dropdown"

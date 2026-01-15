@@ -251,3 +251,44 @@ tbody tr:nth-child(3) { animation-delay: 0.3s; }
     text-align: center;
   }
 }
+.search-container {
+  display: flex;
+  justify-content: center; /* يضع البحث في المنتصف أفقياً */
+  margin-bottom: 18px;
+  perspective: 100px; /* Depth effect */
+}
+
+.search-input {
+  width: 200px;
+  max-width: 80%;
+  padding: 10px 15px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  transition: all 0.4s ease;
+  background: #fff;
+  color: #000; /* يجعل النص واضح دائمًا */
+  box-shadow: 20px 20px 60px #d9d9d9, -5px -5px 20px #ffffff, inset 0 0 0 1px rgba(0,0,0,0.05);
+  
+  display: flex;
+  align-items: center;  /* منتصف عمودي */
+  justify-content: center; /* منتصف أفقي */
+  height: 40px; /* ارتفاع مناسب للمستطيل */
+  background-clip: padding-box; /* يمنع الظل من التأثير على النص */
+}
+
+/* Hover effect */
+.search-input:hover {
+  transform: translateZ(3px); /* رفع بسيط */
+  box-shadow: 30px 30px 70px rgba(0,0,0,0.15), -5px -5px 25px #ffffff, inset 0 0 0 1px rgba(0,0,0,0.05);
+}
+
+/* Focus effect */
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 15px rgba(0,123,255,0.3), 30px 30px 70px rgba(0,0,0,0.15), -5px -5px 25px #ffffff;
+  transform: translateZ(3px);
+}
+
+
