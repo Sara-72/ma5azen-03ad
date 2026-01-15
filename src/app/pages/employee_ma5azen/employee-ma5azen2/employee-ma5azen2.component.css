@@ -183,6 +183,69 @@ tbody tr:nth-child(3) { animation-delay: 0.3s; }
 
 
 
+/* --- ENHANCED 3D SEARCH BAR --- */
+.search-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+  perspective: 1000px; /* Enhanced depth */
+}
+
+.search-input {
+  width: 100%; /* Slightly wider for better presence */
+  max-width: 100%;
+  padding: 12px 40px !important;
+  border-radius: 15px; /* Matches sidebar corners */
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  font-size: 16px;
+  direction: rtl; /* Proper Arabic alignment */
+  background: #ffffff;
+  color: #333;
+
+  /* 3D Neumorphic Shadows */
+  box-shadow:
+    10px 10px 20px #d9d9d9,
+    -5px -5px 15px #ffffff,
+    inset 0 0 0 1px rgba(0,0,0,0.02);
+
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  outline: none;
+}
+
+/* Hover: The bar "rises" toward the user */
+.search-input:hover {
+  transform: translateY(-3px) translateZ(10px);
+  box-shadow:
+    15px 15px 30px #cecece,
+    -8px -8px 20px #ffffff;
+}
+
+/* Focus: The bar "glows" and stabilizes */
+.search-input:focus {
+  width: 400px; /* Subtle expansion effect */
+  border-color: var(--primary-color);
+  background: #fdfdfd;
+
+  /* Combined Outer Lift and Primary Color Glow */
+  box-shadow:
+    0 0 15px rgba(0, 123, 255, 0.15),
+    10px 10px 20px #d9d9d9,
+    -5px -5px 15px #ffffff;
+
+
+}
+
+/* Placeholder Styling */
+.search-input::placeholder {
+  color: #aaa;
+  font-style: italic;
+  font-size: 0.9rem;
+  transition: opacity 0.3s;
+}
+
+.search-input:focus::placeholder {
+  opacity: 0.5;
+}
 
 /* Custom Scrollbar for the table */
 .custom-scrollbar::-webkit-scrollbar {
@@ -193,6 +256,31 @@ tbody tr:nth-child(3) { animation-delay: 0.3s; }
     border-radius: 10px;
 }
 
+
+.search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding:0 20px;
+  width:100%;
+}
+
+.search-icon {
+  position: absolute;
+
+  color: var(--primary-color);
+  pointer-events: none;
+  z-index: 5;
+  margin: 0 7px;
+
+  transition: all 0.3s;
+}
+
+/* Hide icon or change its color when typing */
+.search-input:focus + .search-icon {
+  color: var(--secondary-color);
+
+}
 
 
 /* --- RESPONSIVE LOGIC (Added) --- */
@@ -269,7 +357,7 @@ tbody tr:nth-child(3) { animation-delay: 0.3s; }
   background: #fff;
   color: #000; /* يجعل النص واضح دائمًا */
   box-shadow: 20px 20px 60px #d9d9d9, -5px -5px 20px #ffffff, inset 0 0 0 1px rgba(0,0,0,0.05);
-  
+
   display: flex;
   align-items: center;  /* منتصف عمودي */
   justify-content: center; /* منتصف أفقي */
