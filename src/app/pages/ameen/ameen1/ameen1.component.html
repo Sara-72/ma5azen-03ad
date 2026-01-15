@@ -62,41 +62,71 @@
                 <th>التاريخ</th>
               </tr>
             </thead>
+
             <tbody formArrayName="tableData">
               @for (rowGroup of tableData.controls; track $index) {
               <tr [formGroupName]="$index">
+
+                <!-- ===== CATEGORY ===== -->
                 <td>
                   <input
+                    *ngIf="!isManualCategory[$index]"
                     type="text"
                     formControlName="category"
                     class="form-control"
                     list="categoryOptions"
                     placeholder="ابحث عن فئة..."
+                    (change)="onCategoryChange($any($event.target).value, $index)"
+
                   />
+
+                  <input
+                    *ngIf="isManualCategory[$index]"
+                    type="text"
+                    formControlName="category"
+                    class="form-control"
+                    placeholder="اكتب فئة جديدة"
+                  />
+
                   <datalist id="categoryOptions">
                     @for (category of categories; track category) {
                     <option [value]="category"></option>
                     }
                   </datalist>
+
                   @if (rowGroup.get('category')?.errors?.['invalidCategory'] &&
                   rowGroup.get('category')?.touched) {
                   <div class="text-danger small mt-1">هذه الفئة غير موجودة</div>
                   }
                 </td>
 
+                <!-- ===== ITEM ===== -->
                 <td>
                   <input
+                    *ngIf="!isManualItem[$index]"
                     type="text"
                     formControlName="item"
                     class="form-control"
                     [attr.list]="'itemOptions' + $index"
                     placeholder="ابحث عن صنف..."
+                    (change)="onItemChange($any($event.target).value, $index)"
+
                   />
+
+                  <input
+                    *ngIf="isManualItem[$index]"
+                    type="text"
+                    formControlName="item"
+                    class="form-control"
+                    placeholder="اكتب صنف جديد"
+                  />
+
                   <datalist [id]="'itemOptions' + $index">
                     @for (item of availableItemsByRow[$index]; track item) {
                     <option [value]="item"></option>
                     }
                   </datalist>
+
                   @if (rowGroup.get('item')?.errors?.['invalidItem'] &&
                   rowGroup.get('item')?.touched) {
                   <div class="text-danger small mt-1">
@@ -104,23 +134,38 @@
                   </div>
                   }
                 </td>
+
+                <!-- ===== ITEM TYPE ===== -->
                 <td>
                   <select formControlName="itemType" class="form-control">
-                    <option value="" disabled selected hidden>اختر نوع</option>
+                    <option value="" disabled hidden>اختر نوع</option>
                     @for (type of itemTypes; track type) {
                     <option [value]="type">{{ type }}</option>
                     }
                   </select>
                 </td>
+
+                <!-- ===== UNIT ===== -->
                 <td>
                   <input
+                    *ngIf="!isManualUnit[$index]"
                     type="text"
                     formControlName="unit"
                     class="form-control"
                     list="unitOptions"
                     placeholder="الوحدة..."
-                    [ngClass]="{'is-invalid': rowGroup.get('unit')?.errors?.['invalidUnit'] && rowGroup.get('unit')?.touched}"
+                    (change)="onUnitChange($any($event.target).value, $index)"
+
                   />
+
+                  <input
+                    *ngIf="isManualUnit[$index]"
+                    type="text"
+                    formControlName="unit"
+                    class="form-control"
+                    placeholder="اكتب وحدة جديدة"
+                  />
+
                   <datalist id="unitOptions">
                     @for (u of units; track u) {
                     <option [value]="u"></option>
@@ -132,6 +177,8 @@
                   <div class="text-danger small mt-1">هذه الوحدة غير مسجلة</div>
                   }
                 </td>
+
+                <!-- ===== COUNT ===== -->
                 <td>
                   <input
                     type="number"
@@ -140,6 +187,7 @@
                   />
                 </td>
 
+                <!-- ===== DATE ===== -->
                 <td>
                   <input
                     type="date"
@@ -154,9 +202,7 @@
         </div>
       </div>
 
-      <button type="button" class="remove-row-button" (click)="removeRow()">
-        -
-      </button>
+      <button type="button" class="remove-row-button" (click)="removeRow()">-</button>
       <button type="button" class="add-row-button" (click)="addRow()">+</button>
     </div>
 
