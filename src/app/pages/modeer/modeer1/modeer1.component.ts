@@ -64,15 +64,19 @@ export class Modeer1Component implements OnInit {
         }
       });
 
-      // 🔹 نحول الـ object لـ array
+      //  نحول الـ object لـ array
       this.getStoreKeeperStocks = Object.values(groupedMap);
+      // يرتب الاصناف المشتركة في الفئة ورا بعض
+      this.getStoreKeeperStocks.sort((a, b) =>
+  a.category.localeCompare(b.category, 'ar')
+);
 
-      // 🔹 استخراج الفئات بدون تكرار
+      //  استخراج الفئات بدون تكرار
       this.categories = Array.from(
         new Set(this.getStoreKeeperStocks.map(i => i.category))
       );
 
-      // 🔹 عرض كل الأصناف مبدئيًا
+      //  عرض كل الأصناف مبدئيًا
       this.filteredStocks = [...this.getStoreKeeperStocks];
 
       console.log('STORE KEEPER STOCKS GROUPED:', this.getStoreKeeperStocks);
