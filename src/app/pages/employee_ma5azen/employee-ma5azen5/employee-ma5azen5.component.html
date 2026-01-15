@@ -3,24 +3,41 @@
 <div class="content d-flex flex-row">
   <aside class="sidebar">
     <h5>
-  مرحبًا بك
+      مرحبًا بك
       <span *ngIf="displayName">، {{ displayName }}</span>
     </h5>
+
     <ul class="mt-5">
       <li><a href="/employee_ma5azen1">دفتر المالية</a></li>
       <li><a href="/employee_ma5azen2">كاتب الشطب</a></li>
       <li><a href="/employee_ma5azen3">المخزن</a></li>
       <li><a href="/employee_ma5azen4">مخزن الأمين</a></li>
-      <li class="active"><a> مخزنك </a></li>
+      <li class="active"><a>عرض مخزنك</a></li>
     </ul>
   </aside>
 
-  <main class="flex-grow-1">
-    <div class="table-container-3d text-center" dir="rtl">
-      <h2>عرض المخزن الخاص بك</h2>
+  <main class="content">
+    <div class="table-container">
 
-      <div class="table-responsive custom-scrollbar">
-        <table class="custom-table text-center">
+      <!-- 🔹 Filter Section -->
+      <div class="filter-section mb-4">
+        <h2 class="mb-4 fw-bold text-center" style="color: var(--primary-color)">
+          عرض مخزنك
+        </h2>
+
+        <label for="categorySelect" class="form-label">اختر الفئة:</label>
+        <select id="categorySelect" class="form-select custom-select" [(ngModel)]="selectedCategory"
+          (change)="filterByCategory()">
+          <option value="">الكل</option>
+          <option *ngFor="let cat of categories" [value]="cat">
+            {{ cat }}
+          </option>
+        </select>
+      </div>
+
+      <!-- 🔹 Stocks Table -->
+      <div class="table-responsive-rtl custom-scrollbar">
+        <table class="custom-3d-table text-center" dir="rtl">
           <thead>
             <tr>
               <th>الفئة</th>
@@ -28,30 +45,30 @@
               <th>حالة الصنف</th>
               <th>الوحدة</th>
               <th>العدد</th>
-              <th>التاريخ</th>
             </tr>
           </thead>
+
           <tbody>
-            <tr>
-              <td>أجهزة تقنية</td>
-              <td>شاشة 24 بوصة</td>
-              <td>مستديم</td>
-              <td>عدد</td>
-              <td>2</td>
-              <td>3/2/2026</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+            <tr *ngFor="let item of filteredStocks">
+              <td>{{ item.category }}</td>
+              <td>{{ item.itemName }}</td>
+              <td>{{ item.itemStatus }}</td>
+              <td>{{ item.unit }}</td>
+              <td>{{ item.quantity }}</td>
             </tr>
 
+            <tr *ngIf="filteredStocks.length === 0">
+              <td colspan="5" class="no-data">لا توجد بيانات</td>
+            </tr>
           </tbody>
         </table>
       </div>
+
+      <p class="text-muted d-md-none text-center mt-3 small">
+        <i class="fas fa-arrows-alt-h me-1"></i>
+        اسحب الجدول لليسار أو اليمين لمشاهدة كافة البيانات
+      </p>
+
     </div>
   </main>
 </div>
